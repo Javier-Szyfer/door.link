@@ -1,65 +1,95 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import { useState } from "react";
 
-export default function Home() {
+//Material UI
+import Container from "@material-ui/core/Container";
+import Paper from "@material-ui/core/Paper";
+import { makeStyles } from "@material-ui/core/styles";
+
+//Components
+import Playlist from "../components/playlist";
+import Player from "../components/player";
+import Header from "../components/header";
+
+const useStyles = makeStyles((theme) => ({
+  container: {
+    height: "100%",
+    backgroundColor: "transparent",
+    position: "relative",
+
+    [theme.breakpoints.down("md")]: {
+      width: "100vw",
+      height: "100%",
+      padding: "0px",
+    },
+  },
+  paper: {
+    backgroundColor: "transparent",
+    position: "relative",
+
+    borderRadius: 0,
+    height: "100%",
+  },
+}));
+
+export default function Home({ playlists, darkTheme, dark }) {
+  const tracks = playlists.map((track) => {
+    return {
+      id: track.id,
+      title: track.Title,
+      url: track.audio.url,
+      duration: track.duration,
+      number: track.number,
+      description: track.Description,
+      image: track.artwork.url,
+    };
+  });
+  const [selectedTrack, setSelectedTrack] = useState(null);
+  const classes = useStyles();
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Paper elevation={0} className={classes.paper}>
+      <Container maxWidth="lg" className={classes.container}>
+        <Header
+          darkTheme={darkTheme}
+          dark={dark}
+          selectedTrack={selectedTrack}
+        />
+        {selectedTrack && dark && (
+          <Player
+            selectedTrack={selectedTrack}
+            setSelectedTrack={setSelectedTrack}
+            dark={dark}
+          />
+        )}
+        {selectedTrack && !dark && (
+          <Player
+            selectedTrack={selectedTrack}
+            setSelectedTrack={setSelectedTrack}
+            dark={dark}
+          />
+        )}
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+        {tracks.map((track) => (
+          <Playlist
+            track={track}
+            key={track.id}
+            setSelectedTrack={setSelectedTrack}
+          />
+        ))}
+      </Container>
+    </Paper>
+  );
+}
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+export async function getStaticProps() {
+  const { API_URL } = process.env;
+  const res = await fetch(`${API_URL}/playlists?_sort=date:DESC`);
+  const data = await res.json();
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+  return {
+    props: {
+      playlists: data,
+    },
+    revalidate: 100,
+  };
 }
