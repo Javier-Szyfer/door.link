@@ -83,7 +83,7 @@ export default function Player({ selectedTrack, setSelectedTrack, dark }) {
       <iframe
         type="audio/mp3"
         src="/silence.mp3"
-        allow="autoplay"
+        autoPlay
         style={{ display: "none" }}
       ></iframe>
       <Plyr

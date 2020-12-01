@@ -73,7 +73,14 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
   return (
     <Box className={classes.boxWrapper}>
       <Box className={classes.header}>
-        <Typography variant="body2" style={{ fontWeight: "bolder" }}>
+        <Typography
+          variant="body2"
+          style={{
+            fontWeight: "bolder",
+            paddingTop: "3px",
+            paddingBottom: "3px",
+          }}
+        >
           [ door ]
         </Typography>
         {!selectedTrack && (
