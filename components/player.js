@@ -80,6 +80,12 @@ export default function Player({ selectedTrack, setSelectedTrack, dark }) {
           onClick={() => setSelectedTrack(false)}
         />
       </Box>
+      <iframe
+        type="audio/mp3"
+        src="/silence.mp3"
+        allow="autoplay"
+        style={{ display: "none" }}
+      ></iframe>
       <Plyr
         source={audioSrc}
         autoPlay
