@@ -6,7 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles((theme) => ({
   boxWrapper: {
     display: "flex",
     padding: "0 16px",
@@ -17,7 +17,11 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
     justifyContent: "space-between",
     marginTop: "3rem",
+    [theme.breakpoints.down("sm")]: {
+      marginTop: "1.5rem",
+    },
   },
+
   leftContainer: {
     width: "60%",
     // margin: "3rem 0",
@@ -28,10 +32,16 @@ const useStyles = makeStyles(() => ({
   box: {
     marginTop: "3rem",
     display: "flex",
+    [theme.breakpoints.down("sm")]: {
+      marginTop: "1.5rem",
+    },
   },
   boxLast: {
     margin: "3rem 0",
     display: "flex",
+    [theme.breakpoints.down("sm")]: {
+      margin: "1.5rem 0",
+    },
   },
 
   light: {
