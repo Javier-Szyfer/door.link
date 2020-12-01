@@ -24,7 +24,6 @@ const useStyles = makeStyles((theme) => ({
 
   leftContainer: {
     width: "60%",
-    // margin: "3rem 0",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-evenly",

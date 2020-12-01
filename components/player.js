@@ -13,13 +13,12 @@ import "plyr-react/dist/plyr.css";
 const useStyles = makeStyles((theme) => ({
   player: {
     width: "50%",
-    height: "84.5px",
+    height: "88px",
     position: "fixed",
     zIndex: " 9999",
     bottom: "1rem",
     left: "50%",
     transform: "translateX(-50%)",
-    backgroundColor: "transparent",
     border: "1px solid #ccc",
     [theme.breakpoints.down("md")]: {
       bottom: "0",
@@ -57,7 +56,12 @@ export default function Player({ selectedTrack, setSelectedTrack, dark }) {
   };
 
   return (
-    <Box className={classes.player}>
+    <Box
+      className={classes.player}
+      style={{
+        backgroundColor: dark ? "rgb(20,20,20" : "rgba(255, 255, 255, 0.95)",
+      }}
+    >
       <Box
         className={classes.top}
         style={{
@@ -80,12 +84,6 @@ export default function Player({ selectedTrack, setSelectedTrack, dark }) {
           onClick={() => setSelectedTrack(false)}
         />
       </Box>
-      <iframe
-        type="audio/mp3"
-        src="/silence.mp3"
-        autoPlay
-        style={{ display: "none" }}
-      ></iframe>
       <Plyr
         source={audioSrc}
         autoPlay
