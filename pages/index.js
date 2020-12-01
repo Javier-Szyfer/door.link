@@ -83,7 +83,7 @@ export default function Home({ playlists, darkTheme, dark }) {
 
 export async function getStaticProps() {
   const { API_URL } = process.env;
-  const res = await fetch(`${API_URL}/playlists?_sort=date:DESC`);
+  const res = await fetch(`${API_URL}/playlists?_sort=id:DESC`);
   const data = await res.json();
 
   return {
