@@ -79,9 +79,9 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
         {!selectedTrack && (
           <img
             src={dark ? "/logowhite.svg" : "/logoblack.svg"}
-            style={{ cursor: "pointer" }}
-            width="11px"
-            height="16.9px"
+            style={{ cursor: "pointer", padding: "3px" }}
+            width="16px"
+            height="24.55px"
             alt="door.link logo"
             onClick={darkTheme}
           />
