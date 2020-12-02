@@ -103,6 +103,9 @@ const useStyles = makeStyles((theme) => ({
     "&:hover": {
       color: theme.palette.primary.main,
     },
+    [theme.breakpoints.down("sm")]: {
+      margin: "1.5rem 0 0.5rem 0",
+    },
   },
 }));
 
@@ -148,8 +151,8 @@ export default function Playlist({ track, setSelectedTrack }) {
                   src={track.image}
                   alt="avatar"
                   layout="responsive"
-                  width={400}
-                  height={400}
+                  width={200}
+                  height={200}
                 />
               </Box>
             </Grid>
@@ -178,14 +181,7 @@ export default function Playlist({ track, setSelectedTrack }) {
         }}
       >
         <Fade in={open}>
-          <img
-            className={classes.insideModal}
-            src={track.image}
-            alt="avatar"
-            // layout="fixed"
-            // width={400}
-            // height={400}
-          />
+          <img className={classes.insideModal} src={track.image} alt="avatar" />
         </Fade>
       </Modal>
     </>
