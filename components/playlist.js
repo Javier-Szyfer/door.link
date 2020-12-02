@@ -117,14 +117,15 @@ export default function Playlist({ track, setSelectedTrack }) {
   const handleClose = () => {
     setOpen(false);
   };
+
   return (
     <>
       <Accordion square>
         <AccordionSummary
           color="primary"
           expandIcon={<FiChevronDown className={classes.arrowDown} />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
+          aria-controls={"panel1a-content" + " " + track.title}
+          id={"panel1a-header" + " " + track.title}
         >
           <Grid container>
             <Grid item md={2} sm={12} xs={12}>
