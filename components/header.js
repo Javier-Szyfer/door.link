@@ -97,9 +97,8 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
         {info ? (
           <Box className={classes.box}>
             <Typography variant="h6">
-              Alternative of listening and dancing in small and safe spaces:
-              safe of 2.0, aesthetics, ideology, news, no-required information,
-              movements, ads and disease.
+              A curated selection for listening and dancing in small, safe
+              spaces.
               <Typography
                 onClick={handleInfo}
                 display="inline"
@@ -114,25 +113,24 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
         ) : (
           <Box className={classes.box}>
             <Typography variant="h6">
-              At the end of the 90s, we ripped records that we found in physical
-              stores and "took them to the internet". <br />
+              At the end of the 90s, we ripped albums that we found in physical
+              stores and <i> took them to the internet.</i> <br />
               It was during this era that we built a content channel with a
-              noble purpose, that of listening. The directories in Soulseek were
-              cities, and the feeling was this: emigrating to a new land. By
-              then, connecting to the internet required a desktop computer, good
-              local provider, modem and time. <br />
-              <br /> Life was constituted concretely and cybernetically - a
-              division that no longer exists - and finding material was a
-              product of research, without automatic playlists or advertising,
-              so the user was, at a minimum, selective. With the free internet
-              on the streets and the arrival of the smartphone, the latest
-              generations are easy recipients of non-required information. All
-              this, before touching a wire or having a thoughtful moment. Is
-              information discrimination a threat to modern society? <br />{" "}
+              noble purpose, that of listening. Soulseek's directories were
+              cities, and the feeling: <i> emigrate to a new land.</i> By then,
+              connecting to the Internet required a desktop computer, a good
+              local provider, modem, and time. <br /> <br /> Life was concretely
+              and cybernetically constituted, a division that no longer exists,
+              and finding material was the product of research - without
+              automatic playlists or advertising - so the user was, at the very
+              least, selective. With free internet on the streets and the advent
+              of the smartphone, the latest generations are now easy recipients
+              of unrequested information. All this, before touching a cable or
+              having a thoughtful moment.
               <br />
-              DOOR is an alternative of listening and dancing in small and safe
-              spaces: safe of 2.0, aesthetics, ideology, news, no-required
-              information, movements, ads and disease.
+              <br />
+              Door is a curated selection for listening and dancing in small,
+              safe spaces.
               <Typography
                 onClick={handleInfo}
                 style={{ marginLeft: "10px", cursor: "pointer" }}
