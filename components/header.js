@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   leftContainer: {
-    width: "65%",
+    width: "80%",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-evenly",
@@ -132,8 +132,18 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               unrequested information. all this, before touching a wire or
               having a thoughtful moment. <br />
               <br />
-              door is a curated selection for listening and dancing in small,
-              safe spaces.
+              door is a curated selection - by
+              <Link
+                href="https://www.hi-malta.com"
+                rel="noopener"
+                target="_blank"
+              >
+                <Typography variant="body2" color="primary" display="inline">
+                  {" "}
+                  romo{" "}
+                </Typography>
+              </Link>
+              - for listening and dancing in small, safe spaces.
               <Typography
                 onClick={handleInfo}
                 style={{
@@ -164,6 +174,20 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               Patreon
             </Typography>
           </Link>
+          <Link
+            href="https://github.com/Javier-Szyfer/door.link"
+            rel="noopener"
+            target="_blank"
+          >
+            <Typography
+              variant="body2"
+              style={{ marginRight: "10px" }}
+              color="primary"
+            >
+              Github
+            </Typography>
+          </Link>
+
           <Link href="mailto:contact@door.link">
             <Typography
               variant="body2"
