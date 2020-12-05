@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
   },
 
   leftContainer: {
-    width: "60%",
+    width: "65%",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-evenly",
@@ -102,7 +102,11 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               <Typography
                 onClick={handleInfo}
                 display="inline"
-                style={{ marginLeft: "10px", cursor: "pointer" }}
+                style={{
+                  marginLeft: "10px",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
                 color="primary"
                 variant="body2"
               >
@@ -113,27 +117,30 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
         ) : (
           <Box className={classes.box}>
             <Typography variant="h6">
-              At the end of the 90s, we ripped albums that we found in physical
-              stores and <i> took them to the internet.</i> <br />
-              It was during this era that we built a content channel with a
-              noble purpose, that of listening. Soulseek's directories were
-              cities, and the feeling: <i> emigrate to a new land.</i> By then,
-              connecting to the Internet required a desktop computer, a good
-              local provider, modem, and time. <br /> <br /> Life was concretely
-              and cybernetically constituted, a division that no longer exists,
-              and finding material was the product of research - without
-              automatic playlists or advertising - so the user was, at the very
-              least, selective. With free internet on the streets and the advent
-              of the smartphone, the latest generations are now easy recipients
-              of unrequested information. All this, before touching a cable or
-              having a thoughtful moment.
+              at the end of the 90s, we ripped albums that we found in physical
+              stores and <i> took them to the internet.</i> it was during this
+              era that we built a content channel with a noble purpose, that of
+              listening. soulseek's directories were cities and “emigrate to a
+              new land” was a common feeling. by then, connecting to the
+              Internet required a desktop computer, a good local provider,
+              modem, and time. <br /> <br /> life was concretely and
+              cybernetically constituted,a division that no longer exists and
+              -without automatic playlists or advertising- finding material was
+              the product of research so the user was, at the very least,
+              selective. with free internet on the streets and the advent of the
+              smartphone, the latest generations are now easy recipients of
+              unrequested information. all this, before touching a wire or
+              having a thoughtful moment. <br />
               <br />
-              <br />
-              Door is a curated selection for listening and dancing in small,
+              door is a curated selection for listening and dancing in small,
               safe spaces.
               <Typography
                 onClick={handleInfo}
-                style={{ marginLeft: "10px", cursor: "pointer" }}
+                style={{
+                  marginLeft: "10px",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
                 color="primary"
                 variant="body2"
                 display="inline"
@@ -144,7 +151,11 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
           </Box>
         )}
         <Box className={classes.boxLast}>
-          <Link href="https://nextjs.org/">
+          <Link
+            href="https://www.patreon.com/doordotlink"
+            rel="noopener"
+            target="_blank"
+          >
             <Typography
               variant="body2"
               style={{ marginRight: "10px" }}
@@ -153,7 +164,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               Patreon
             </Typography>
           </Link>
-          <Link href="https://nextjs.org/">
+          <Link href="mailto:contact@door.link">
             <Typography
               variant="body2"
               style={{ marginRight: "10px" }}
