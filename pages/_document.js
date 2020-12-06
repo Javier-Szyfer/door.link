@@ -7,6 +7,21 @@ export default class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+          <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-7E2SWW6YEG"
+          />
+
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-7E2SWW6YEG');
+        `,
+            }}
+          />
           <link rel="shortcut icon" href="/favicon.svg" />
           {/* <meta name="theme-color" content={theme.palette.primary.main} /> */}
         </Head>

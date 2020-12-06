@@ -132,7 +132,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               unrequested information. all this, before touching a wire or
               having a thoughtful moment. <br />
               <br />
-              door is a curated selection - by
+              curated by
               <Link
                 href="https://www.hi-malta.com"
                 rel="noopener"
@@ -143,7 +143,8 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
                   romo{" "}
                 </Typography>
               </Link>
-              - for listening and dancing in small, safe spaces.
+              , door is a selection for listening and dancing in small, safe
+              spaces.
               <Typography
                 onClick={handleInfo}
                 style={{

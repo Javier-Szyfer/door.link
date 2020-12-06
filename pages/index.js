@@ -90,6 +90,6 @@ export async function getStaticProps() {
     props: {
       playlists: data,
     },
-    revalidate: 100,
+    revalidate: 1,
   };
 }
