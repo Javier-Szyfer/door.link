@@ -146,13 +146,13 @@ export default function Playlist({ track, setSelectedTrack }) {
           <Grid container>
             <Grid item md={2} sm={12} xs={12}>
               <Box className={classes.imageCont} onClick={handleOpen}>
-                <Image
+                <img
                   className={classes.image}
                   src={track.image}
                   alt="avatar"
                   layout="responsive"
-                  width={200}
-                  height={200}
+                  width="100px"
+                  height="100px"
                 />
               </Box>
             </Grid>
