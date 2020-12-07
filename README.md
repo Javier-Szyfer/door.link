@@ -6,3 +6,6 @@ Deployed on [Vercel Platform](https://vercel.com/import?utm_medium=default-templ
 
 Strapi as the headless cms deployed on Heroku.
 
+https://door.link
+
+Enjoy :)
