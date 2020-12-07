@@ -23,8 +23,29 @@ export default class MyDocument extends Document {
             }}
           />
           <link rel="shortcut icon" href="/favicon.svg" />
-          <link rel="stylesheet" href="/images/apple-touch-icon-180x180.png" />
-          <link rel="stylesheet" href="/images/apple-touch-icon-152x152.png" />
+          <link
+            rel="apple-touch-icon"
+            href="/images/apple-touch-icon-180x180.png"
+          />
+          <link
+            rel="apple-touch-icon"
+            href="/images/apple-touch-icon-152x152.png"
+          />
+          <meta
+            name="twitter:card"
+            content="summary_large_image"
+            key="twcard"
+          />
+          <meta
+            property="og:image"
+            content="https://res.cloudinary.com/aldi/image/upload/v1607370937/ogcard_bmltnc.jpg"
+            key="ogimage"
+          />
+          <meta
+            property="og:image:alt"
+            content="this is the logo of door.link, used as an open graph"
+          />
+
           {/* <meta name="theme-color" content={theme.palette.primary.main} /> */}
         </Head>
         <body>

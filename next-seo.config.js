@@ -7,14 +7,5 @@ export default {
     locale: "en_IE",
     url: "https://www.door.link",
     site_name: "door.link",
-    images: [
-      {
-        width: "1200",
-        height: "630",
-        url:
-          "https://radio-strapi-bucket.s3-sa-east-1.amazonaws.com/ogcard.jpg",
-        alt: "Open graph logo image",
-      },
-    ],
   },
 };
