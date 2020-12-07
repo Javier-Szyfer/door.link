@@ -11,7 +11,8 @@ export default {
       {
         width: "1200",
         height: "630",
-        url: "https://kapwi.ng/c/9W3vQjNk",
+        url:
+          "https://radio-strapi-bucket.s3-sa-east-1.amazonaws.com/ogcard.jpg",
         alt: "Open graph logo image",
       },
     ],
