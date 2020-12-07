@@ -117,13 +117,13 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
         ) : (
           <Box className={classes.box}>
             <Typography variant="h6">
-              at the end of the 90s, we ripped albums that we found in physical
+              At the end of the 90s, we ripped albums that we found in physical
               stores and <i> took them to the internet.</i> it was during this
               era that we built a content channel with a noble purpose, that of
               listening. soulseek's directories were cities and “emigrate to a
               new land” was a common feeling. by then, connecting to the
               Internet required a desktop computer, a good local provider,
-              modem, and time. <br /> <br /> life was concretely and
+              modem, and time. <br /> <br /> Life was concretely and
               cybernetically constituted,a division that no longer exists and
               -without automatic playlists or advertising- finding material was
               the product of research so the user was, at the very least,
@@ -132,7 +132,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               unrequested information. all this, before touching a wire or
               having a thoughtful moment. <br />
               <br />
-              curated by
+              Curated by
               <Link
                 href="https://www.hi-malta.com"
                 rel="noopener"
@@ -140,11 +140,11 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               >
                 <Typography variant="body2" color="primary" display="inline">
                   {" "}
-                  romo{" "}
+                  romo
                 </Typography>
               </Link>
-              , door is a selection for listening and dancing in small, safe
-              spaces.
+              , door is a music selection for listening and dancing in small,
+              safe spaces.
               <Typography
                 onClick={handleInfo}
                 style={{
@@ -172,7 +172,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               style={{ marginRight: "10px" }}
               color="primary"
             >
-              Patreon
+              Support
             </Typography>
           </Link>
           <Link

@@ -23,6 +23,14 @@ export default class MyDocument extends Document {
             }}
           />
           <link rel="shortcut icon" href="/favicon.svg" />
+          <link
+            rel="stylesheet"
+            href="https://radio-strapi-bucket.s3-sa-east-1.amazonaws.com/apple-touch-icon-180x180.png"
+          />
+          <link
+            rel="stylesheet"
+            href="https://radio-strapi-bucket.s3-sa-east-1.amazonaws.com/apple-touch-icon-152x152.png"
+          />
           {/* <meta name="theme-color" content={theme.palette.primary.main} /> */}
         </Head>
         <body>
