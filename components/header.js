@@ -118,18 +118,18 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
           <Box className={classes.box}>
             <Typography variant="h6">
               At the end of the 90s, we ripped albums that we found in physical
-              stores and <i> took them to the internet.</i> it was during this
+              stores and <i> took them to the internet.</i> It was during this
               era that we built a content channel with a noble purpose, that of
-              listening. soulseek's directories were cities and “emigrate to a
-              new land” was a common feeling. by then, connecting to the
+              listening. Soulseek's directories were cities and “emigrate to a
+              new land” was a common feeling. By then, connecting to the
               Internet required a desktop computer, a good local provider,
               modem, and time. <br /> <br /> Life was concretely and
               cybernetically constituted,a division that no longer exists and
               -without automatic playlists or advertising- finding material was
               the product of research so the user was, at the very least,
-              selective. with free internet on the streets and the advent of the
+              selective. With free internet on the streets and the advent of the
               smartphone, the latest generations are now easy recipients of
-              unrequested information. all this, before touching a wire or
+              unrequested information. All this, before touching a wire or
               having a thoughtful moment. <br />
               <br />
               Curated by

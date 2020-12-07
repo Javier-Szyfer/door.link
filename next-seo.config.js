@@ -6,5 +6,6 @@ export default {
     locale: "en_IE",
     url: "https://www.door.link",
     site_name: "door.link",
+    image: "https://kapwi.ng/c/9W3vQjNk",
   },
 };
