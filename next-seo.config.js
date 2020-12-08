@@ -1,6 +1,7 @@
 export default {
   title: "door.link",
-  description: "Weekly mixtapes from Buenos Aires to the world",
+  description:
+    "A curated selection of music for listening and dancing in small, safe spaces.",
   canonical: "https://www.door.link",
   openGraph: {
     type: "website",
