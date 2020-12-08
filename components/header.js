@@ -121,7 +121,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               stores and <i> took them to the internet.</i> It was during this
               era that we built a content channel with a noble purpose, that of
               listening. Soulseek's directories were cities and “emigrate to a
-              new land” was a common feeling. By then, connecting to the
+              new land” was a common feeling. Back then, connecting to the
               Internet required a desktop computer, a good local provider,
               modem, and time. <br /> <br /> Life was concretely and
               cybernetically constituted,a division that no longer exists and
