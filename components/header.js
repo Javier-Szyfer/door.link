@@ -97,8 +97,8 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
         {info ? (
           <Box className={classes.box}>
             <Typography variant="h6">
-              A curated selection for listening and dancing in small, safe
-              spaces.
+              A curated selection of music for listening and dancing in small,
+              safe spaces.
               <Typography
                 onClick={handleInfo}
                 display="inline"
