@@ -6,6 +6,9 @@ import Typography from "@material-ui/core/Typography";
 import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 
+//Components
+import Subscribers from "./subscribers";
+
 const useStyles = makeStyles((theme) => ({
   boxWrapper: {
     display: "flex",
@@ -36,11 +39,20 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   boxLast: {
-    margin: "3rem 0",
+    margin: "2rem 0 3rem 0",
     display: "flex",
     [theme.breakpoints.down("sm")]: {
       margin: "1.5rem 0",
     },
+  },
+  form: {
+    display: "flex",
+    justifyContent: "flexStart",
+    alignItems: "center",
+    margin: "1rem 0",
+  },
+  input: {
+    margin: "0 1rem",
   },
 
   light: {
@@ -66,9 +78,11 @@ const useStyles = makeStyles((theme) => ({
 export default function Header({ darkTheme, dark, selectedTrack }) {
   const classes = useStyles();
   const [info, setInfo] = useState(true);
+  const [showForm, setShowForm] = useState(false);
   const handleInfo = () => {
     setInfo(!info);
   };
+
   return (
     <Box className={classes.boxWrapper}>
       <Box className={classes.header}>
@@ -162,6 +176,15 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
           </Box>
         )}
         <Box className={classes.boxLast}>
+          <Typography
+            variant="body2"
+            style={{ marginRight: "10px", cursor: "pointer" }}
+            color="primary"
+            onClick={() => setShowForm(true)}
+          >
+            Subscribe
+          </Typography>
+          {/* 
           <Link
             href="https://www.patreon.com/doordotlink"
             rel="noopener"
@@ -174,7 +197,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
             >
               Support
             </Typography>
-          </Link>
+          </Link> */}
           <Link
             href="https://github.com/Javier-Szyfer/door.link"
             rel="noopener"
@@ -200,6 +223,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
           </Link>
         </Box>
       </Box>
+      {showForm && <Subscribers setShowForm={setShowForm} />}
     </Box>
   );
 }

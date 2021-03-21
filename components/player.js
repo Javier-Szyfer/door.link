@@ -59,7 +59,7 @@ export default function Player({ selectedTrack, setSelectedTrack, dark }) {
     <Box
       className={classes.player}
       style={{
-        backgroundColor: dark ? "rgb(20,20,20" : "rgba(255, 255, 255, 0.95)",
+        backgroundColor: dark ? "rgb(20,20,20)" : "rgba(255, 255, 255, 0.95)",
       }}
     >
       <Box
