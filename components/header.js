@@ -184,7 +184,20 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
           >
             Subscribe
           </Typography>
-          {/* 
+          <Link
+            href="/rss.xml"
+            rel="noopener"
+            target="_blank"
+          >
+            <Typography
+              variant="body2"
+              style={{ marginRight: "10px" }}
+              color="primary"
+            >
+              RSS
+            </Typography>
+          </Link>
+          {/*
           <Link
             href="https://www.patreon.com/doordotlink"
             rel="noopener"
