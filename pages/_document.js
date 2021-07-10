@@ -45,6 +45,11 @@ export default class MyDocument extends Document {
             property="og:image:alt"
             content="this is the logo of door.link, used as an open graph"
           />
+          <link
+            rel="alternate" type="application/rss+xml"
+            title="Subscribe to the RSS feed."
+            href="https://door.link/rss.xml"
+          />
 
           {/* <meta name="theme-color" content={theme.palette.primary.main} /> */}
         </Head>

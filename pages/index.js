@@ -10,6 +10,9 @@ import Playlist from "../components/playlist";
 import Player from "../components/player";
 import Header from "../components/header";
 
+//Playlist object
+import { getPlaylist } from "./api/playlist";
+
 const useStyles = makeStyles((theme) => ({
   container: {
     height: "100%",
@@ -83,15 +86,7 @@ export default function Home({ playlists, darkTheme, dark }) {
 }
 
 export async function getStaticProps() {
-  const { API_URL } = process.env;
-  const res = await fetch(`${API_URL}/playlists?_sort=created_at:desc`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const data = await res.json();
-  console.log("res", res);
+  const data = await getPlaylist();
   return {
     props: {
       playlists: data,
