@@ -3,7 +3,7 @@ import { Box, Typography } from "@material-ui/core";
 
 export default function TxList({ txs }) {
   //Add a test network or the mainnet
-  const network = "https://rinkeby.etherscan.io/tx/";
+  const network = "https://etherscan.io/tx/";
   if (txs.length === 0) return null;
 
   return (
