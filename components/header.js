@@ -8,6 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 //Components
 import Subscribers from "./subscribers";
+import SendETH from "./sendETH";
 
 const useStyles = makeStyles((theme) => ({
   boxWrapper: {
@@ -79,6 +80,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
   const classes = useStyles();
   const [info, setInfo] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [support, setSupport] = useState(false);
   const handleInfo = () => {
     setInfo(!info);
   };
@@ -131,7 +133,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
         ) : (
           <Box className={classes.box}>
             <Typography variant="h6">
-              Ot the end of the 90s, we ripped albums that we found in physical
+              At the end of the 90s, we ripped albums that we found in physical
               stores and <i> took them to the internet.</i> It was during this
               era that we built a content channel with a noble purpose, that of
               listening. Soulseek's directories were cities and “emigrate to a
@@ -193,20 +195,6 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               RSS
             </Typography>
           </Link>
-          {/*
-          <Link
-            href="https://www.patreon.com/doordotlink"
-            rel="noopener"
-            target="_blank"
-          >
-            <Typography
-              variant="body2"
-              style={{ marginRight: "10px" }}
-              color="primary"
-            >
-              Support
-            </Typography>
-          </Link> */}
           <Link
             href="https://github.com/Javier-Szyfer/door.link"
             rel="noopener"
@@ -230,9 +218,18 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               Contact
             </Typography>
           </Link>
+          <Typography
+            variant="body2"
+            style={{ cursor: "pointer" }}
+            color="primary"
+            onClick={() => setSupport(true)}
+          >
+            Support
+          </Typography>
         </Box>
       </Box>
-      {showForm && <Subscribers setShowForm={setShowForm} />}
+      {showForm && <Subscribers setShowForm={setShowForm} dark={dark} />}
+      {support && <SendETH setSupport={setSupport} dark={dark} />}
     </Box>
   );
 }
