@@ -131,7 +131,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
         ) : (
           <Box className={classes.box}>
             <Typography variant="h6">
-              At the end of the 90s, we ripped albums that we found in physical
+              Ot the end of the 90s, we ripped albums that we found in physical
               stores and <i> took them to the internet.</i> It was during this
               era that we built a content channel with a noble purpose, that of
               listening. Soulseek's directories were cities and “emigrate to a
@@ -184,11 +184,7 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
           >
             Subscribe
           </Typography>
-          <Link
-            href="/rss.xml"
-            rel="noopener"
-            target="_blank"
-          >
+          <Link href="/rss.xml" rel="noopener" target="_blank">
             <Typography
               variant="body2"
               style={{ marginRight: "10px" }}
