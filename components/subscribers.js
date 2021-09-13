@@ -1,8 +1,10 @@
 import { useState } from "react";
 
+import { AiOutlineClose } from "react-icons/ai";
+
 import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
-import { Button, Paper } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
 import Typography from "@material-ui/core/Typography";
 import LinearProgress from "@material-ui/core/LinearProgress";
@@ -18,8 +20,14 @@ const useStyles = makeStyles((theme) => ({
     zIndex: "99",
     top: "0",
     left: "0",
-    backgroundColor: "rgba(255, 255, 255, 0.98)",
   },
+  close: {
+    position: "fixed",
+    top: "2rem",
+    right: "2rem",
+    cursor: "pointer",
+  },
+
   form: {
     display: "flex",
     flexDirection: "column",
@@ -28,17 +36,32 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   input: {
-    margin: "1rem 0",
+    margin: "1rem 0 0 0",
+    borderColor: "red",
   },
+  cssFocused: { color: "white", borderRadius: "0" },
+
+  cssOutlinedInput: {
+    "&$cssFocused $notchedOutline": {
+      borderColor: "green",
+    },
+    color: theme.palette.primary.main,
+    borderRadius: "0",
+  },
+  notchedOutline: {
+    borderWidth: "1px",
+    borderColor: "blue !important",
+  },
+
   btnsWrapper: {
     display: "flex",
     width: "100%",
     margin: "1rem 0",
-    justifyContent: "center",
+    justifyContent: "space-between",
   },
 }));
 
-export default function Subscribers({ setShowForm }) {
+export default function Subscribers({ setShowForm, dark }) {
   const classes = useStyles();
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
@@ -47,7 +70,6 @@ export default function Subscribers({ setShowForm }) {
 
   const subscribeToNewsletter = async (e) => {
     e.preventDefault();
-    console.log("subscribing");
 
     if (email === "") {
       setError("Enter your email to subscribe");
@@ -66,7 +88,6 @@ export default function Subscribers({ setShowForm }) {
         }),
       });
       const data = await res.json();
-      console.log(data);
       setSuccess(true);
       setEmail("");
       setLoading(false);
@@ -76,10 +97,17 @@ export default function Subscribers({ setShowForm }) {
   };
 
   return (
-    <Box className={classes.boxWrapper}>
+    <Box
+      className={classes.boxWrapper}
+      style={{ backgroundColor: dark ? "#121212" : "white" }}
+    >
+      <Box onClick={() => setShowForm(false)} className={classes.close}>
+        <AiOutlineClose style={{ color: "blue", fontSize: "30px" }} />
+      </Box>
+
       <form onSubmit={subscribeToNewsletter}>
         <Box className={classes.form}>
-          <Typography variant="body2" style={{ color: "rgb(20,20,20)" }}>
+          <Typography variant="body2">
             Sign up for updates — no spam, just music.
           </Typography>
 
@@ -88,12 +116,19 @@ export default function Subscribers({ setShowForm }) {
             type="email"
             size="small"
             value={email}
-            placeholder="email"
+            placeholder="Email"
             onChange={(e) => {
               setEmail(e.target.value), setSuccess(false), setError(false);
             }}
             className={classes.input}
             autoComplete="true"
+            InputProps={{
+              classes: {
+                root: classes.cssOutlinedInput,
+                focused: classes.cssFocused,
+                notchedOutline: classes.notchedOutline,
+              },
+            }}
           />
 
           <Box className={classes.btnsWrapper}>
@@ -103,16 +138,27 @@ export default function Subscribers({ setShowForm }) {
               disableRipple
               disableElevation={true}
               onClick={() => setShowForm(false)}
-              style={{ width: "40%", padding: "0 1 rem" }}
+              style={{
+                width: "40%",
+                padding: "0 1 rem",
+                borderRadius: "0",
+                textTransform: "none",
+                backgroundColor: "#f2f2f2",
+              }}
             >
               Back
             </Button>
             <Button
-              variant="contained"
               type="submit"
               disableRipple
               disableElevation={true}
-              style={{ width: "40%" }}
+              style={{
+                width: "40%",
+                borderRadius: "0",
+                textTransform: "none",
+                backgroundColor: "blue",
+                color: "white",
+              }}
             >
               Join
             </Button>

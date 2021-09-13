@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Home({ playlists, darkTheme, dark }) {
-  console.log(playlists);
   const tracks = playlists.map((track) => {
     return {
       id: track.id,
