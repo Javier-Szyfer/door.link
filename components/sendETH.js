@@ -154,7 +154,8 @@ const SendETH = ({ dark, setSupport }) => {
   const fetcher = (...args) => fetch(...args).then((res) => res.json());
   const { data } = useSWR(
     "https://api.coingecko.com/api/v3/coins/ethereum",
-    fetcher
+    fetcher,
+    { revalidate: 60 }
   );
 
   const classes = useStyles();
@@ -271,7 +272,13 @@ const SendETH = ({ dark, setSupport }) => {
             </Box>
             {error && (
               <Typography
-                style={{ color: "red", textAlign: "center", marginTop: "1rem" }}
+                style={{
+                  color: "red",
+                  textAlign: "center",
+                  marginTop: "1rem",
+                  maxWidth: "350px",
+                }}
+                noWrap
               >
                 {error}
               </Typography>
