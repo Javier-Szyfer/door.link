@@ -114,6 +114,7 @@ Plyr.defaultProps = {
       "mute",
       "volume",
       "settings",
+      "download",
     ],
     // debug: "true",
     listeners: "true",
