@@ -1,138 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import { TrackContext } from "../context/trackContext";
 
-//Material UI
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
-import Link from "@material-ui/core/Link";
-import { makeStyles } from "@material-ui/core/styles";
+import Link from "next/link";
+import Image from "next/image";
+
+import { useTheme } from "next-themes";
 
 //Components
 import Subscribers from "./subscribers";
 import SendETH from "./sendETH";
 
-const useStyles = makeStyles((theme) => ({
-  boxWrapper: {
-    display: "flex",
-    padding: "0 16px",
-    flexDirection: "column",
-  },
-  header: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: "3rem",
-    [theme.breakpoints.down("sm")]: {
-      marginTop: "1.5rem",
-    },
-  },
+export default function Header() {
+  const { selectedTrack } = useContext(TrackContext);
 
-  leftContainer: {
-    width: "80%",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-evenly",
-  },
-  box: {
-    marginTop: "3rem",
-    display: "flex",
-    [theme.breakpoints.down("sm")]: {
-      marginTop: "1.5rem",
-    },
-  },
-  boxLast: {
-    margin: "2rem 0 3rem 0",
-    display: "flex",
-    [theme.breakpoints.down("sm")]: {
-      margin: "1.5rem 0",
-    },
-  },
-  form: {
-    display: "flex",
-    justifyContent: "flexStart",
-    alignItems: "center",
-    margin: "1rem 0",
-  },
-  input: {
-    margin: "0 1rem",
-  },
-
-  light: {
-    width: "14px",
-    height: "14px",
-    borderRadius: "14px",
-    border: "1px solid #ffffff",
-    backgroundColor: "transparent",
-    cursor: "pointer",
-  },
-
-  dark: {
-    width: "14px",
-    height: "14px",
-    borderRadius: "14px",
-    border: "1px solid #333333",
-
-    backgroundColor: "transparent",
-    cursor: "pointer",
-  },
-}));
-
-export default function Header({ darkTheme, dark, selectedTrack }) {
-  const classes = useStyles();
-  const [info, setInfo] = useState(true);
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [fullDescription, setFullDescription] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [support, setSupport] = useState(false);
   const handleInfo = () => {
-    setInfo(!info);
+    setFullDescription(!fullDescription);
   };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <Box className={classes.boxWrapper}>
-      <Box className={classes.header}>
-        <Typography
-          variant="body2"
-          style={{
-            fontWeight: "bolder",
-            paddingTop: "3px",
-            paddingBottom: "3px",
-          }}
-        >
-          [ door ]
-        </Typography>
+    <div className="flex flex-col px-4 text-sm text-[rgb(68,68,68)] dark:text-[#f1f1f1]">
+      <div className="flex justify-between pt-6 lg:pt-12  ">
+        <h1 className="font-semibold">[ door ]</h1>
         {!selectedTrack && (
-          <img
-            src={dark ? "/logowhite.svg" : "/logoblack.svg"}
-            style={{ cursor: "pointer", padding: "3px" }}
-            width="16px"
-            height="24.55px"
-            alt="door.link logo"
-            onClick={darkTheme}
+          <Image
+            src={theme === "dark" ? "/logowhite.svg" : "/logoblack.svg"}
+            className="cursor-pointer p-[3px]"
+            width="10px"
+            height="18.55px"
+            alt="door.link-logo"
+            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
           />
         )}
-      </Box>
-      <Box className={classes.leftContainer}>
-        {info ? (
-          <Box className={classes.box}>
-            <Typography variant="h6">
+      </div>
+      <div className="max-w-[18rem] sm:max-w-[60rem]">
+        {!fullDescription ? (
+          <div className="flex mt-7  lg:mt-12">
+            <p>
               A curated selection of music for listening and dancing in small,
               safe spaces.
-              <Typography
+              <span
                 onClick={handleInfo}
-                display="inline"
-                style={{
-                  marginLeft: "10px",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-                color="primary"
-                variant="body2"
+                className="text-[#1500FF] dark:text-[#84858C] whitespace-nowrap ml-2 cursor-pointer"
               >
                 [ more ]
-              </Typography>
-            </Typography>
-          </Box>
+              </span>
+            </p>
+          </div>
         ) : (
-          <Box className={classes.box}>
-            <Typography variant="h6">
+          <div className="mt-7 lg:mt-12">
+            <p>
               At the end of the 90s, we ripped albums that we found in physical
               stores and <i> took them to the internet.</i> It was during this
               era that we built a content channel with a noble purpose, that of
@@ -149,87 +73,52 @@ export default function Header({ darkTheme, dark, selectedTrack }) {
               having a thoughtful moment. <br />
               <br />
               Curated by
-              <Link
-                href="https://www.hi-malta.com"
-                rel="noopener"
-                target="_blank"
-              >
-                <Typography variant="body2" color="primary" display="inline">
-                  {" "}
-                  romo
-                </Typography>
+              <Link href="https://www.hi-malta.com" passHref>
+                <a target="_blank" rel="noopener noreferrer">
+                  <span className="text-[#1500FF] dark:text-[#84858C] hover:underline cursor-pointer">
+                    {" "}
+                    romo
+                  </span>
+                </a>
               </Link>
               , door is a music selection for listening and dancing in small,
               safe spaces.
-              <Typography
+              <span
                 onClick={handleInfo}
-                style={{
-                  marginLeft: "10px",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-                color="primary"
-                variant="body2"
-                display="inline"
+                className="text-[#1500FF] dark:text-[#84858C] whitespace-nowrap ml-2 cursor-pointer"
               >
                 [ less ]
-              </Typography>
-            </Typography>
-          </Box>
+              </span>
+            </p>
+          </div>
         )}
-        <Box className={classes.boxLast}>
-          <Typography
-            variant="body2"
-            style={{ marginRight: "10px", cursor: "pointer" }}
-            color="primary"
-            onClick={() => setShowForm(true)}
-          >
+        <div className="py-6 lg:py-9 flex space-x-3 text-[#1500FF] dark:text-[#84858C]">
+          <h2 onClick={() => setShowForm(true)} className="cursor-pointer">
             Subscribe
-          </Typography>
-          <Link href="/rss.xml" rel="noopener" target="_blank">
-            <Typography
-              variant="body2"
-              style={{ marginRight: "10px" }}
-              color="primary"
-            >
-              RSS
-            </Typography>
+          </h2>
+          <Link href="/rss.xml">
+            <a target="_blank" rel="noopener noreferrer">
+              <h2>RSS</h2>
+            </a>
           </Link>
-          <Link
-            href="https://github.com/Javier-Szyfer/door.link"
-            rel="noopener"
-            target="_blank"
-          >
-            <Typography
-              variant="body2"
-              style={{ marginRight: "10px" }}
-              color="primary"
-            >
-              Github
-            </Typography>
+          <Link href="https://github.com/Javier-Szyfer/door.link">
+            <a target="_blank" rel="noopener noreferrer">
+              <h2>Github</h2>
+            </a>
           </Link>
 
           <Link href="mailto:contact@door.link">
-            <Typography
-              variant="body2"
-              style={{ marginRight: "10px" }}
-              color="primary"
-            >
-              Contact
-            </Typography>
+            <a target="_blank" rel="noopener noreferrer">
+              <h2>Contact</h2>
+            </a>
           </Link>
-          <Typography
-            variant="body2"
-            style={{ cursor: "pointer" }}
-            color="primary"
-            onClick={() => setSupport(true)}
-          >
+          <h6 className="cursor-pointer" onClick={() => setSupport(true)}>
             Support
-          </Typography>
-        </Box>
-      </Box>
-      {showForm && <Subscribers setShowForm={setShowForm} dark={dark} />}
-      {support && <SendETH setSupport={setSupport} dark={dark} />}
-    </Box>
+          </h6>
+        </div>
+      </div>
+      {showForm && <Subscribers setShowForm={setShowForm} />}
+      {support && <SendETH setSupport={setSupport} />}
+    </div>
   );
 }

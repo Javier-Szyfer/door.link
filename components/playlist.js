@@ -1,189 +1,141 @@
-import { useState } from "react";
-
-//Components
+import { Fragment, useState, useContext } from "react";
+import { TrackContext } from "../context/trackContext";
 import Image from "next/image";
+
+import { Dialog, Transition, Disclosure } from "@headlessui/react";
 
 //ICONS
 import { FiPlay } from "react-icons/fi";
-import { FiChevronDown } from "react-icons/fi";
+import { FiChevronUp } from "react-icons/fi";
 
-//MATERIAL UI
-import { withStyles } from "@material-ui/core/styles";
-import MuiAccordion from "@material-ui/core/Accordion";
-import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
-import MuiAccordionDetails from "@material-ui/core/AccordionDetails";
-import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
-import Modal from "@material-ui/core/Modal";
-import Backdrop from "@material-ui/core/Backdrop";
-import Fade from "@material-ui/core/Fade";
-import { makeStyles } from "@material-ui/core/styles";
+export default function Playlist({ track }) {
+  const { setSelectedTrack } = useContext(TrackContext);
+  const [clicked, setClicked] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-const Accordion = withStyles({
-  root: {
-    border: "1px solid #a9a9a9",
-    backgroundColor: "transparent",
-    borderLeft: "0px",
-    borderRight: "0px",
-    boxShadow: "none",
-    "&:not(:last-child)": {
-      borderBottom: 0,
-    },
-    "&:before": {
-      display: "none",
-    },
-    "&$expanded": {
-      margin: "auto",
-    },
-  },
-  expanded: {},
-})(MuiAccordion);
+  const URL = `http://localhost:3000/mixtapes/${track.number}`;
 
-const AccordionSummary = withStyles({
-  root: {
-    borderBottom: "0px solid #a9a9a9",
+  function closeModal() {
+    setIsOpen(false);
+  }
 
-    marginBottom: -1,
-    minHeight: 56,
-    "&$expanded": {
-      minHeight: 56,
-    },
-  },
-  content: {
-    "&$expanded": {
-      margin: "12px 0",
-    },
-  },
-  expanded: {},
-})(MuiAccordionSummary);
-
-const AccordionDetails = withStyles((theme) => ({
-  root: {
-    padding: theme.spacing(2),
-    borderBottom: "0px solid #a9a9a9",
-  },
-}))(MuiAccordionDetails);
-
-const useStyles = makeStyles((theme) => ({
-  modal: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  insideModal: {
-    padding: "0px",
-    outline: "none",
-    border: " none",
-    objectFit: "cover",
-    height: "500px",
-    width: "500px",
-
-    [theme.breakpoints.down("sm")]: {
-      width: "300px",
-      height: "300px",
-    },
-  },
-  imageCont: {
-    width: "100px",
-    height: "100px",
-    marginTop: "8px",
-    cursor: "pointer",
-  },
-  image: {
-    objectFit: "cover",
-  },
-  arrowDown: {
-    color: theme.palette.primary.main,
-  },
-  playBtn: {
-    margin: "0.5rem 0",
-    cursor: "pointer",
-    color: theme.palette.secondary.main,
-    "&:hover": {
-      color: theme.palette.primary.main,
-    },
-    [theme.breakpoints.down("sm")]: {
-      margin: "1.5rem 0 0.5rem 0",
-    },
-  },
-}));
-
-export default function Playlist({ track, setSelectedTrack }) {
-  const classes = useStyles();
-
-  const [open, setOpen] = useState(false);
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-  const handleClose = () => {
-    setOpen(false);
-  };
+  function openModal() {
+    setIsOpen(true);
+  }
 
   return (
-    <>
-      <Accordion square>
-        <AccordionSummary
-          color="primary"
-          expandIcon={<FiChevronDown className={classes.arrowDown} />}
-          aria-controls={"panel1a-content" + " " + track.title}
-          id={"panel1a-header" + " " + track.title}
-        >
-          <Grid container>
-            <Grid item md={2} sm={12} xs={12}>
-              <Typography variant="body2">{track.number}</Typography>
-            </Grid>
-            <Grid item md={7} sm={12} xs={12}>
-              <Typography variant="body2">{track.title}</Typography>
-            </Grid>
-            <Grid item md={2} sm={12} xs={12}>
-              <Typography variant="body2">{track.duration}</Typography>
-            </Grid>
-          </Grid>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Grid container>
-            <Grid item md={2} sm={12} xs={12}>
-              <Box className={classes.imageCont} onClick={handleOpen}>
-                <img
-                  className={classes.image}
-                  src={track.image}
-                  alt="avatar"
-                  layout="responsive"
-                  width="100px"
-                  height="100px"
+    <div className="w-full  mx-auto text-[#444444] dark:text-[#f1f1f1]  ">
+      <Disclosure>
+        {({ open }) => (
+          <>
+            <Disclosure.Button className="relative flex flex-col justify-between items-center w-full px-4 py-4  text-sm  text-left border-t border-stone-400">
+              <div className="grid grid-cols-12 w-full items-center ">
+                <div className=" col-span-12 md:col-span-2">
+                  <span>{track.number}</span>
+                </div>
+                <div className=" col-span-12 md:col-span-7">
+                  <span>{track.title}</span>
+                </div>
+                <div className=" col-span-12 md:col-span-2">
+                  <span>{track.duration}</span>
+                </div>
+
+                <FiChevronUp
+                  className={`${
+                    open ? "transform rotate-180" : ""
+                  } w-6 h-6 text-[#1500FF] dark:text-[#84858C] text-right absolute right-4 `}
                 />
-              </Box>
-            </Grid>
-            <Grid item md={9} sm={12} xs={12}>
-              <FiPlay
-                onClick={() => {
-                  setSelectedTrack(track);
-                }}
-                className={classes.playBtn}
-              />
-              <Typography variant="body2">{track.description}</Typography>
-            </Grid>
-          </Grid>
-        </AccordionDetails>
-      </Accordion>
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        className={classes.modal}
-        open={open}
-        onClose={handleClose}
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}
-      >
-        <Fade in={open}>
-          <img className={classes.insideModal} src={track.image} alt="avatar" />
-        </Fade>
-      </Modal>
-    </>
+              </div>
+            </Disclosure.Button>
+            <Disclosure.Panel className="px-4 ">
+              <div className="grid grid-cols-12 w-full items-start py-4">
+                <div className=" col-span-12 md:col-span-2">
+                  <Image
+                    src={track.image}
+                    alt="track image"
+                    layout="fixed"
+                    objectFit="cover"
+                    width={100}
+                    height={100}
+                    className="cursor-pointer"
+                    onClick={openModal}
+                  />
+                </div>
+                <div className=" col-span-12 md:col-span-9 text-sm">
+                  <div className="flex items-center py-2">
+                    <FiPlay
+                      onClick={() => {
+                        setSelectedTrack(track);
+                      }}
+                      className="hover:text-blue-600 mr-2 cursor-pointer"
+                    />
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(URL);
+                        setClicked(true);
+                      }}
+                    >
+                      {clicked ? "Copied" : "Copy mix"}
+                    </button>
+                  </div>
+                  <span>{track.description}</span>
+                </div>
+              </div>
+            </Disclosure.Panel>
+          </>
+        )}
+      </Disclosure>
+      <>
+        <Transition appear show={isOpen} as={Fragment}>
+          <Dialog
+            as="div"
+            className="fixed inset-0 z-10 overflow-y-auto"
+            onClose={closeModal}
+          >
+            <div className="min-h-screen px-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in duration-300"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <Dialog.Overlay
+                  className="fixed inset-0 bg-black opacity-30"
+                  onClick={closeModal}
+                />
+              </Transition.Child>
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <div
+                  className="flex flex-col min-h-screen justify-center items-center w-full overflow-auto transition-all transform "
+                  onClick={closeModal}
+                >
+                  <div className="h-72 w-72 md:h-[32rem] md:w-[32rem]">
+                    <Image
+                      src={track.image}
+                      alt="avatar"
+                      layout="responsive"
+                      objectFit="cover"
+                      width={300}
+                      height={300}
+                    />
+                  </div>
+                </div>
+              </Transition.Child>
+            </div>
+          </Dialog>
+        </Transition>
+      </>
+    </div>
   );
 }

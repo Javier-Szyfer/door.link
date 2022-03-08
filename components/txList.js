@@ -1,5 +1,4 @@
 import NextLink from "next/link";
-import { Box, Typography } from "@material-ui/core";
 
 export default function TxList({ txs }) {
   //Add a test network or the mainnet
@@ -11,7 +10,7 @@ export default function TxList({ txs }) {
       {txs.map((item) => (
         <div key={item}>
           <NextLink href={`${network}${item.hash}`}>
-            <Box
+            <div
               style={{
                 display: "flex",
                 flexDirection: "column",
@@ -24,11 +23,9 @@ export default function TxList({ txs }) {
                 marginTop: "1rem",
               }}
             >
-              <Typography noWrap> See your transaction</Typography>
-              <Typography noWrap style={{ maxWidth: "300px" }}>
-                {item.hash}
-              </Typography>
-            </Box>
+              <span> See your transaction</span>
+              <span style={{ maxWidth: "300px" }}>{item.hash}</span>
+            </div>
           </NextLink>
         </div>
       ))}
