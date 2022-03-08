@@ -1,51 +1,16 @@
-import { FiX } from "react-icons/fi";
+import { useContext } from "react";
+import { TrackContext } from "../context/trackContext";
 
-//Material UI
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
+import { useTheme } from "next-themes";
+import { FiX } from "react-icons/fi";
 
 // Plyr
 import Plyr from "plyr-react";
 import "plyr-react/dist/plyr.css";
-//Components
 
-const useStyles = makeStyles((theme) => ({
-  player: {
-    width: "50%",
-    height: "88px",
-    position: "fixed",
-    zIndex: " 9999",
-    bottom: "1rem",
-    left: "50%",
-    transform: "translateX(-50%)",
-    border: "1px solid #ccc",
-    [theme.breakpoints.down("md")]: {
-      bottom: "0",
-      width: "100vw",
-      height: "80px",
-      borderLeft: "0",
-      borderRight: "0",
-      borderBottom: "0",
-    },
-  },
-  top: {
-    display: "flex",
-    alignItems: "center",
-    paddingTop: "10px",
-    justifyContent: "space-between",
-    padding: "0 18px",
-    backgroundColor: "red",
-  },
-  trackInfo: {
-    display: "flex",
-    alignItems: "center",
-  },
-}));
-
-export default function Player({ selectedTrack, setSelectedTrack, dark }) {
-  const classes = useStyles();
-
+export default function Player() {
+  const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
+  const { theme } = useTheme();
   const audioSrc = {
     type: "audio",
     sources: [
@@ -56,39 +21,30 @@ export default function Player({ selectedTrack, setSelectedTrack, dark }) {
   };
 
   return (
-    <Box
-      className={classes.player}
+    <div
+      className="fixed bottom-0 z-40 w-screen h-20 border-t border-stone-300 lg:w-1/2
+      lg:h-[88px] lg:bottom-[1rem] lg:left-[50%] lg:translate-x-[-50%] lg:border"
       style={{
-        backgroundColor: dark ? "rgb(20,20,20)" : "rgba(255, 255, 255, 0.95)",
+        backgroundColor:
+          theme === "dark" ? "rgb(20,20,20)" : "rgba(255, 255, 255, 0.95)",
       }}
     >
-      <Box
-        className={classes.top}
-        style={{
-          backgroundColor: dark
-            ? "rgb(20, 20,20)"
-            : "rgba(255, 255, 255, 0.95)",
-        }}
-      >
-        <Box className={classes.trackInfo}>
-          <Typography variant="caption">{selectedTrack.number}</Typography>
-          <span
-            style={{ margin: "0 2px", color: dark ? "#f1f1f1" : "#444444" }}
-          >
-            -
-          </span>
-          <Typography variant="caption">{selectedTrack.title}</Typography>
-        </Box>
+      <div className="flex items-center pt-[10px] px-[18px] justify-between">
+        <div className="flex items-center">
+          <span className="text-xs">{selectedTrack.number}</span>
+          <span className="mx-1">-</span>
+          <span className="text-xs">{selectedTrack.title}</span>
+        </div>
         <FiX
-          style={{ cursor: "pointer", color: dark ? "#f1f1f1" : "#444444" }}
-          onClick={() => setSelectedTrack(false)}
+          className="cursor-pointer"
+          onClick={() => setSelectedTrack(null)}
         />
-      </Box>
+      </div>
       <Plyr
         source={audioSrc}
         autoPlay
         style={
-          dark
+          theme === "dark"
             ? {
                 "--plyr-color-main": "#dddddd",
                 "--plyr-audio-controls-background": "rgb(20,20,20)",
@@ -101,7 +57,7 @@ export default function Player({ selectedTrack, setSelectedTrack, dark }) {
               }
         }
       />
-    </Box>
+    </div>
   );
 }
 Plyr.displayName = "Plyr";

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import NextLink from "next/link";
+import Link from "next/link";
 
 //SWR
 import useSWR from "swr";
@@ -8,116 +8,6 @@ import { AiOutlineClose } from "react-icons/ai";
 import { ethers } from "ethers";
 
 import TxList from "./txList";
-//UI
-import { makeStyles } from "@material-ui/core/styles";
-import {
-  Box,
-  Typography,
-  Button,
-  TextField,
-  CircularProgress,
-} from "@material-ui/core";
-
-const useStyles = makeStyles((theme) => ({
-  boxWrapper: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100vw",
-    height: "100vh",
-    position: "fixed",
-    zIndex: "99",
-    top: "0",
-    left: "0",
-  },
-  close: {
-    position: "fixed",
-    top: "2rem",
-    right: "2rem",
-    cursor: "pointer",
-  },
-  bigBox: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    color: "white",
-    width: "100%",
-    maxWidth: "800px",
-    [theme.breakpoints.down("xs")]: {
-      flexDirection: "column",
-      alignItems: "flex-start",
-    },
-  },
-  payPal: {
-    color: "blue",
-    fontWeight: "bold",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    maxHeight: "400px",
-    maxWidth: "400px",
-    width: "100%",
-    height: "300px",
-    padding: "2rem",
-    textAlign: "left",
-    paddingLeft: 0,
-
-    [theme.breakpoints.down("xs")]: {
-      height: "auto",
-    },
-  },
-  outerBox: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    maxHeight: "400px",
-    maxWidth: "400px",
-    width: "100%",
-    height: "250px",
-    backgroundColor: "blue",
-    color: "white",
-    padding: "2rem",
-  },
-  text: {
-    fontSize: "1rem",
-    lineHeight: "1.1",
-    color: theme.palette.primary.main,
-    marginBottom: " 1rem",
-    textAlign: "left",
-  },
-  inputField: {
-    marginRight: ".5rem",
-    border: "1px solid white",
-  },
-  input: {
-    color: "white",
-    fontSize: "1.5rem",
-  },
-  flex: {
-    display: "flex",
-    alignItems: "center",
-    marginTop: "1rem",
-  },
-  eth: {
-    letterSpacing: 0,
-    fontSize: "2rem",
-    fontWeight: "normal",
-  },
-  Button: {
-    width: "100%",
-    color: "blue",
-    backgroundColor: "white",
-    borderColor: "white",
-    textTransform: "none",
-    fontWeight: "bold",
-    borderRadius: "0",
-    "&:hover": {
-      backgroundColor: "#fff",
-      color: "blue",
-    },
-  },
-}));
 
 const createTransaction = async ({
   setError,
@@ -158,7 +48,6 @@ const SendETH = ({ dark, setSupport }) => {
     { revalidate: 60 }
   );
 
-  const classes = useStyles();
   //State
   const [ether, setEther] = useState("0.01");
   const [txs, setTxs] = useState([]);
@@ -193,102 +82,62 @@ const SendETH = ({ dark, setSupport }) => {
   };
 
   return (
-    <Box
-      className={classes.boxWrapper}
-      style={{ backgroundColor: dark ? "#121212" : "white" }}
-    >
-      <Box onClick={() => setSupport(false)} className={classes.close}>
-        <AiOutlineClose style={{ color: "blue", fontSize: "30px" }} />
-      </Box>
-      <Box
-        style={{
-          width: "100%",
-          display: "flex",
-          maxWidth: "800px",
-          padding: "2rem",
-          flexDirection: "column",
-        }}
+    <div className="fixed inset-0 z-50 flex flex-col justify-center items-center bg-white dark:bg-[#121212] text-[#1500FF] dark:text-[#f1f1f1]">
+      <div
+        onClick={() => setSupport(false)}
+        className="fixed z-50 right-[1rem] top-[1rem] md:top-[2rem] md:right-[2rem]  cursor-pointer "
       >
-        <Typography className={classes.text}>
+        <AiOutlineClose className="text-[#1500FF] h-8 w-8" />
+      </div>
+      <div className="flex flex-col max-w-3xl p-[2rem] w-full">
+        <h2 className="">
           If you enjoy door.link, <br /> consider sending your support
-        </Typography>
+        </h2>
 
-        <Box className={classes.bigBox}>
-          <Box className={classes.payPal} style={{ textAlign: "left" }}>
-            <NextLink href="https://www.paypal.com/donate?hosted_button_id=A397N24XG4CZJ">
-              <a
-                target="_blank"
-                rel="noopener"
-                style={{ cursor: "pointer", width: "80px" }}
-              >
+        <div className="flex flex-col items-start md:flex-row md:items-center md:justify-between mt-10">
+          <div className="text-left  font-bold flex flex-col justify-evenly max-h-[400px] max-w-[400px] md:h-[250px] mb-10 sm:mb-0 ">
+            <Link
+              href="https://www.paypal.com/donate?hosted_button_id=A397N24XG4CZJ"
+              passHref
+            >
+              <a target="_blank" rel="noopener" className="cursor-pointer">
                 &rarr; Paypal
               </a>
-            </NextLink>
-          </Box>
+            </Link>
+          </div>
           <form onSubmit={handleSubmitPayment}>
-            <Box className={classes.outerBox}>
-              <Box className={classes.flex}>
-                <TextField
+            <div className="mb-2 flex flex-col justify-evenly max-h-[400px] max-w-[400px] w-full h-[250px] bg-[#1500FF] text-white p-4 ">
+              <div className="flex items-center">
+                <input
                   value={ether}
-                  variant="outlined"
-                  className={classes.inputField}
-                  InputProps={{
-                    className: classes.input,
-                  }}
+                  className="border border-white w-full px-2 py-2 text-xl mr-2 bg-[#1500FF] placeholder:text-white focus:outline-none"
                   onChange={(e) => {
                     setError(""), setEther(e.target.value);
                   }}
+                  placeholder="0.01"
                 />
-                <Typography className={classes.eth}>ETH</Typography>
-              </Box>
-              <Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  fontSize: ".7rem",
-                  margin: "0.5rem 0",
-                }}
-              >
-                <Typography variant="body1" style={{ fontSize: ".8rem" }}>
-                  {ether && "USD"}
-                </Typography>
-                <Typography
-                  variant="body1"
-                  style={{ marginLeft: "0.5rem", fontSize: ".8rem" }}
-                >
+                <span className="text-4xl">ETH</span>
+              </div>
+              <div className="flex items-center">
+                <span className=" mr-2">{ether && "USD"}</span>
+                <span className="">
                   {ether ? formatter.format(ether * currentETHPriceInUSD) : ""}
-                </Typography>
-              </Box>
-              <Button
+                </span>
+              </div>
+              <button
                 type="submit"
-                variant="outlined"
-                disableElevation
-                disableRipple
-                disabled={loading}
-                className={classes.Button}
+                className="bg-[#1500FF] py-2 px-4 text-xl font-bold hover:bg-white hover:text-[#1500FF] border border-white"
               >
                 {loading ? <CircularProgress size={25} /> : "Transfer"}
-              </Button>
-            </Box>
-            {error && (
-              <Typography
-                style={{
-                  color: "red",
-                  textAlign: "center",
-                  marginTop: "1rem",
-                  maxWidth: "350px",
-                }}
-                noWrap
-              >
-                {error}
-              </Typography>
-            )}
+              </button>
+            </div>
+            {error && <span className=" text-red-600">{error}</span>}
           </form>
-        </Box>
-      </Box>
+        </div>
+      </div>
 
       <TxList txs={txs} />
-    </Box>
+    </div>
   );
 };
 

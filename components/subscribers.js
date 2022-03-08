@@ -2,67 +2,7 @@ import { useState } from "react";
 
 import { AiOutlineClose } from "react-icons/ai";
 
-import TextField from "@material-ui/core/TextField";
-import { makeStyles } from "@material-ui/core/styles";
-import { Button } from "@material-ui/core";
-import Box from "@material-ui/core/Box";
-import Typography from "@material-ui/core/Typography";
-import LinearProgress from "@material-ui/core/LinearProgress";
-
-const useStyles = makeStyles((theme) => ({
-  boxWrapper: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100vw",
-    height: "100vh",
-    position: "fixed",
-    zIndex: "99",
-    top: "0",
-    left: "0",
-  },
-  close: {
-    position: "fixed",
-    top: "2rem",
-    right: "2rem",
-    cursor: "pointer",
-  },
-
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    [theme.breakpoints.down("sm")]: {
-      padding: "0  2rem",
-    },
-  },
-  input: {
-    margin: "1rem 0 0 0",
-    borderColor: "red",
-  },
-  cssFocused: { color: "white", borderRadius: "0" },
-
-  cssOutlinedInput: {
-    "&$cssFocused $notchedOutline": {
-      borderColor: "green",
-    },
-    color: theme.palette.primary.main,
-    borderRadius: "0",
-  },
-  notchedOutline: {
-    borderWidth: "1px",
-    borderColor: "blue !important",
-  },
-
-  btnsWrapper: {
-    display: "flex",
-    width: "100%",
-    margin: "1rem 0",
-    justifyContent: "space-between",
-  },
-}));
-
-export default function Subscribers({ setShowForm, dark }) {
-  const classes = useStyles();
+export default function Subscribers({ setShowForm }) {
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -97,93 +37,70 @@ export default function Subscribers({ setShowForm, dark }) {
   };
 
   return (
-    <Box
-      className={classes.boxWrapper}
-      style={{ backgroundColor: dark ? "#121212" : "white" }}
-    >
-      <Box onClick={() => setShowForm(false)} className={classes.close}>
-        <AiOutlineClose style={{ color: "blue", fontSize: "30px" }} />
-      </Box>
+    <div className="fixed inset-0 z-50 flex flex-col min-h-screen justify-center items-center w-full bg-white dark:bg-[#121212] text-[#444444] dark:text-[#f1f1f1]">
+      <div
+        onClick={() => setShowForm(false)}
+        className="fixed z-50 right-[1rem] top-[1rem] md:top-[2rem] md:right-[2rem]  cursor-pointer "
+      >
+        <AiOutlineClose className="text-[#1500FF] h-8 w-8" />
+      </div>
 
       <form onSubmit={subscribeToNewsletter}>
-        <Box className={classes.form}>
-          <Typography variant="body2">
-            Sign up for updates — no spam, just music.
-          </Typography>
+        <div className="flex flex-col py-8">
+          <h2>Sign up for updates — no spam, just music.</h2>
 
-          <TextField
-            variant="outlined"
+          <input
             type="email"
-            size="small"
+            required
             value={email}
             placeholder="Email"
             onChange={(e) => {
               setEmail(e.target.value), setSuccess(false), setError(false);
             }}
-            className={classes.input}
+            className="border border-[#1500FF] py-2 px-2 mt-4 placeholder:text-[#1500FF] bg-white dark:bg-[#121212]"
             autoComplete="true"
-            InputProps={{
-              classes: {
-                root: classes.cssOutlinedInput,
-                focused: classes.cssFocused,
-                notchedOutline: classes.notchedOutline,
-              },
-            }}
           />
 
-          <Box className={classes.btnsWrapper}>
-            <Button
-              variant="text"
-              type="text"
-              disableRipple
-              disableElevation={true}
+          <div className="flex justify-between mt-4 ">
+            <button
               onClick={() => setShowForm(false)}
-              style={{
-                width: "40%",
-                padding: "0 1 rem",
-                borderRadius: "0",
-                textTransform: "none",
-                backgroundColor: "#f2f2f2",
-              }}
+              className="bg-stone-200 w-[40%] hover:bg-stone-300 dark:text-stone-800 "
             >
               Back
-            </Button>
-            <Button
+            </button>
+            <button
               type="submit"
-              disableRipple
-              disableElevation={true}
-              style={{
-                width: "40%",
-                borderRadius: "0",
-                textTransform: "none",
-                backgroundColor: "blue",
-                color: "white",
-              }}
+              className="bg-[#1500FF] w-[40%] hover:bg-[#0e0eb6] text-white py-2 flex items-center justify-center"
             >
+              {loading && (
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              )}
               Join
-            </Button>
-          </Box>
-          {success && (
-            <Typography
-              variant="body2"
-              color="primary"
-              style={{ marginTop: "10px" }}
-            >
-              : ) thx!
-            </Typography>
-          )}
-          {error && (
-            <Typography
-              variant="body2"
-              color="primary"
-              style={{ marginTop: "10px" }}
-            >
-              {error}
-            </Typography>
-          )}
-          {loading && <LinearProgress />}
-        </Box>
+            </button>
+          </div>
+          {success && <span className="mt-5 text-[#1500FF]">: ) thx!</span>}
+          {error && <span className="mt-5">{error}</span>}
+        </div>
       </form>
-    </Box>
+    </div>
   );
 }
