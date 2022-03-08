@@ -6,7 +6,7 @@ import { Dialog, Transition, Disclosure } from "@headlessui/react";
 
 //ICONS
 import { FiPlay } from "react-icons/fi";
-import { FiChevronUp } from "react-icons/fi";
+import { FiChevronDown } from "react-icons/fi";
 
 export default function Playlist({ track }) {
   const { setSelectedTrack } = useContext(TrackContext);
@@ -40,7 +40,7 @@ export default function Playlist({ track }) {
                   <span>{track.duration}</span>
                 </div>
 
-                <FiChevronUp
+                <FiChevronDown
                   className={`${
                     open ? "transform rotate-180" : ""
                   } w-6 h-6 text-[#1500FF] dark:text-[#84858C] text-right absolute right-4 `}
