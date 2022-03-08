@@ -13,7 +13,7 @@ export default function Playlist({ track }) {
   const [clicked, setClicked] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const URL = `http://localhost:3000/mixtapes/${track.number}`;
+  const URL = `https://door.link/mixtapes/${track.number}`;
 
   function closeModal() {
     setIsOpen(false);

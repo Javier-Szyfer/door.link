@@ -4,7 +4,7 @@ import { TrackContext } from "../context/trackContext";
 //Components
 import Header from "../components/header";
 import Player from "../components/player";
-import PlaylistUi from "../components/Playlist";
+import Playlist from "../components/Playlist";
 
 //Playlist object
 import { getPlaylist } from "./api/playlist";
@@ -30,7 +30,7 @@ export default function Home({ playlists }) {
       {selectedTrack && <Player />}
 
       {tracks.map((track) => (
-        <PlaylistUi track={track} key={track.id} />
+        <Playlist track={track} key={track.id} />
       ))}
     </div>
   );
