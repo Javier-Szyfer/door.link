@@ -27,10 +27,10 @@ export default function MixNum({ mix }) {
   }, []);
 
   return (
-    <div className="bg-white dark:bg-[#121212] text-[#444444] dark:text-[#f1f1f1] px-4 min-h-screen max-w-3xl flex flex-col space-y-4 mx-auto justify-center   items-center">
+    <div className="bg-white dark:bg-[#121212] text-[#444444] dark:text-[#f1f1f1] px-8 min-h-screen max-w-3xl flex flex-col space-y-4 mx-auto justify-evenly pb-20  items-center overflow-y-auto">
       <Link href={"/"} passHref>
         <div
-          className="cursor-pointer fixed top-10"
+          className="cursor-pointer mt-12"
           onClick={() => setSelectedTrack(null)}
         >
           <Image
@@ -54,7 +54,7 @@ export default function MixNum({ mix }) {
       />
       <div className="flex flex-col justify-center items-center ">
         <h1 className="">{m.title}</h1>
-        <p className="text-center mt-4">{m.description}</p>
+        <p className="text-center mt-4 pb-12">{m.description}</p>
       </div>
       {selectedTrack && <Player />}
     </div>
