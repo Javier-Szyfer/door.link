@@ -2,9 +2,9 @@ import { useContext } from "react";
 import { TrackContext } from "../context/trackContext";
 
 //Components
-import Header from "../components/Header";
-import Playlist from "../components/Playlist";
-import Player from "../components/Player";
+import Header from "../components/header";
+import Playlist from "../components/playlist";
+import Player from "../components/player";
 
 //Playlist object
 import { getPlaylist } from "./api/playlist";

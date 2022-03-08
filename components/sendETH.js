@@ -7,7 +7,7 @@ import { AiOutlineClose } from "react-icons/ai";
 //web3 Portal
 import { ethers } from "ethers";
 
-import TxList from "./TxList";
+import TxList from "./txList";
 
 const createTransaction = async ({
   setError,

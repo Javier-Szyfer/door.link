@@ -7,8 +7,8 @@ import Image from "next/image";
 import { useTheme } from "next-themes";
 
 //Components
-import Subscribers from "./Subscribers";
-import SendETH from "./SendETH";
+import Subscribers from "./subscribers";
+import SendETH from "./sendETH";
 
 export default function Header() {
   const { selectedTrack } = useContext(TrackContext);
