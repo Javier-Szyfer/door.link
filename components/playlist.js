@@ -9,11 +9,12 @@ import { FiPlay } from "react-icons/fi";
 import { FiChevronDown } from "react-icons/fi";
 
 export default function Playlist({ track }) {
+  console.log(track);
   const { setSelectedTrack } = useContext(TrackContext);
   const [clicked, setClicked] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const URL = `https://door.link/mixtapes/${track.number}`;
+  const URL = `http://localhost:3000/mixtapes/${track.number}`;
 
   function closeModal() {
     setIsOpen(false);
