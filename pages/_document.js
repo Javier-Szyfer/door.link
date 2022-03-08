@@ -53,7 +53,7 @@ export default class MyDocument extends Document {
 
           {/* <meta name="theme-color" content={theme.palette.primary.main} /> */}
         </Head>
-        <body>
+        <body className="bg-white dark:bg-[#121212]">
           <Main />
           <NextScript />
         </body>
