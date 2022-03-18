@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Dialog, Transition, Disclosure } from "@headlessui/react";
 
 //ICONS
-import { FiPlay } from "react-icons/fi";
 import { FiChevronDown } from "react-icons/fi";
 
 export default function Playlist({ track }) {
@@ -64,19 +63,23 @@ export default function Playlist({ track }) {
                 </div>
                 <div className=" col-span-12 md:col-span-9 text-sm">
                   <div className="flex items-center py-2">
-                    <FiPlay
+                    <button
                       onClick={() => {
                         setSelectedTrack(track);
                       }}
-                      className="hover:text-blue-600 mr-2 cursor-pointer"
-                    />
+                      className="hover:text-[#1500FF] mr-2 cursor-pointer"
+                    >
+                      Play
+                    </button>
+                    <span>|</span>
                     <button
                       onClick={() => {
                         navigator.clipboard.writeText(URL);
                         setClicked(true);
                       }}
+                      className="ml-2 hover:text-[#1500FF]"
                     >
-                      {clicked ? "Copied" : "Copy mix"}
+                      {clicked ? "Copied" : "Get Url"}
                     </button>
                   </div>
                   <span>{track.description}</span>
