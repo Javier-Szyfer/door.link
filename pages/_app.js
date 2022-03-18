@@ -9,11 +9,10 @@ import { WalletConnectConnector } from "wagmi/connectors/walletConnect";
 import { WalletLinkConnector } from "wagmi/connectors/walletLink";
 import { DefaultSeo } from "next-seo";
 import SEO from "../next-seo.config";
-import { ethers } from "ethers";
+// import { ethers } from "ethers";
 
 // API key for Ethereum node
-const infuraId =
-  "https://mainnet.infura.io/v3/161721284ff9485c90b9f09026704e55";
+const infuraId = process.env.INFURA_ID;
 
 //Only for testing otherwise use mainnet and remove provider prop from Provider Hook
 // const provider = new ethers.providers.InfuraProvider(
