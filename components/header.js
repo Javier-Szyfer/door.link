@@ -17,7 +17,7 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
   const [fullDescription, setFullDescription] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [support, setSupport] = useState(false);
+  // const [support, setSupport] = useState(false);
   const handleInfo = () => {
     setFullDescription(!fullDescription);
   };
@@ -112,13 +112,13 @@ export default function Header() {
               <h2>Contact</h2>
             </a>
           </Link>
-          <h6 className="cursor-pointer" onClick={() => setSupport(true)}>
-            Support
-          </h6>
+          <Link href={"/support"}>
+            <h6 className="cursor-pointer">Support</h6>
+          </Link>
         </div>
       </div>
       {showForm && <Subscribers setShowForm={setShowForm} />}
-      {support && <SendETH setSupport={setSupport} />}
+      {/* {support && <SendETH setSupport={setSupport} />} */}
     </div>
   );
 }
