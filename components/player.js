@@ -9,7 +9,7 @@ import Plyr from "plyr-react";
 import "plyr-react/dist/plyr.css";
 
 export default function Player() {
-  const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
+  const { selectedTrack, setSelectedTrack, player } = useContext(TrackContext);
   const { theme } = useTheme();
   const audioSrc = {
     type: "audio",
@@ -43,6 +43,7 @@ export default function Player() {
       <Plyr
         source={audioSrc}
         autoPlay
+        ref={player}
         style={
           theme === "dark"
             ? {

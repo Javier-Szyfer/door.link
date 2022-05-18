@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { TrackContext } from "../context/trackContext";
 
 //Components
@@ -10,7 +10,7 @@ import Player from "../components/player";
 import { getPlaylist } from "./api/playlist";
 
 export default function Home({ playlists }) {
-  const { selectedTrack } = useContext(TrackContext);
+  const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
 
   const tracks = playlists.map((track) => {
     return {
@@ -23,6 +23,19 @@ export default function Home({ playlists }) {
       image: track.artwork.url,
     };
   });
+
+  useEffect(() => {
+    const lastPlayedTrackInfo = localStorage.getItem('lastPlayedTrackInfo')
+
+    if (lastPlayedTrackInfo) {
+      const { currentTime, id } = JSON.parse(lastPlayedTrackInfo)
+      const targetTrack = tracks.find((track) => track.id === id)
+      setSelectedTrack({
+        ...targetTrack,
+        url: `${targetTrack.url}#t=${Math.round(currentTime)}`
+      })
+    }
+  }, [])
 
   return (
     <div className="max-w-7xl mx-auto bg-white dark:bg-[#121212] pb-10">
