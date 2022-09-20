@@ -47,7 +47,7 @@ export default class RSS extends Component {
   static async getInitialProps({ res }) {
     const tag = TagWriter(res);
 
-    res.setHeader('Content-Type', 'text/xml');
+    res.setHeader('Content-Type', 'text/xml; charset=utf-8');
     res.write(`<?xml version="1.0" encoding="UTF-8"?>\n`);
     tag.open('rss', {
       version: "2.0",
@@ -70,16 +70,19 @@ export default class RSS extends Component {
     const entries = await getPlaylist();
     for (const entry of entries) {
       const { audio } = entry;
+      // Convert ISO8601 date string to RFC822.
+      const date = new Date(Date.parse(entry.published_at));
       tag.open('item', {}, 1);
       tag.write('title', {}, entry.Title, 2);
-      tag.write('guid', {}, audio.hash, 2);
+      tag.write('guid', { isPermaLink: false }, audio.hash, 2);
       tag.write('link', {}, "https://door.link/", 2);
       tag.write('enclosure', {
         url: audio.url, type: audio.mime,
         length: Math.trunc(audio.size * 1000)
       }, null, 2, true);
-      tag.write('description', {}, entry.Description.trim(), 2);
-      tag.write('pubDate', {}, entry.published_at, 2);
+      // Description tag must be encoded twice, first as HTML, then as XML.
+      tag.write('description', {}, entry.Description.trim().encodeXML(), 2);
+      tag.write('pubDate', {}, date.toUTCString(), 2);
       tag.close('item', 1);
     }
     // Close remaining tags.
