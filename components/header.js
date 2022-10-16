@@ -71,11 +71,11 @@ export default function Header() {
               having a thoughtful moment. <br />
               <br />
               Curated by
-              <Link href="https://www.hi-malta.com" passHref>
+              <Link href="https://www.romi.link" passHref>
                 <a target="_blank" rel="noopener noreferrer">
                   <span className="text-[#1500FF] dark:text-[#84858C] hover:underline cursor-pointer">
                     {" "}
-                    romo
+                    romi
                   </span>
                 </a>
               </Link>
