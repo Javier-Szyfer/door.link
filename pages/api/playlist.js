@@ -10,7 +10,6 @@ export const getPlaylist = async () => {
   return data;
 };
 
-const Playlist = async (req, res) =>
-  res.status(200).json(await getPlaylist());
+const Playlist = async (req, res) => res.status(200).json(await getPlaylist());
 
 export default Playlist;
