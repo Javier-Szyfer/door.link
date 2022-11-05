@@ -8,7 +8,6 @@ import { useTheme } from "next-themes";
 
 //Components
 import Subscribers from "./subscribers";
-import SendETH from "./sendETH";
 
 export default function Header() {
   const { selectedTrack } = useContext(TrackContext);
@@ -17,7 +16,6 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
   const [fullDescription, setFullDescription] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  // const [support, setSupport] = useState(false);
   const handleInfo = () => {
     setFullDescription(!fullDescription);
   };
@@ -44,8 +42,8 @@ export default function Header() {
         {!fullDescription ? (
           <div className="flex mt-7  lg:mt-12">
             <p>
-              A curated selection of music for listening and dancing in small,
-              safe spaces.
+              A curated selection of music for listening and dancing in closed
+              spaces.
               <span
                 onClick={handleInfo}
                 className="text-[#1500FF] dark:text-[#84858C] whitespace-nowrap ml-2 cursor-pointer"
@@ -73,16 +71,16 @@ export default function Header() {
               having a thoughtful moment. <br />
               <br />
               Curated by
-              <Link href="https://www.hi-malta.com" passHref>
+              <Link href="https://www.romi.link" passHref>
                 <a target="_blank" rel="noopener noreferrer">
                   <span className="text-[#1500FF] dark:text-[#84858C] hover:underline cursor-pointer">
                     {" "}
-                    romo
+                    romi
                   </span>
                 </a>
               </Link>
-              , door is a music selection for listening and dancing in small,
-              safe spaces.
+              , door is a music selection for listening and dancing in closed
+              spaces.
               <span
                 onClick={handleInfo}
                 className="text-[#1500FF] dark:text-[#84858C] whitespace-nowrap ml-2 cursor-pointer"
@@ -101,11 +99,6 @@ export default function Header() {
               <h2>RSS</h2>
             </a>
           </Link>
-          <Link href="https://github.com/Javier-Szyfer/door.link">
-            <a target="_blank" rel="noopener noreferrer">
-              <h2>Github</h2>
-            </a>
-          </Link>
           <Link href="https://urbit.org/groups/~natnex-ronret/door-link">
             <a target="_blank" rel="noopener noreferrer">
               <h2>Urbit</h2>
@@ -116,13 +109,9 @@ export default function Header() {
               <h2>Contact</h2>
             </a>
           </Link>
-          <Link href={"/support"}>
-            <h6 className="cursor-pointer">Support</h6>
-          </Link>
         </div>
       </div>
       {showForm && <Subscribers setShowForm={setShowForm} />}
-      {/* {support && <SendETH setSupport={setSupport} />} */}
     </div>
   );
 }
