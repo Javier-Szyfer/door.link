@@ -6,7 +6,7 @@ import Header from "../components/header";
 import Playlist from "../components/playlist";
 import Player from "../components/player";
 
-//Playlist object
+//Playlist
 import { getPlaylist } from "./api/playlist";
 
 export default function Home({ playlists }) {
