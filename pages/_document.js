@@ -50,8 +50,6 @@ export default class MyDocument extends Document {
             title="Subscribe to the RSS feed."
             href="https://door.link/rss.xml"
           />
-
-          {/* <meta name="theme-color" content={theme.palette.primary.main} /> */}
         </Head>
         <body className="bg-white dark:bg-[#121212]">
           <Main />
