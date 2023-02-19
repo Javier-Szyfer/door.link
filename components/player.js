@@ -6,16 +6,18 @@ import { FiX } from "react-icons/fi";
 
 // Plyr
 import Plyr from "plyr-react";
-import "plyr-react/dist/plyr.css";
+import "plyr-react/plyr.css";
 
 export default function Player() {
   const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
   const { theme } = useTheme();
   const audioSrc = {
     type: "audio",
+    download: selectedTrack.url,
     sources: [
       {
         src: selectedTrack.url,
+        download: selectedTrack.url,
       },
     ],
   };
@@ -43,6 +45,7 @@ export default function Player() {
       <Plyr
         source={audioSrc}
         autoPlay
+        download={selectedTrack.url}
         style={
           theme === "dark"
             ? {
