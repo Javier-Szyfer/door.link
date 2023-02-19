@@ -1,16 +1,17 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TrackContext } from "../context/trackContext";
-
 import { useTheme } from "next-themes";
 import { FiX } from "react-icons/fi";
 
 // Plyr
 import Plyr from "plyr-react";
-import "plyr-react/dist/plyr.css";
+import "plyr-react/plyr.css";
 
 export default function Player() {
   const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
+  const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
+
   const audioSrc = {
     type: "audio",
     sources: [
@@ -19,6 +20,36 @@ export default function Player() {
       },
     ],
   };
+
+  const plyrOptions = {
+    options: {
+      download: selectedTrack.url,
+      controls: [
+        "play",
+        "progress",
+        "current-time",
+        "mute",
+        "volume",
+        "settings",
+        "download",
+      ],
+      listeners: "true",
+    },
+  };
+
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (mounted) {
+      const downloadButton = document.getElementsByTagName("a")[3];
+      downloadButton.addEventListener("click", () => {
+        downloadButton.setAttribute("href", selectedTrack.url);
+        downloadButton.setAttribute("download", selectedTrack.title);
+      });
+    }
+  }, [mounted]);
+
+  if (!mounted) return null;
 
   return (
     <div
@@ -41,8 +72,10 @@ export default function Player() {
         />
       </div>
       <Plyr
+        {...plyrOptions}
         source={audioSrc}
         autoPlay
+        href={selectedTrack.url}
         style={
           theme === "dark"
             ? {
@@ -56,23 +89,7 @@ export default function Player() {
                 "--plyr-audio-controls-background": "rgba(255, 255, 255, 0.95)",
               }
         }
-      />
+      ></Plyr>
     </div>
   );
 }
-Plyr.displayName = "Plyr";
-Plyr.defaultProps = {
-  options: {
-    controls: [
-      "play",
-      "progress",
-      "current-time",
-      "mute",
-      "volume",
-      "settings",
-      "download",
-    ],
-    // debug: "true",
-    listeners: "true",
-  },
-};

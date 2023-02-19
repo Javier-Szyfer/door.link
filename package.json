@@ -12,16 +12,14 @@
     "@tailwindcss/typography": "0.5.2",
     "dotenv": "^8.2.0",
     "eslint-config-next": "12.1.0",
-    "ethers": "5.6.0",
     "next": "12.1.0",
     "next-seo": "^4.17.0",
     "next-themes": "0.1.1",
-    "plyr-react": "^3.0.7",
+    "plyr-react": "^5.1.2",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-icons": "^3.11.0",
-    "swr": "1.2.2",
-    "wagmi": "0.2.0"
+    "swr": "1.2.2"
   },
   "devDependencies": {
     "autoprefixer": "10.4.2",
