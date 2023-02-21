@@ -42,7 +42,7 @@ export default function Player() {
   useEffect(() => {
     if (mounted) {
       const downloadButton = document.getElementsByTagName("a")[3];
-      downloadButton.addEventListener("click", () => {
+      downloadButton?.addEventListener("click", () => {
         downloadButton.setAttribute("href", selectedTrack.url);
         downloadButton.setAttribute("download", selectedTrack.title);
       });
