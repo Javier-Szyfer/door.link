@@ -49,7 +49,7 @@ export default function MixNum({ mix }) {
         />
         <meta
           property="og:description"
-          content="A curated selection of music for listening and dancing in small, safe spaces."
+          content="A curated selection of music for listening and dancing in closed spaces."
           key="ogdesc"
         />
         <title>{m.number} - door.link </title>
