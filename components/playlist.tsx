@@ -1,6 +1,6 @@
 import { Fragment, useState, useContext } from "react";
 import { TrackContext } from "../context/trackContext";
-import Image from "next/image";
+import Image from "next/legacy/image";
 
 import { Dialog, Transition, Disclosure } from "@headlessui/react";
 
@@ -52,8 +52,6 @@ export default function Playlist({ track }) {
                   <Image
                     src={track.image}
                     alt="track image"
-                    layout="fixed"
-                    objectFit="cover"
                     width={100}
                     height={100}
                     priority

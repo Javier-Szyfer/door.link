@@ -63,8 +63,8 @@ export default function MixNum({ mix }) {
             <Image
               src={theme === "dark" ? "/logowhite.svg" : "/logoblack.svg"}
               className="cursor-pointer p-[3px]"
-              width="20px"
-              height="28.55px"
+              width={20}
+              height={28}
               alt="door.link-logo"
             />
           </div>

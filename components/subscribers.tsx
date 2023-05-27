@@ -7,11 +7,12 @@ export default function Subscribers({ setShowForm }) {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const subscribeToNewsletter = async (e) => {
     e.preventDefault();
 
     if (email === "") {
-      setError("Enter your email to subscribe");
+      setErrorMessage("Enter your email to subscribe");
       return;
     }
     setLoading(true);
@@ -32,9 +33,9 @@ export default function Subscribers({ setShowForm }) {
       setLoading(false);
     } catch (err) {
       if (err instanceof TypeError) {
-        setError("Not a valid email");
+        setErrorMessage("Not a valid email");
       } else {
-        setError("An unexpected error occurred");
+        setErrorMessage("An unexpected error occurred");
       }
       setLoading(false);
     }
@@ -102,7 +103,7 @@ export default function Subscribers({ setShowForm }) {
             </button>
           </div>
           {success && <span className="mt-5 text-[#1500FF]">: ) thx!</span>}
-          {error && <span className="mt-5">{error}</span>}
+          {errorMessage && <span className="mt-5">{error}</span>}
         </div>
       </form>
     </div>

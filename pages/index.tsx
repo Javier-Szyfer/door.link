@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TrackContext } from "../context/trackContext";
 
 //Components
@@ -6,11 +6,18 @@ import Header from "../components/header";
 import Playlist from "../components/playlist";
 import Player from "../components/player";
 
-//Playlist
-import { getPlaylist } from "./api/playlist";
-
-export default function Home({ playlists }) {
+export default function Home() {
   const { selectedTrack } = useContext(TrackContext);
+  const [playlists, setPlaylists] = useState([]);
+
+  // fetch playlist
+  useEffect(() => {
+    fetch("/api/playlist", { next: { revalidate: 10 } })
+      .then((response) => response.json())
+      .then((data) => {
+        setPlaylists(data);
+      });
+  }, []);
 
   const tracks = playlists.map((track) => {
     return {
@@ -34,14 +41,4 @@ export default function Home({ playlists }) {
       ))}
     </div>
   );
-}
-
-export async function getStaticProps() {
-  const data = await getPlaylist();
-  return {
-    props: {
-      playlists: data,
-    },
-    revalidate: 10,
-  };
 }
