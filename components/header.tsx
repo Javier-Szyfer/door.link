@@ -11,7 +11,6 @@ import Subscribers from "./subscribers";
 
 export default function Header() {
   const { selectedTrack } = useContext(TrackContext);
-
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
   const [fullDescription, setFullDescription] = useState(false);
@@ -33,8 +32,8 @@ export default function Header() {
           <Image
             src={theme === "dark" ? "/logowhite.svg" : "/logoblack.svg"}
             className="cursor-pointer p-[3px]"
-            width="10px"
-            height="18.55px"
+            width={16}
+            height={16}
             alt="door.link-logo"
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
           />
@@ -74,12 +73,12 @@ export default function Header() {
               <br />
               Curated by
               <Link href="https://www.romi.link" passHref>
-                <a target="_blank" rel="noopener noreferrer">
-                  <span className="text-[#1500FF] dark:text-[#84858C] hover:underline cursor-pointer">
-                    {" "}
-                    romi
-                  </span>
-                </a>
+                {/* <a target="_blank" rel="noopener noreferrer"> */}
+                <span className="text-[#1500FF] dark:text-[#84858C] hover:underline cursor-pointer">
+                  {" "}
+                  romi
+                </span>
+                {/* </a> */}
               </Link>
               , door is a music selection for listening and dancing in closed
               spaces.
@@ -97,19 +96,17 @@ export default function Header() {
             Subscribe
           </h2>
           <Link href="/rss.xml">
-            <a target="_blank" rel="noopener noreferrer">
-              <h2>RSS</h2>
-            </a>
+            {/* <a target="_blank" rel="noopener noreferrer"> */}
+            <h2>RSS</h2>
+            {/* </a> */}
           </Link>
           <Link href="https://urbit.org/groups/~natnex-ronret/door-link">
-            <a target="_blank" rel="noopener noreferrer">
-              <h2>Urbit</h2>
-            </a>
+            {/* <a target="_blank" rel="noopener noreferrer"> */}
+            <h2>Urbit</h2>
+            {/* </a> */}
           </Link>
           <Link href="mailto:contact@door.link">
-            <a target="_blank" rel="noopener noreferrer">
-              <h2>Contact</h2>
-            </a>
+            <h2>Contact</h2>
           </Link>
         </div>
       </div>
