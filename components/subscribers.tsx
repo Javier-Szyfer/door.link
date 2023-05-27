@@ -17,7 +17,7 @@ export default function Subscribers({ setShowForm }) {
     }
     setLoading(true);
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL;
+      const API_URL = process.env.API_URL;
       const res = await fetch(`${API_URL}/subscribers`, {
         method: "POST",
         headers: {

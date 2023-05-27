@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export const getPlaylist = async (): Promise<any[]> => {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const API_URL = process.env.API_URL;
     const response = await fetch(`${API_URL}/playlists?_sort=created_at:desc`, {
       method: "GET",
       headers: {
