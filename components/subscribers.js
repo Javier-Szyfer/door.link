@@ -7,7 +7,6 @@ export default function Subscribers({ setShowForm }) {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-
   const subscribeToNewsletter = async (e) => {
     e.preventDefault();
 
@@ -17,7 +16,7 @@ export default function Subscribers({ setShowForm }) {
     }
     setLoading(true);
     try {
-      const { API_URL } = process.env;
+      const API_URL = process.env.NEXT_PUBLIC_API_URL;
       const res = await fetch(`${API_URL}/subscribers`, {
         method: "POST",
         headers: {
@@ -32,7 +31,12 @@ export default function Subscribers({ setShowForm }) {
       setEmail("");
       setLoading(false);
     } catch (err) {
-      setError("Not a valid email");
+      if (err instanceof TypeError) {
+        setError("Not a valid email");
+      } else {
+        setError("An unexpected error occurred");
+      }
+      setLoading(false);
     }
   };
 

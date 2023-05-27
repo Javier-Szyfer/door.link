@@ -72,14 +72,16 @@ export default function Header() {
               having a thoughtful moment. <br />
               <br />
               Curated by
-              <Link href="https://www.romi.link" passHref>
-                {/* <a target="_blank" rel="noopener noreferrer"> */}
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://www.romi.link"
+              >
                 <span className="text-[#1500FF] dark:text-[#84858C] hover:underline cursor-pointer">
                   {" "}
                   romi
                 </span>
-                {/* </a> */}
-              </Link>
+              </a>
               , door is a music selection for listening and dancing in closed
               spaces.
               <span
@@ -95,16 +97,16 @@ export default function Header() {
           <h2 onClick={() => setShowForm(true)} className="cursor-pointer">
             Subscribe
           </h2>
-          <Link href="/rss.xml">
-            {/* <a target="_blank" rel="noopener noreferrer"> */}
+          <a target="_blank" rel="noopener noreferrer" href="/rss.xml">
             <h2>RSS</h2>
-            {/* </a> */}
-          </Link>
-          <Link href="https://urbit.org/groups/~natnex-ronret/door-link">
-            {/* <a target="_blank" rel="noopener noreferrer"> */}
+          </a>
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://urbit.org/groups/~natnex-ronret/door-link"
+          >
             <h2>Urbit</h2>
-            {/* </a> */}
-          </Link>
+          </a>
           <Link href="mailto:contact@door.link">
             <h2>Contact</h2>
           </Link>

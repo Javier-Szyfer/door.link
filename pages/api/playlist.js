@@ -1,5 +1,5 @@
 export const getPlaylist = async () => {
-  const { API_URL } = process.env;
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const playlist = await fetch(`${API_URL}/playlists?_sort=created_at:desc`, {
     method: "GET",
     headers: {
