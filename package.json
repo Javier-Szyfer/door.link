@@ -1,11 +1,14 @@
 {
-  "name": "radio-app",
+  "name": "door.link",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
+  },
+  "engines": {
+    "node": "18.x"
   },
   "dependencies": {
     "@headlessui/react": "1.5.0",
