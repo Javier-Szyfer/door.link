@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { TrackContext } from "../context/trackContext";
+import { TrackContext } from "../../context/trackContext";
 
 import Link from "next/link";
 import Image from "next/image";

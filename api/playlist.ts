@@ -23,7 +23,7 @@ export const getPlaylist = async (): Promise<any[]> => {
   }
 };
 
-const Playlist = async (req: NextApiRequest, res: NextApiResponse) => {
+const AllPlaylist = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const data = await getPlaylist();
     res.status(200).json(data);
@@ -32,4 +32,4 @@ const Playlist = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
-export default Playlist;
+export default AllPlaylist;

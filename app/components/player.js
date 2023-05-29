@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { TrackContext } from "../context/trackContext";
+import { TrackContext } from "../../context/trackContext";
 import { useTheme } from "next-themes";
 import { FiX } from "react-icons/fi";
 

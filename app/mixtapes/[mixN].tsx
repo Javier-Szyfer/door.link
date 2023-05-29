@@ -3,11 +3,11 @@ import { TrackContext } from "../../context/trackContext";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { getPlaylist } from "../api/playlist";
+import { getPlaylist } from "../../api/playlist";
 import { useTheme } from "next-themes";
 import { FiPlay } from "react-icons/fi";
 
-import Player from "../../components/player";
+import Player from "../components/player";
 
 export default function MixNum({ mix }) {
   const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
