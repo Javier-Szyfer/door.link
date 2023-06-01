@@ -3,26 +3,42 @@ import { NextApiRequest, NextApiResponse } from "next";
 export const getPlaylist = async (): Promise<any[]> => {
   try {
     const API_URL = process.env.API_URL;
-    const response = await fetch(`${API_URL}/playlists?_sort=created_at:desc`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    let start = 0;
+    const limit = 100;
+    let playlists: any[] = [];
 
-    // Check if the response status is not OK
-    if (!response.ok) {
-      throw new Error("Server error");
+    while (true) {
+      const response = await fetch(
+        `${API_URL}/playlists?_sort=created_at:desc&_start=${start}&_limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // Check if the response status is not OK
+      if (!response.ok) {
+        throw new Error("Server error");
+      }
+
+      const data = await response.json();
+
+      if (data.length > 0) {
+        playlists = [...playlists, ...data];
+        start += limit;
+      } else {
+        break;
+      }
     }
 
-    const data: any[] = await response.json();
-    return data;
+    return playlists;
   } catch (error) {
     console.error(`Error fetching playlists: ${error}`);
     throw error;
   }
 };
-
 const AllPlaylist = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const data = await getPlaylist();

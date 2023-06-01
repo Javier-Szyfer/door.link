@@ -1,10 +1,10 @@
 "use client";
+import "../styles/globals.css";
 
 import { useContext, useEffect, useState } from "react";
 import { TrackContext } from "../context/trackContext";
 
 //Components
-import Header from "./components/header";
 import Playlist from "./components/playlist";
 import Player from "./components/player";
 
@@ -17,7 +17,7 @@ async function allMixtapes() {
 export default function Home() {
   const { selectedTrack } = useContext(TrackContext);
   const [playlists, setPlaylists] = useState<any[]>();
-  console.log(playlists);
+
   useEffect(() => {
     allMixtapes().then((data) => {
       return setPlaylists(data);
@@ -39,13 +39,11 @@ export default function Home() {
     });
 
   return (
-    <div className="max-w-7xl mx-auto bg-white dark:bg-[#121212] pb-10">
-      <Header />
+    <>
       {selectedTrack && <Player />}
-
       {tracks?.map((track) => (
         <Playlist track={track} key={track.id} />
       ))}
-    </div>
+    </>
   );
 }

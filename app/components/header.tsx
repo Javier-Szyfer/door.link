@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect, useContext } from "react";
 import { TrackContext } from "../../context/trackContext";
 
