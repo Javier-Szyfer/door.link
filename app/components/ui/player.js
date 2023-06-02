@@ -1,5 +1,7 @@
+"use client";
+
 import { useContext, useEffect, useState } from "react";
-import { TrackContext } from "../../context/trackContext";
+import { TrackContext } from "../../Providers";
 import { useTheme } from "next-themes";
 import { FiX } from "react-icons/fi";
 
@@ -16,14 +18,14 @@ export default function Player() {
     type: "audio",
     sources: [
       {
-        src: selectedTrack.url,
+        src: selectedTrack && selectedTrack.url,
       },
     ],
   };
 
   const plyrOptions = {
     options: {
-      download: selectedTrack.url,
+      download: selectedTrack && selectedTrack.url,
       controls: [
         "play",
         "progress",
@@ -49,7 +51,7 @@ export default function Player() {
     }
   }, [mounted]);
 
-  if (!mounted) return null;
+  if (!selectedTrack) return null;
 
   return (
     <div

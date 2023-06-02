@@ -1,6 +1,7 @@
 import "./styles/globals.css";
 import { MixtapeListItem } from "./components/ui/MixtapeListItem";
 import { getMixtapes } from "./lib/getAllMixtapes";
+import Player from "./components/ui/Player";
 
 const Page = async () => {
   const mixtapesData: Promise<any[]> = getMixtapes();
@@ -21,9 +22,14 @@ const Page = async () => {
     });
 
   if (!tracks) return null;
-  return tracks.map((track) => (
-    <MixtapeListItem track={track} key={track.id} />
-  ));
+  return (
+    <>
+      {tracks.map((track) => (
+        <MixtapeListItem track={track} key={track.id} />
+      ))}
+      <Player />
+    </>
+  );
 };
 
 export default Page;

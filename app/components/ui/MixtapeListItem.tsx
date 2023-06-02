@@ -2,7 +2,7 @@
 
 import { Fragment, useState, useContext } from "react";
 import Image from "next/legacy/image";
-import { TrackContext } from "@/context/trackContext";
+import { TrackContext } from "../../Providers";
 
 import { Dialog, Transition, Disclosure } from "@headlessui/react";
 

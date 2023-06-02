@@ -9,7 +9,7 @@ import { useTheme } from "next-themes";
 import { FiPlay } from "react-icons/fi";
 import { getMixtapeById } from "../../lib/getMixtapeById";
 import { usePathname } from "next/navigation";
-import Player from "../../components/ui/player";
+import Player from "../../components/ui/Player";
 
 export default async function Mix() {
   const mixN = usePathname().split("/")[2];

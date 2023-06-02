@@ -1,7 +1,7 @@
 import { Nav } from "./components/ui/Header/Nav";
 import { Header } from "./components/ui/Header/Header";
 import type { Metadata } from "next";
-import { Providers } from "ThemeProvider";
+import { Providers } from "Providers";
 
 export const metadata: Metadata = {
   title: "door.link",

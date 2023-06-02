@@ -4,12 +4,11 @@ import Image from "next/image";
 import { useContext } from "react";
 import { useTheme } from "next-themes";
 // CONTEXT
-import { TrackContext } from "@/context/trackContext";
+import { TrackContext } from "../../../Providers";
 
 export const ToggleThemeIcon = () => {
   const { selectedTrack } = useContext(TrackContext);
   const { theme, setTheme } = useTheme();
-  console.log(theme);
 
   return (
     <button>
