@@ -1,18 +1,20 @@
+"use client";
+
 import { Fragment, useState, useContext } from "react";
-import { TrackContext } from "../../context/trackContext";
 import Image from "next/legacy/image";
+import { TrackContext } from "@/context/trackContext";
 
 import { Dialog, Transition, Disclosure } from "@headlessui/react";
 
 //ICONS
 import { FiChevronDown } from "react-icons/fi";
 
-export default function Playlist({ track }) {
+export const MixtapeListItem = ({ track }) => {
   const { setSelectedTrack } = useContext(TrackContext);
   const [clicked, setClicked] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const URL = `https://door.link/mixtapes/${track.number}`;
+  const URL = `http://localhost:3000/mixtapes/${track.number}`;
 
   function closeModal() {
     setIsOpen(false);
@@ -140,4 +142,4 @@ export default function Playlist({ track }) {
       </>
     </div>
   );
-}
+};

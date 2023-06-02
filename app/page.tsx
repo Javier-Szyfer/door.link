@@ -1,32 +1,14 @@
-"use client";
-import "../styles/globals.css";
+import "./styles/globals.css";
+import { MixtapeListItem } from "./components/ui/MixtapeListItem";
+import { getMixtapes } from "./lib/getAllMixtapes";
 
-import { useContext, useEffect, useState } from "react";
-import { TrackContext } from "../context/trackContext";
-
-//Components
-import Playlist from "./components/playlist";
-import Player from "./components/player";
-
-import { getPlaylist } from "../api/playlist";
-
-async function allMixtapes() {
-  const allMixtapes = await getPlaylist();
-  return allMixtapes;
-}
-export default function Home() {
-  const { selectedTrack } = useContext(TrackContext);
-  const [playlists, setPlaylists] = useState<any[]>();
-
-  useEffect(() => {
-    allMixtapes().then((data) => {
-      return setPlaylists(data);
-    });
-  }, []);
+const Page = async () => {
+  const mixtapesData: Promise<any[]> = getMixtapes();
+  const mixtapes = await mixtapesData;
 
   const tracks =
-    playlists &&
-    playlists.map((track: any) => {
+    mixtapes &&
+    mixtapes.map((track: any) => {
       return {
         id: track.id,
         title: track.Title,
@@ -38,12 +20,10 @@ export default function Home() {
       };
     });
 
-  return (
-    <>
-      {selectedTrack && <Player />}
-      {tracks?.map((track) => (
-        <Playlist track={track} key={track.id} />
-      ))}
-    </>
-  );
-}
+  if (!tracks) return null;
+  return tracks.map((track) => (
+    <MixtapeListItem track={track} key={track.id} />
+  ));
+};
+
+export default Page;

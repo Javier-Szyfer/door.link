@@ -1,11 +1,9 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
-export const getPlaylist = async (): Promise<any[]> => {
+export const getMixtapes = async () => {
   try {
     const API_URL = process.env.API_URL;
     let start = 0;
     const limit = 100;
-    let playlists: any[] = [];
+    let mixtapes: any[] = [];
 
     while (true) {
       const response = await fetch(
@@ -18,7 +16,6 @@ export const getPlaylist = async (): Promise<any[]> => {
         }
       );
 
-      // Check if the response status is not OK
       if (!response.ok) {
         throw new Error("Server error");
       }
@@ -26,26 +23,16 @@ export const getPlaylist = async (): Promise<any[]> => {
       const data = await response.json();
 
       if (data.length > 0) {
-        playlists = [...playlists, ...data];
+        mixtapes = [...mixtapes, ...data];
         start += limit;
       } else {
         break;
       }
     }
 
-    return playlists;
+    return mixtapes;
   } catch (error) {
-    console.error(`Error fetching playlists: ${error}`);
+    console.error(`Error fetching mixtapes: ${error}`);
     throw error;
   }
 };
-const AllPlaylist = async (req: NextApiRequest, res: NextApiResponse) => {
-  try {
-    const data = await getPlaylist();
-    res.status(200).json(data);
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch the playlist" });
-  }
-};
-
-export default AllPlaylist;

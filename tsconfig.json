@@ -1,5 +1,12 @@
 {
   "compilerOptions": {
+    "baseUrl": "app",
+    "paths": {
+      "@/context/*": ["context/*"],
+      "@/components/*": ["components/*"],
+      // "@/styles/*": ["styles/*"],
+      // You can add more aliases here.
+    },
     "lib": [
       "dom",
       "dom.iterable",

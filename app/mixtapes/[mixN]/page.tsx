@@ -1,17 +1,28 @@
+"use client";
+
 import { useContext, useEffect } from "react";
 import { TrackContext } from "../../context/trackContext";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { getPlaylist } from "../../api/playlist";
 import { useTheme } from "next-themes";
 import { FiPlay } from "react-icons/fi";
+import { getMixtapeById } from "../../lib/getMixtapeById";
+import { usePathname } from "next/navigation";
+import Player from "../../components/ui/player";
 
-import Player from "../components/player";
+export default async function Mix() {
+  const mixN = usePathname().split("/")[2];
+  console.log("mixN", mixN);
 
-export default function MixNum({ mix }) {
   const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
   const { theme } = useTheme();
+
+  const mixtapeData: Promise<any> = getMixtapeById(mixN);
+  const mixes = await mixtapeData;
+  const mix = mixes.filter((mix) => mix.number.toString() === mixN)[0];
+
+  console.log("mix", mix);
 
   const m = {
     id: mix.id,
@@ -97,30 +108,4 @@ export default function MixNum({ mix }) {
       </div>
     </>
   );
-}
-
-export async function getStaticPaths() {
-  const data = await getPlaylist();
-
-  const paths = data.map((track) => {
-    return {
-      params: { mixN: track.number.toString() },
-    };
-  });
-  return {
-    paths,
-    fallback: "blocking",
-  };
-}
-
-export async function getStaticProps(context) {
-  const mixN = context.params.mixN;
-  const data = await getPlaylist();
-  const mix = data.filter((x) => x.number.toString() === mixN);
-
-  return {
-    props: {
-      mix: mix[0],
-    },
-  };
 }

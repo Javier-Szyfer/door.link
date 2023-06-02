@@ -1,14 +1,17 @@
+"use client";
 import { useState } from "react";
+import Link from "next/link";
 
+import "../styles/globals.css";
 import { AiOutlineClose } from "react-icons/ai";
 
-export default function Subscribers({ setShowForm }) {
+export default function Subscribers() {
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const subscribeToNewsletter = async (e) => {
+  const subscribeToNewsletter = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     if (email === "") {
@@ -43,12 +46,11 @@ export default function Subscribers({ setShowForm }) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col min-h-screen justify-center items-center w-full bg-white dark:bg-[#121212] text-[#444444] dark:text-[#f1f1f1]">
-      <div
-        onClick={() => setShowForm(false)}
-        className="fixed z-50 right-[1rem] top-[1rem] md:top-[2rem] md:right-[2rem]  cursor-pointer "
-      >
-        <AiOutlineClose className="text-[#1500FF] h-8 w-8" />
-      </div>
+      <Link href="/">
+        <div className="fixed z-50 right-[1rem] top-[1rem] md:top-[2rem] md:right-[2rem]  cursor-pointer ">
+          <AiOutlineClose className="text-[#1500FF] h-8 w-8" />
+        </div>
+      </Link>
 
       <form onSubmit={subscribeToNewsletter}>
         <div className="flex flex-col py-8">
@@ -68,10 +70,10 @@ export default function Subscribers({ setShowForm }) {
 
           <div className="flex justify-between mt-4 ">
             <button
-              onClick={() => setShowForm(false)}
+              type="button"
               className="bg-stone-200 w-[40%] hover:bg-stone-300 dark:text-stone-800 "
             >
-              Back
+              <Link href="/">Back</Link>
             </button>
             <button
               type="submit"
