@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useEffect, useRef } from "react";
-import { TrackContext } from "Providers";
+import { TrackContext } from "../../Providers";
 import { useTheme } from "next-themes";
 import { FiX } from "react-icons/fi";
 
