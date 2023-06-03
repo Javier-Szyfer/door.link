@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
+// COMPONENTS
 import { Nav } from "./components/ui/Header/Nav";
 import { Header } from "./components/ui/Header/Header";
-import type { Metadata } from "next";
+// PROVIDERS
 import { Providers } from "Providers";
 
 export const metadata: Metadata = {

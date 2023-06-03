@@ -1,7 +1,7 @@
 "use client";
 
-import { ThemeProvider } from "next-themes";
 import { createContext, useState } from "react";
+import { ThemeProvider } from "next-themes";
 
 export const TrackContext = createContext({} as any);
 
