@@ -1,7 +1,7 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
-import { TrackContext } from "../../Providers";
+import { useContext, useEffect, useRef } from "react";
+import { TrackContext } from "Providers";
 import { useTheme } from "next-themes";
 import { FiX } from "react-icons/fi";
 
@@ -9,10 +9,11 @@ import { FiX } from "react-icons/fi";
 import Plyr from "plyr-react";
 import "plyr-react/plyr.css";
 
-export default function Player() {
+export const Player = () => {
   const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
-  const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
+
+  const playerContainerRef = useRef(null);
 
   const audioSrc = {
     type: "audio",
@@ -25,7 +26,6 @@ export default function Player() {
 
   const plyrOptions = {
     options: {
-      download: selectedTrack && selectedTrack.url,
       controls: [
         "play",
         "progress",
@@ -39,22 +39,37 @@ export default function Player() {
     },
   };
 
-  useEffect(() => setMounted(true), []);
-
   useEffect(() => {
-    if (mounted) {
-      const downloadButton = document.getElementsByTagName("a")[3];
-      downloadButton?.addEventListener("click", () => {
-        downloadButton.setAttribute("href", selectedTrack.url);
-        downloadButton.setAttribute("download", selectedTrack.title);
+    if (playerContainerRef.current) {
+      // Initiate the observer
+      const observer = new MutationObserver(() => {
+        // Locate the download button
+        // Locate the download button
+        const downloadButton = playerContainerRef.current.querySelector(
+          'a[data-plyr="download"]'
+        ); // Update its properties
+        if (downloadButton) {
+          downloadButton.href = selectedTrack && selectedTrack.url;
+          downloadButton.download = selectedTrack && selectedTrack.title;
+          downloadButton.target = "_blank";
+        }
       });
+      // Observe changes
+      observer.observe(playerContainerRef.current, {
+        childList: true,
+        subtree: true,
+      });
+
+      // Disconnect observer on unmount
+      return () => observer.disconnect();
     }
-  }, [mounted]);
+  }, [selectedTrack]);
 
   if (!selectedTrack) return null;
 
   return (
     <div
+      ref={playerContainerRef}
       className="fixed bottom-0 z-40 w-screen h-20 border-t border-stone-300 lg:w-1/2
       lg:h-[88px] lg:bottom-[1rem] lg:left-[50%] lg:translate-x-[-50%] lg:border"
       style={{
@@ -94,4 +109,4 @@ export default function Player() {
       ></Plyr>
     </div>
   );
-}
+};
