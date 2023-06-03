@@ -1,6 +1,12 @@
 import { Component } from "react";
 
-import { getPlaylist } from "./api/playlist";
+import { getMixtapes } from "../app/lib/getAllMixtapes";
+
+declare global {
+  interface String {
+    encodeXML(): string;
+  }
+}
 
 if (!String.prototype.encodeXML) {
   String.prototype.encodeXML = function () {
@@ -79,7 +85,7 @@ export default class RSS extends Component {
       true
     );
     // Generate entries.
-    const entries = await getPlaylist();
+    const entries = await getMixtapes();
     for (const entry of entries) {
       const { audio } = entry;
       // Convert ISO8601 date string to RFC822.

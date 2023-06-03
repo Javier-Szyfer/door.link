@@ -18,7 +18,7 @@ export const UI = ({ mixtapes }) => {
   const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
 
   const pathname = usePathname();
-  const mixNumber = pathname.split("/")[2];
+  const mixNumber = pathname && pathname.split("/")[2];
 
   const mix = mixtapes.find((t: { number: string }) => t.number === mixNumber);
 
