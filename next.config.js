@@ -5,6 +5,6 @@ module.exports = {
     API_URL: process.env.API_URL,
   },
   images: {
-    domains: [process.env.BUCKET_URL],
+    domains: ["radio-strapi-bucket.s3.sa-east-1.amazonaws.com"],
   },
 };
