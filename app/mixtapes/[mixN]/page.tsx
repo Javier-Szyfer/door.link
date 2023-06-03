@@ -17,6 +17,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${mixN} | door.link`,
+    twitter: {
+      title: `${mixN} | door.link`,
+    },
   };
 }
 
