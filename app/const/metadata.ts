@@ -1,4 +1,4 @@
-export const GENERAL_METADATA = {
+export const SHARED_METADATA = {
   title: "door.link",
   description:
     "A curated selection of music for listening and dancing in closed spaces.",
