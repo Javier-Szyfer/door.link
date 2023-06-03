@@ -2,7 +2,7 @@ import "./styles/globals.css";
 import { getMixtapes } from "@/lib/getAllMixtapes";
 // components
 import { MixtapeListItem } from "@/components/ui/MixtapeListItem";
-import Player from "@/components/ui/Player";
+import Player from "./components/ui/Player";
 import { Header } from "@/components/ui/Header/Header";
 import { Nav } from "@/components/ui/Header/Nav";
 

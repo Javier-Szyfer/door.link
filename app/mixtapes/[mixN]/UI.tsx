@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 // components
-import Player from "@/components/ui/Player";
+import Player from "../../components/ui/Player";
 // context
 import { TrackContext } from "Providers";
 // hooks
