@@ -1,11 +1,3 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "door.link",
-  description:
-    "A curated selection of music for listening and dancing in closed spaces.",
-};
-
 export default function MixPageLayout({
   children,
 }: {
