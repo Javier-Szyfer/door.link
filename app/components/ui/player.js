@@ -9,7 +9,7 @@ import { FiX } from "react-icons/fi";
 import Plyr from "plyr-react";
 import "plyr-react/plyr.css";
 
-export default function Player() {
+export const Player = () => {
   const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
   const { theme } = useTheme();
 
@@ -109,4 +109,4 @@ export default function Player() {
       ></Plyr>
     </div>
   );
-}
+};

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 // components
-import Player from "../../components/ui/Player";
+import { Player } from "@/components/ui/Player";
 // context
 import { TrackContext } from "Providers";
 // hooks
@@ -13,7 +13,7 @@ import { usePathname } from "next/navigation";
 // icons
 import { FiPlay } from "react-icons/fi";
 
-export const UI = ({ mixtapes }) => {
+export const Content = ({ mixtapes }) => {
   const { theme } = useTheme();
   const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
 

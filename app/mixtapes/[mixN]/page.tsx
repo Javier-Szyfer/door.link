@@ -1,7 +1,7 @@
 import "../../styles/globals.css";
 
 import { getMixtapes } from "@/lib/getAllMixtapes";
-import { UI } from "./UI";
+import { Content } from "./Content";
 
 import { Metadata } from "next";
 
@@ -43,7 +43,7 @@ const MixPage = async () => {
 
   return (
     <>
-      <UI mixtapes={mixtapesFormatted} />
+      <Content mixtapes={mixtapesFormatted} />
     </>
   );
 };
