@@ -4,6 +4,7 @@
     "paths": {
       "@/context/*": ["context/*"],
       "@/components/*": ["components/*"],
+      "@/lib/*": ["lib/*"],
       // "@/styles/*": ["styles/*"],
       // You can add more aliases here.
     },

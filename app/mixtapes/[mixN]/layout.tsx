@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-// PROVIDERS
-import { Providers } from "Providers";
 
 export const metadata: Metadata = {
   title: "door.link",
@@ -8,16 +6,14 @@ export const metadata: Metadata = {
     "A curated selection of music for listening and dancing in closed spaces.",
 };
 
-export default function RootLayout({
+export default function MixPageLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang="en">
-      <body>
-        <Providers>{children}</Providers>
-      </body>
-    </html>
+    <main className="bg-white dark:bg-[#121212] text-[#444444] dark:text-[#f1f1f1] px-8 min-h-screen max-w-3xl flex flex-col space-y-4 mx-auto justify-evenly pb-20  items-center overflow-y-auto">
+      {children}
+    </main>
   );
 }

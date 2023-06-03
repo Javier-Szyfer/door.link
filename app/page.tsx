@@ -1,7 +1,10 @@
 import "./styles/globals.css";
-import { MixtapeListItem } from "./components/ui/MixtapeListItem";
-import { getMixtapes } from "./lib/getAllMixtapes";
-import Player from "./components/ui/Player";
+import { getMixtapes } from "@/lib/getAllMixtapes";
+// components
+import { MixtapeListItem } from "@/components/ui/MixtapeListItem";
+import Player from "@/components/ui/Player";
+import { Header } from "@/components/ui/Header/Header";
+import { Nav } from "@/components/ui/Header/Nav";
 
 const Page = async () => {
   const mixtapesData: Promise<any[]> = getMixtapes();
@@ -23,12 +26,14 @@ const Page = async () => {
 
   if (!tracks) return null;
   return (
-    <>
+    <main className="max-w-7xl mx-auto  pb-10 text-sm">
+      <Header />
+      <Nav />
       {tracks.map((track) => (
         <MixtapeListItem track={track} key={track.id} />
       ))}
       <Player />
-    </>
+    </main>
   );
 };
 

@@ -1,111 +1,31 @@
-"use client";
+import "../../styles/globals.css";
 
-import { useContext, useEffect } from "react";
-import { TrackContext } from "../../context/trackContext";
-import Head from "next/head";
-import Image from "next/image";
-import Link from "next/link";
-import { useTheme } from "next-themes";
-import { FiPlay } from "react-icons/fi";
-import { getMixtapeById } from "../../lib/getMixtapeById";
-import { usePathname } from "next/navigation";
-import Player from "../../components/ui/Player";
+import { getMixtapes } from "@/lib/getAllMixtapes";
+import { UI } from "./UI";
 
-export default async function Mix() {
-  const mixN = usePathname().split("/")[2];
-  console.log("mixN", mixN);
+const MixPage = async () => {
+  const mixtapesData: Promise<any[]> = getMixtapes();
+  const allMixtapes = await mixtapesData;
 
-  const { selectedTrack, setSelectedTrack } = useContext(TrackContext);
-  const { theme } = useTheme();
-
-  const mixtapeData: Promise<any> = getMixtapeById(mixN);
-  const mixes = await mixtapeData;
-  const mix = mixes.filter((mix) => mix.number.toString() === mixN)[0];
-
-  console.log("mix", mix);
-
-  const m = {
-    id: mix.id,
-    title: mix.Title,
-    url: mix.audio.url,
-    duration: mix.duration,
-    number: mix.number,
-    description: mix.Description,
-    image: mix.artwork.url,
-  };
-
-  useEffect(() => {
-    setSelectedTrack(m);
-  }, []);
+  const mixtapesFormatted =
+    allMixtapes &&
+    allMixtapes.map((track: any) => {
+      return {
+        id: track.id,
+        title: track.Title,
+        url: track.audio.url,
+        duration: track.duration,
+        number: track.number,
+        description: track.Description,
+        image: track.artwork.url,
+      };
+    });
 
   return (
     <>
-      <Head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta charSet="utf-8" />
-        <meta
-          name="description"
-          content="A curated selection of music for listening and dancing in small, safe spaces."
-        />
-        <meta
-          property="og:image"
-          content="https://res.cloudinary.com/aldi/image/upload/v1607370937/ogcard_bmltnc.jpg"
-          key="ogimage"
-        />
-        <meta property="og:image:alt" content="this is the logo of door.link" />
-        <meta
-          property="og:title"
-          content={`${m.number} door.link`}
-          key="ogtitle"
-        />
-        <meta
-          property="og:description"
-          content="A curated selection of music for listening and dancing in closed spaces."
-          key="ogdesc"
-        />
-        <title>{m.number} - door.link </title>
-      </Head>
-      <div className="bg-white dark:bg-[#121212] text-[#444444] dark:text-[#f1f1f1] px-8 min-h-screen max-w-3xl flex flex-col space-y-4 mx-auto justify-evenly pb-20  items-center overflow-y-auto">
-        <Link href={"/"} passHref>
-          <div
-            className="cursor-pointer mt-12"
-            onClick={() => setSelectedTrack(null)}
-          >
-            <Image
-              src={theme === "dark" ? "/logowhite.svg" : "/logoblack.svg"}
-              className="cursor-pointer p-[3px]"
-              width={20}
-              height={28}
-              alt="door.link-logo"
-            />
-          </div>
-        </Link>
-        <div className="mt-16"></div>
-        <Image
-          src={m.image}
-          alt={m.title}
-          layout="fixed"
-          objectFit="cover"
-          width={250}
-          height={250}
-          priority
-        />
-        <div className="flex flex-col justify-center items-center">
-          <div className="flex items-center">
-            {!selectedTrack && (
-              <FiPlay
-                onClick={() => {
-                  setSelectedTrack(m);
-                }}
-                className="hover:text-[#1500FF] mr-2 cursor-pointer"
-              />
-            )}
-            <h1 className="">{m.title}</h1>
-          </div>
-          <p className="text-center mt-4 pb-12">{m.description}</p>
-        </div>
-        {selectedTrack && <Player />}
-      </div>
+      <UI mixtapes={mixtapesFormatted} />
     </>
   );
-}
+};
+
+export default MixPage;
