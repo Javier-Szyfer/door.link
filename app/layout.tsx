@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { SHARED_METADATA } from "const/metadata";
+import { SHARED_METADATA } from "./const/metadata";
 // PROVIDERS
-import { Providers } from "Providers";
+import { Providers } from "./Providers";
 import Script from "next/script";
 
 export const metadata: Metadata = {

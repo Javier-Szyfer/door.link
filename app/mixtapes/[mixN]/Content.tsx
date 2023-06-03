@@ -5,7 +5,7 @@ import Link from "next/link";
 // components
 import { Player } from "@/components/ui/Player";
 // context
-import { TrackContext } from "Providers";
+import { TrackContext } from "../../Providers";
 // hooks
 import { useContext, useEffect } from "react";
 import { useTheme } from "next-themes";

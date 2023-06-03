@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
-    "baseUrl": "app",
+    "baseUrl": ".",
     "paths": {
-      "@/context/*": ["context/*"],
-      "@/components/*": ["components/*"],
-      "@/components/ui/*": ["components/ui/*"],  
-      "@/lib/*": ["lib/*"],
+      "@/*": ["app/*"]
     },
     "lib": [
       "dom",
