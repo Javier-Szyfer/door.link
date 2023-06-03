@@ -14,7 +14,7 @@ export const MixtapeListItem = ({ track }) => {
   const [clicked, setClicked] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const URL = `http://localhost:3000/mixtapes/${track.number}`;
+  const URL = `${process.env.NEXT_PUBLIC_BASE_URL}/mixtapes/${track.number}`;
 
   function closeModal() {
     setIsOpen(false);
