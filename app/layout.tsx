@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { GENERAL_METADATA } from "const/metadata";
 // PROVIDERS
 import { Providers } from "Providers";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   ...GENERAL_METADATA,
@@ -15,6 +16,21 @@ export default function RootLayout({
   return (
     <html suppressHydrationWarning lang="en">
       <body>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-7E2SWW6YEG"
+        />
+
+        <Script
+          dangerouslySetInnerHTML={{
+            __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-7E2SWW6YEG');
+        `,
+          }}
+        />
         <Providers>{children}</Providers>
       </body>
     </html>
