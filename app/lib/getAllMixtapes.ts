@@ -8,12 +8,7 @@ export const getMixtapes = async () => {
     while (true) {
       const response = await fetch(
         `${API_URL}/playlists?_sort=created_at:desc&_start=${start}&_limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+        { next: { revalidate: 10 } }
       );
 
       if (!response.ok) {
