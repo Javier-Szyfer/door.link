@@ -1,8 +1,7 @@
 import groq from "groq";
 import { client } from "../client/sanity";
-
-export const getAllMixtapes = async () => {
-  const query = groq`*[_type == "mixtape"]{
+export const getMixtapeByNumber = async (mixtapeNumber: string) => {
+  const query = groq`*[number=="${mixtapeNumber}"]{
     _createdAt,
     _id,
     _rev,
@@ -15,7 +14,7 @@ export const getAllMixtapes = async () => {
     duration,
     number,
     title
-  } | order(number desc)`;
+  }`;
 
   return client
     .fetch(query)

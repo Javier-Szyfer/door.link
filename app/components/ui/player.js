@@ -19,7 +19,7 @@ export const Player = () => {
     type: "audio",
     sources: [
       {
-        src: selectedTrack && selectedTrack.url,
+        src: selectedTrack && selectedTrack.audioUrl,
       },
     ],
   };

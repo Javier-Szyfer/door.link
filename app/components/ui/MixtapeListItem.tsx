@@ -1,13 +1,14 @@
 "use client";
 
-import { Fragment, useState, useContext } from "react";
 import Image from "next/legacy/image";
 import { TrackContext } from "../../Providers";
 
+import { Fragment, useState, useContext } from "react";
+// COMPONENTs
 import { Dialog, Transition, Disclosure } from "@headlessui/react";
-
-//ICONS
+// ICONS
 import { FiChevronDown } from "react-icons/fi";
+// TYPES
 
 export const MixtapeListItem = ({ track }) => {
   const { setSelectedTrack } = useContext(TrackContext);

@@ -5,6 +5,6 @@ module.exports = {
     API_URL: process.env.API_URL,
   },
   images: {
-    domains: [process.env.BUCKET_URL],
+    domains: [process.env.BUCKET_URL, "cdn.sanity.io"],
   },
 };

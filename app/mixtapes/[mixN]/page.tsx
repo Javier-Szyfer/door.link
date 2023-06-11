@@ -1,6 +1,5 @@
 import "../../styles/globals.css";
 
-import { getMixtapes } from "@/lib/getAllMixtapes";
 import { Content } from "./Content";
 
 import { Metadata } from "next";
@@ -11,8 +10,6 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // read route params
-
   const { mixN } = params;
 
   return {
@@ -24,28 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const MixPage = async () => {
-  const mixtapesData: Promise<any[]> = getMixtapes();
-  const allMixtapes = await mixtapesData;
-
-  const mixtapesFormatted =
-    allMixtapes &&
-    allMixtapes.map((track: any) => {
-      return {
-        id: track.id,
-        title: track.Title,
-        url: track.audio.url,
-        duration: track.duration,
-        number: track.number,
-        description: track.Description,
-        image: track.artwork.url,
-      };
-    });
-
-  return (
-    <>
-      <Content mixtapes={mixtapesFormatted} />
-    </>
-  );
+  return <Content />;
 };
 
 export default MixPage;

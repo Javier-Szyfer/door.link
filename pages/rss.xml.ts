@@ -1,6 +1,6 @@
 import { Component } from "react";
 
-import { getMixtapes } from "../app/lib/getAllMixtapes";
+import { getAllMixtapes } from "../app/lib/getAllMixtapes";
 
 declare global {
   interface String {
@@ -30,7 +30,7 @@ const TagWriter = (writer) => ({
             .join(" ")
       );
     if (isVoid) writer.write(` />\n`);
-    else writer.write(`>${content.encodeXML()}</${tag}>\n`);
+    else writer.write(`>${content ? content.encodeXML() : ""}</${tag}>\n`);
   },
   open: (tag, attrs = {}, indent = 0) => {
     const tab = "  ".repeat(indent);
@@ -85,20 +85,20 @@ export default class RSS extends Component {
       true
     );
     // Generate entries.
-    const entries = await getMixtapes();
+    const entries = await getAllMixtapes();
     for (const entry of entries) {
       const { audio } = entry;
       // Convert ISO8601 date string to RFC822.
-      const date = new Date(Date.parse(entry.published_at));
+      const date = new Date(Date.parse(entry._createdAt));
       tag.open("item", {}, 1);
-      tag.write("title", {}, entry.Title, 2);
+      tag.write("title", {}, entry.title, 2);
       tag.write("guid", { isPermaLink: false }, audio.hash, 2);
       tag.write("link", {}, "https://door.link/", 2);
       tag.write(
         "enclosure",
         {
           url: audio.url,
-          type: audio.mime,
+          type: audio.mimeType,
           length: Math.trunc(audio.size * 1000),
         },
         null,
@@ -106,7 +106,7 @@ export default class RSS extends Component {
         true
       );
       // Description tag must be encoded twice, first as HTML, then as XML.
-      tag.write("description", {}, entry.Description.trim().encodeXML(), 2);
+      tag.write("description", {}, entry.description.trim().encodeXML(), 2);
       tag.write("pubDate", {}, date.toUTCString(), 2);
       tag.close("item", 1);
     }
