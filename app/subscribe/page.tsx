@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-
 import "../styles/globals.css";
 import { AiOutlineClose } from "react-icons/ai";
 
@@ -9,38 +8,43 @@ export default function Subscribers() {
   const [email, setEmail] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const subscribeToNewsletter = async (e: { preventDefault: () => void }) => {
+
+  const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+
+  const subscribeToNewsletter = async (e) => {
     e.preventDefault();
 
-    if (email === "") {
-      setErrorMessage("Enter your email to subscribe");
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Please provide a valid email");
       return;
     }
+
     setLoading(true);
+    setSuccess(false);
+    setErrorMessage("");
+
     try {
-      const API_URL = process.env.API_URL;
-      const res = await fetch(`${API_URL}/subscribers`, {
+      const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          email,
-        }),
+        body: JSON.stringify({ email: email }),
       });
+
       const data = await res.json();
-      setSuccess(true);
-      setEmail("");
-      setLoading(false);
-    } catch (err) {
-      if (err instanceof TypeError) {
-        setErrorMessage("Not a valid email");
+
+      if (res.ok) {
+        setLoading(false);
+        setSuccess(true);
+        setEmail("");
       } else {
-        setErrorMessage("An unexpected error occurred");
+        throw new Error(data.message);
       }
+    } catch (error) {
       setLoading(false);
+      setErrorMessage("Something went wrong. Please try again.");
     }
   };
 
@@ -57,12 +61,11 @@ export default function Subscribers() {
           <h2>Sign up for updates — no spam, just music.</h2>
 
           <input
-            type="email"
-            required
+            type="text"
             value={email}
             placeholder="Email"
             onChange={(e) => {
-              setEmail(e.target.value), setSuccess(false), setError(false);
+              setEmail(e.target.value), setSuccess(false), setErrorMessage("");
             }}
             className="border border-[#1500FF] py-2 px-2 mt-4 placeholder:text-[#1500FF] bg-white dark:bg-[#121212]"
             autoComplete="true"
@@ -105,7 +108,9 @@ export default function Subscribers() {
             </button>
           </div>
           {success && <span className="mt-5 text-[#1500FF]">: ) thx!</span>}
-          {errorMessage && <span className="mt-5">{error}</span>}
+          {errorMessage && (
+            <span className="mt-5 text-[#ff0000]">{errorMessage}</span>
+          )}
         </div>
       </form>
     </div>
