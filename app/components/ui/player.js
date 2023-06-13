@@ -48,8 +48,9 @@ export const Player = () => {
         const downloadButton = playerContainerRef.current.querySelector(
           'a[data-plyr="download"]'
         ); // Update its properties
+
         if (downloadButton) {
-          downloadButton.href = selectedTrack && selectedTrack.url;
+          downloadButton.href = selectedTrack && selectedTrack.audioUrl;
           downloadButton.download = selectedTrack && selectedTrack.title;
           downloadButton.target = "_blank";
         }
