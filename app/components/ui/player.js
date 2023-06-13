@@ -39,6 +39,7 @@ export const Player = () => {
     },
   };
 
+  // **** HANDLE DOWNLOAD ****
   useEffect(() => {
     if (playerContainerRef.current) {
       // Initiate the observer

@@ -1,5 +1,5 @@
 import groq from "groq";
-import { client } from "../client/sanity";
+import { publicClient } from "../client/sanity";
 export const getMixtapeByNumber = async (mixtapeNumber: string) => {
   const query = groq`*[number=="${mixtapeNumber}"]{
     _createdAt,
@@ -16,7 +16,7 @@ export const getMixtapeByNumber = async (mixtapeNumber: string) => {
     title
   }`;
 
-  return client
+  return publicClient
     .fetch(query)
     .then((res) => {
       return res;
