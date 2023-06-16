@@ -1,6 +1,8 @@
 import groq from "groq";
 import { publicClient } from "../client/sanity";
 
+export const runtime = "edge";
+
 export const getAllMixtapes = async () => {
   const query = groq`*[_type == "mixtape"]{
     _createdAt,
