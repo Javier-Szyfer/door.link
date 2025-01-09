@@ -115,8 +115,6 @@ export const updateMixtape = async (id: number, mixtapeData: MixtapeData) => {
 		const supabase = await createClient();
 		const user = await supabase.auth.getUser();
 
-		console.log("Mixtape data:", mixtapeData);
-
 		if (!isAdmin(user.data.user?.id ?? "")) {
 			return { error: "Not authorized to update mixtapes" };
 		}
