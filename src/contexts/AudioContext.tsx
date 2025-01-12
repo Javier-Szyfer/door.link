@@ -10,6 +10,10 @@ interface AudioContextType {
 	duration: number;
 	currentMixtape: { number: string; title: string; id: string } | null;
 	audioSrc: string | null;
+	queue: Array<{
+		audio_uri: string;
+		mixtapeInfo: { number: string; title: string; id: string };
+	}>;
 	togglePlay: () => void;
 	toggleMute: () => void;
 	setVolume: (volume: number) => void;
@@ -17,6 +21,10 @@ interface AudioContextType {
 	setAudioSrc: (
 		src: string,
 		mixtapeInfo: { number: string; title: string; id: string },
+		queue?: Array<{
+			audio_uri: string;
+			mixtapeInfo: { number: string; title: string; id: string };
+		}>,
 	) => void;
 }
 
@@ -41,30 +49,83 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		title: string;
 		id: string;
 	} | null>(null);
+	const [queue, setQueue] = useState<
+		Array<{
+			audio_uri: string;
+			mixtapeInfo: { number: string; title: string; id: string };
+		}>
+	>([]);
+
+	console.log("queue", queue);
+	console.log("currentMixtape", currentMixtape);
 
 	useEffect(() => {
-		audioRef.current = new Audio();
-
+		if (!audioRef.current) return;
 		const audio = audioRef.current;
 
-		audio.addEventListener("timeupdate", () => {
+		const handleTimeUpdate = () => {
 			setProgress(audio.currentTime);
-		});
+		};
 
-		audio.addEventListener("durationchange", () => {
+		const handleDurationChange = () => {
 			setDuration(audio.duration);
-		});
+		};
 
-		audio.addEventListener("ended", () => {
+		const handleEnded = async () => {
 			setIsPlaying(false);
 			setProgress(0);
-		});
+
+			// Play next track if available
+			if (queue.length > 0) {
+				const nextTrack = queue[0];
+				const remainingQueue = queue.slice(1);
+
+				try {
+					// First, pause and reset any existing playback
+					audio.pause();
+
+					// Set up the new audio source
+					audio.src = nextTrack.audio_uri;
+					audio.load();
+					setAudioSrcState(nextTrack.audio_uri);
+					setCurrentMixtape(nextTrack.mixtapeInfo);
+					setQueue(remainingQueue);
+
+					// Wait a bit for the audio to be ready
+					await new Promise((resolve) => setTimeout(resolve, 100));
+
+					// Start playing the new audio
+					await audio.play();
+					setIsPlaying(true);
+				} catch (error) {
+					console.log("Auto-play next track error:", error);
+					setIsPlaying(false);
+				}
+			}
+		};
+
+		audio.addEventListener("timeupdate", handleTimeUpdate);
+		audio.addEventListener("durationchange", handleDurationChange);
+
+		audio.addEventListener("ended", handleEnded);
 
 		return () => {
-			audio.pause();
-			audio.src = "";
+			audio.removeEventListener("timeupdate", handleTimeUpdate);
+			audio.removeEventListener("durationchange", handleDurationChange);
+			audio.removeEventListener("ended", handleEnded);
 		};
-	}, []);
+	}, [queue]); // Add queue as dependency
+
+	// Initialize audio element
+	useEffect(() => {
+		audioRef.current = new Audio();
+		return () => {
+			if (audioRef.current) {
+				audioRef.current.pause();
+				audioRef.current.src = "";
+			}
+		};
+	}, []); // This effect only runs once to initialize
 
 	useEffect(() => {
 		if (audioRef.current) {
@@ -73,15 +134,22 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		}
 	}, [volume]);
 
-	const togglePlay = () => {
+	const togglePlay = async () => {
 		if (!audioRef.current) return;
 
-		if (isPlaying) {
-			audioRef.current.pause();
-		} else {
-			audioRef.current.play();
+		try {
+			if (isPlaying) {
+				audioRef.current.pause();
+				setIsPlaying(false);
+			} else {
+				const playPromise = audioRef.current.play();
+				await playPromise;
+				setIsPlaying(true);
+			}
+		} catch (error) {
+			console.log("Toggle play error:", error);
+			setIsPlaying(false);
 		}
-		setIsPlaying(!isPlaying);
 	};
 
 	const toggleMute = () => {
@@ -115,25 +183,43 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		setProgress(clampedTime);
 	};
 
-	const setAudioSrc = (
+	const setAudioSrc = async (
 		src: string,
 		mixtapeInfo: { number: string; title: string; id: string },
+		newQueue?: Array<{
+			audio_uri: string;
+			mixtapeInfo: { number: string; title: string; id: string };
+		}>,
 	) => {
 		if (!audioRef.current) return;
 
-		// If already playing, pause current audio
-		if (isPlaying) {
-			audioRef.current.pause();
+		try {
+			// Pause and reset any existing playback
+			if (audioRef.current.src) {
+				audioRef.current.pause();
+				setIsPlaying(false);
+			}
+
+			// Set up the new audio source
+			audioRef.current.src = src;
+			audioRef.current.load();
+			setAudioSrcState(src);
+			setCurrentMixtape(mixtapeInfo);
+
+			// Update queue if provided
+			if (newQueue) setQueue(newQueue);
+
+			// Wait a bit for the audio to be ready
+			await new Promise((resolve) => setTimeout(resolve, 100));
+
+			// Start playing the new audio
+			const playPromise = audioRef.current.play();
+			await playPromise;
+			setIsPlaying(true);
+		} catch (error) {
+			console.log("Playback error:", error);
+			setIsPlaying(false);
 		}
-
-		audioRef.current.src = src;
-		audioRef.current.load();
-		setAudioSrcState(src);
-		setCurrentMixtape(mixtapeInfo);
-
-		// Start playing the new audio
-		audioRef.current.play();
-		setIsPlaying(true);
 	};
 
 	return (
@@ -146,6 +232,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 				duration,
 				currentMixtape,
 				audioSrc,
+				queue,
 				togglePlay,
 				toggleMute,
 				setVolume,
