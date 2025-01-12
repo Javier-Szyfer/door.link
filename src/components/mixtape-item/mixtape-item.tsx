@@ -22,8 +22,10 @@ import type { Database } from "@/types/database.types";
 
 export const MixtapeItem = ({
 	mixtape,
+	allMixtapes,
 }: {
 	mixtape: Database["public"]["Tables"]["mixtapes"]["Row"];
+	allMixtapes: Database["public"]["Tables"]["mixtapes"]["Row"][];
 }) => {
 	const { id, number, title, duration, artwork_uri, description, audio_uri } =
 		mixtape;
@@ -36,7 +38,24 @@ export const MixtapeItem = ({
 		if (currentMixtape?.id === id.toString()) {
 			togglePlay();
 		} else {
-			setAudioSrc(audio_uri, { number, title, id: id.toString() });
+			// Find current mixtape index
+			const currentIndex = allMixtapes.findIndex((m) => m.id === id);
+
+			// Create queue of all mixtapes after the current one, excluding the current one
+			const remainingMixtapes = allMixtapes.slice(currentIndex + 1);
+			const queue =
+				remainingMixtapes.length > 0
+					? remainingMixtapes.map((m) => ({
+							audio_uri: m.audio_uri,
+							mixtapeInfo: {
+								number: m.number,
+								title: m.title,
+								id: m.id.toString(),
+							},
+						}))
+					: [];
+
+			setAudioSrc(audio_uri, { number, title, id: id.toString() }, queue);
 		}
 	};
 
