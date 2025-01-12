@@ -25,14 +25,19 @@ export const MixtapeItem = ({
 }: {
 	mixtape: Database["public"]["Tables"]["mixtapes"]["Row"];
 }) => {
-	const { number, title, duration, artwork_uri, description, audio_uri } =
+	const { id, number, title, duration, artwork_uri, description, audio_uri } =
 		mixtape;
 	const URL = `${baseUrl}/mix/${number}`;
-	const { isPlaying, togglePlay, setAudioSrc } = useAudio();
+	const { isPlaying, currentMixtape, togglePlay, setAudioSrc } = useAudio();
+
+	const isCurrentlyPlaying = isPlaying && currentMixtape?.id === id.toString();
 
 	const handlePlayClick = () => {
-		setAudioSrc(audio_uri, { number, title });
-		togglePlay();
+		if (currentMixtape?.id === id.toString()) {
+			togglePlay();
+		} else {
+			setAudioSrc(audio_uri, { number, title, id: id.toString() });
+		}
 	};
 
 	return (
@@ -58,7 +63,7 @@ export const MixtapeItem = ({
 									className="flex items-center gap-2 hover:text-[#1500FF]"
 									onClick={handlePlayClick}
 								>
-									{isPlaying ? "Pause" : "Play"}
+									{isCurrentlyPlaying ? "Pause" : "Play"}
 								</Button>
 								<span className="mx-2">|</span>
 								<CopyLinkButton url={URL} />
