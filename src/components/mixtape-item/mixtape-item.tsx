@@ -1,3 +1,5 @@
+"use client";
+
 // COMPONENTS
 import {
 	Accordion,
@@ -12,6 +14,9 @@ import { ExpandedDialog } from "./expanded-dialog";
 // CONSTANTS
 import { baseUrl } from "@/constants/urls";
 
+// HOOKS
+import { useAudio } from "@/contexts/AudioContext";
+
 // TYPES
 import type { Database } from "@/types/database.types";
 
@@ -20,8 +25,15 @@ export const MixtapeItem = ({
 }: {
 	mixtape: Database["public"]["Tables"]["mixtapes"]["Row"];
 }) => {
-	const { number, title, duration, artwork_uri, description } = mixtape;
+	const { number, title, duration, artwork_uri, description, audio_uri } =
+		mixtape;
 	const URL = `${baseUrl}/mix/${number}`;
+	const { isPlaying, togglePlay, setAudioSrc } = useAudio();
+
+	const handlePlayClick = () => {
+		setAudioSrc(audio_uri, { number, title });
+		togglePlay();
+	};
 
 	return (
 		<Accordion type="single" collapsible>
@@ -43,9 +55,10 @@ export const MixtapeItem = ({
 								<Button
 									type="button"
 									variant="text"
-									className="hover:text-[#1500FF]"
+									className="flex items-center gap-2 hover:text-[#1500FF]"
+									onClick={handlePlayClick}
 								>
-									Play
+									{isPlaying ? "Pause" : "Play"}
 								</Button>
 								<span className="mx-2">|</span>
 								<CopyLinkButton url={URL} />
