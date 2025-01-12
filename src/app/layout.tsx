@@ -1,6 +1,8 @@
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
+import { AudioProvider } from "@/contexts/AudioContext";
+import { Player } from "@/components/player/player";
 
 export const metadata = {
 	title: "door.link",
@@ -23,8 +25,11 @@ export default function RootLayout({
 						enableSystem
 						disableTransitionOnChange
 					>
-						{children}
-						<Toaster />
+						<AudioProvider>
+							{children}
+							<Player />
+							<Toaster />
+						</AudioProvider>
 					</ThemeProvider>
 				</div>
 			</body>
