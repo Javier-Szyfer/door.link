@@ -8,7 +8,7 @@ interface AudioContextType {
 	volume: number;
 	progress: number;
 	duration: number;
-	currentMixtape: { number: string; title: string } | null;
+	currentMixtape: { number: string; title: string; id: string } | null;
 	audioSrc: string | null;
 	togglePlay: () => void;
 	toggleMute: () => void;
@@ -16,7 +16,7 @@ interface AudioContextType {
 	seek: (time: number) => void;
 	setAudioSrc: (
 		src: string,
-		mixtapeInfo: { number: string; title: string },
+		mixtapeInfo: { number: string; title: string; id: string },
 	) => void;
 }
 
@@ -32,12 +32,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		}
 		return 1;
 	});
+	const [lastVolume, setLastVolume] = useState(1);
 	const [progress, setProgress] = useState(0);
 	const [duration, setDuration] = useState(0);
 	const [audioSrc, setAudioSrcState] = useState<string | null>(null);
 	const [currentMixtape, setCurrentMixtape] = useState<{
 		number: string;
 		title: string;
+		id: string;
 	} | null>(null);
 
 	useEffect(() => {
@@ -84,6 +86,18 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
 	const toggleMute = () => {
 		if (!audioRef.current) return;
+
+		if (!isMuted) {
+			// Saving current volume before muting
+			if (volume > 0) {
+				setLastVolume(volume);
+			}
+			setVolumeState(0);
+		} else {
+			// Restore to last volume, but ensure it's not 0
+			setVolumeState(lastVolume || 1);
+		}
+
 		audioRef.current.muted = !isMuted;
 		setIsMuted(!isMuted);
 	};
@@ -103,20 +117,30 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
 	const setAudioSrc = (
 		src: string,
-		mixtapeInfo: { number: string; title: string },
+		mixtapeInfo: { number: string; title: string; id: string },
 	) => {
 		if (!audioRef.current) return;
+
+		// If already playing, pause current audio
+		if (isPlaying) {
+			audioRef.current.pause();
+		}
+
 		audioRef.current.src = src;
 		audioRef.current.load();
 		setAudioSrcState(src);
 		setCurrentMixtape(mixtapeInfo);
+
+		// Start playing the new audio
+		audioRef.current.play();
+		setIsPlaying(true);
 	};
 
 	return (
 		<AudioContext.Provider
 			value={{
 				isPlaying,
-				isMuted,
+				isMuted: isMuted || volume === 0,
 				volume,
 				progress,
 				duration,
