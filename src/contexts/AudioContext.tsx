@@ -26,6 +26,7 @@ interface AudioContextType {
 			audio_uri: string;
 			mixtapeInfo: { number: string; title: string; id: string };
 		}>,
+		autoPlay?: boolean,
 	) => void;
 }
 
@@ -36,13 +37,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [isMuted, setIsMuted] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
-	const [volume, setVolumeState] = useState(() => {
-		if (typeof window !== "undefined") {
-			return Number(localStorage.getItem("audio-volume")) || 1;
-		}
-		return 1;
-	});
-	const [lastVolume, setLastVolume] = useState(1);
+	const [volume, setVolumeState] = useState(0.5);
+	const [lastVolume, setLastVolume] = useState(0.5);
 	const [progress, setProgress] = useState(0);
 	const [duration, setDuration] = useState(0);
 	const [audioSrc, setAudioSrcState] = useState<string | null>(null);
@@ -58,16 +54,34 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		}>
 	>([]);
 
+	// Initialize volume from localStorage
+	useEffect(() => {
+		const savedVolume = localStorage.getItem("audio-volume");
+		if (savedVolume !== null) {
+			setVolumeState(Number(savedVolume));
+		}
+	}, []);
+
+	// Set up audio event listeners
+	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
 	useEffect(() => {
 		if (!audioRef.current) return;
+
 		const audio = audioRef.current;
 
 		const handleTimeUpdate = () => {
 			setProgress(audio.currentTime);
 		};
 
-		const handleDurationChange = () => {
+		const handleLoadedMetadata = () => {
 			setDuration(audio.duration);
+			setIsLoading(false);
+		};
+
+		const handleLoadStart = () => {
+			setIsLoading(true);
+			setDuration(0);
+			setProgress(0);
 		};
 
 		const handleEnded = async () => {
@@ -80,20 +94,14 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 				const remainingQueue = queue.slice(1);
 
 				try {
-					// First, pause and reset any existing playback
 					audio.pause();
-
-					// Set up the new audio source
 					audio.src = nextTrack.audio_uri;
 					audio.load();
 					setAudioSrcState(nextTrack.audio_uri);
 					setCurrentMixtape(nextTrack.mixtapeInfo);
 					setQueue(remainingQueue);
 
-					// Wait a bit for the audio to be ready
 					await new Promise((resolve) => setTimeout(resolve, 100));
-
-					// Start playing the new audio
 					await audio.play();
 					setIsPlaying(true);
 				} catch (error) {
@@ -104,16 +112,28 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		};
 
 		audio.addEventListener("timeupdate", handleTimeUpdate);
-		audio.addEventListener("durationchange", handleDurationChange);
-
+		audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+		audio.addEventListener("loadstart", handleLoadStart);
 		audio.addEventListener("ended", handleEnded);
+
+		// If audio source exists, trigger metadata load
+		if (audio.src) audio.load();
 
 		return () => {
 			audio.removeEventListener("timeupdate", handleTimeUpdate);
-			audio.removeEventListener("durationchange", handleDurationChange);
+			audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+			audio.removeEventListener("loadstart", handleLoadStart);
 			audio.removeEventListener("ended", handleEnded);
 		};
-	}, [queue]); // Add queue as dependency
+	}, [queue, audioSrc]);
+
+	// Update audio volume when volume state changes
+	useEffect(() => {
+		if (audioRef.current) {
+			audioRef.current.volume = volume;
+			localStorage.setItem("audio-volume", volume.toString());
+		}
+	}, [volume]);
 
 	// Initialize audio element
 	useEffect(() => {
@@ -124,14 +144,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 				audioRef.current.src = "";
 			}
 		};
-	}, []); // This effect only runs once to initialize
-
-	useEffect(() => {
-		if (audioRef.current) {
-			audioRef.current.volume = volume;
-			localStorage.setItem("audio-volume", volume.toString());
-		}
-	}, [volume]);
+	}, []);
 
 	const togglePlay = async () => {
 		if (!audioRef.current) return;
@@ -189,6 +202,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 			audio_uri: string;
 			mixtapeInfo: { number: string; title: string; id: string };
 		}>,
+		autoPlay?: boolean,
 	) => {
 		if (!audioRef.current) return;
 
@@ -202,20 +216,35 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
 			// Set up the new audio source
 			audioRef.current.src = src;
-			audioRef.current.load();
 			setAudioSrcState(src);
 			setCurrentMixtape(mixtapeInfo);
 
 			// Update queue if provided
 			if (newQueue) setQueue(newQueue);
 
-			// Wait a bit for the audio to be ready
-			await new Promise((resolve) => setTimeout(resolve, 100));
+			// Load the audio and wait for metadata
+			audioRef.current.load();
 
-			// Start playing the new audio
-			const playPromise = audioRef.current.play();
-			await playPromise;
-			setIsPlaying(true);
+			// Wait for metadata to load
+			if (!audioRef.current.duration) {
+				await new Promise((resolve) => {
+					const handleMetadata = () => {
+						audioRef.current?.removeEventListener(
+							"loadedmetadata",
+							handleMetadata,
+						);
+						resolve(true);
+					};
+					audioRef.current?.addEventListener("loadedmetadata", handleMetadata);
+				});
+			}
+
+			// Only auto-play if specified
+			if (autoPlay) {
+				const playPromise = audioRef.current.play();
+				await playPromise;
+				setIsPlaying(true);
+			}
 		} catch (error) {
 			console.log("Playback error:", error);
 			setIsPlaying(false);

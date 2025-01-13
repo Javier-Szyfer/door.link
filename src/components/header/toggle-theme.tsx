@@ -13,7 +13,7 @@ export const ToggleThemeIcon = () => {
 				className="cursor-pointer p-[3px]"
 				width={16}
 				height={16}
-				alt="door.link-logo"
+				alt="Keyhole logo"
 				onClick={() => setTheme(theme === "light" ? "dark" : "light")}
 			/>
 		</button>
