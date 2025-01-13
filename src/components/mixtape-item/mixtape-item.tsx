@@ -29,7 +29,7 @@ export const MixtapeItem = ({
 }) => {
 	const { id, number, title, duration, artwork_uri, description, audio_uri } =
 		mixtape;
-	const URL = `${baseUrl}/mix/${number}`;
+	const URL = `${baseUrl}/mixtapes/${number}`;
 	const { isPlaying, currentMixtape, togglePlay, setAudioSrc } = useAudio();
 
 	const isCurrentlyPlaying = isPlaying && currentMixtape?.id === id.toString();
@@ -55,7 +55,7 @@ export const MixtapeItem = ({
 						}))
 					: [];
 
-			setAudioSrc(audio_uri, { number, title, id: id.toString() }, queue);
+			setAudioSrc(audio_uri, { number, title, id: id.toString() }, queue, true);
 		}
 	};
 

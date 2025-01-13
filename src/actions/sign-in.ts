@@ -18,12 +18,9 @@ export const signIn = async (formData: FormData) => {
 
 	const user = await supabase.auth.getUser();
 
-	if (error) {
-		return encodedRedirect("error", "/admin", error.message);
-	}
-	if (isAdmin(user.data.user?.id ?? "")) {
-		return redirect("/admin/dashboard");
-	}
+	if (error) return encodedRedirect("error", "/admin", error.message);
+
+	if (isAdmin(user.data.user?.id ?? "")) return redirect("/admin/dashboard");
 
 	return encodedRedirect(
 		"error",
