@@ -10,6 +10,7 @@ interface AudioContextType {
 	duration: number;
 	currentMixtape: { number: string; title: string; id: string } | null;
 	audioSrc: string | null;
+	isLoading: boolean;
 	queue: Array<{
 		audio_uri: string;
 		mixtapeInfo: { number: string; title: string; id: string };
@@ -34,6 +35,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [isMuted, setIsMuted] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 	const [volume, setVolumeState] = useState(() => {
 		if (typeof window !== "undefined") {
 			return Number(localStorage.getItem("audio-volume")) || 1;
@@ -55,9 +57,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 			mixtapeInfo: { number: string; title: string; id: string };
 		}>
 	>([]);
-
-	console.log("queue", queue);
-	console.log("currentMixtape", currentMixtape);
 
 	useEffect(() => {
 		if (!audioRef.current) return;
@@ -194,6 +193,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		if (!audioRef.current) return;
 
 		try {
+			setIsLoading(true);
 			// Pause and reset any existing playback
 			if (audioRef.current.src) {
 				audioRef.current.pause();
@@ -219,6 +219,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		} catch (error) {
 			console.log("Playback error:", error);
 			setIsPlaying(false);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -232,6 +234,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 				duration,
 				currentMixtape,
 				audioSrc,
+				isLoading,
 				queue,
 				togglePlay,
 				toggleMute,
