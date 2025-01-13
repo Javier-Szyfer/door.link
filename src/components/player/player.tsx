@@ -105,22 +105,20 @@ export function Player({
 	// Show player if we have either a mixtape prop or an audioSrc
 	if (!mixtape && !audioSrc) return null;
 
+	const baseIconStyles = "h-5 w-5";
+
 	return (
 		<div className="fixed bottom-0 z-40 h-20 w-screen border-t border-stone-300 bg-white p-4 dark:bg-[#121212] lg:bottom-[1rem] lg:left-[50%] lg:h-[88px] lg:w-1/2 lg:translate-x-[-50%] lg:border">
 			<div className="mx-auto flex max-w-7xl flex-col gap-2">
-				<div className="text-sm">
+				<div className="px-2 text-sm">
 					{currentMixtape?.number} - {currentMixtape?.title}
 				</div>
 				<div className="flex items-center justify-between gap-2">
-					<Button
-						className="h-8 w-8 rounded-lg"
-						size="icon"
-						onClick={togglePlay}
-					>
+					<Button className="h-8 w-8 shrink-0" size="icon" onClick={togglePlay}>
 						{isPlaying ? (
-							<PauseIcon className="h-5 w-5" />
+							<PauseIcon className={baseIconStyles} />
 						) : (
-							<PlayIcon className="h-5 w-5" />
+							<PlayIcon className={baseIconStyles} />
 						)}
 					</Button>
 					<Slider
@@ -131,12 +129,16 @@ export function Player({
 						className="cursor-pointer"
 					/>
 					<span className="w-12 text-xs">{formatTime(remainingTime)}</span>
-					<div className="flex items-center">
-						<Button size="icon" onClick={toggleMute}>
+					<div className="flex items-center gap-2">
+						<Button
+							size="icon"
+							className="h-8 w-8 shrink-0"
+							onClick={toggleMute}
+						>
 							{isMuted ? (
-								<VolumeXIcon className="h-5 w-5" />
+								<VolumeXIcon className={baseIconStyles} />
 							) : (
-								<Volume2Icon className="h-5 w-5" />
+								<Volume2Icon className={baseIconStyles} />
 							)}
 						</Button>
 						<Slider
@@ -147,15 +149,16 @@ export function Player({
 							className="w-24 cursor-pointer"
 						/>
 						<Button
-							variant="ghost"
 							size="icon"
 							onClick={handleDownload}
-							className="h-8 w-8"
+							className="h-8 w-8 shrink-0"
 							title="Download"
 							disabled={isDownloading}
 						>
 							<DownloadIcon
-								className={`h-5 w-5 ${isDownloading ? "opacity-50" : ""}`}
+								className={`${baseIconStyles} ${
+									isDownloading ? "opacity-50" : ""
+								}`}
 							/>
 						</Button>
 					</div>
