@@ -17,7 +17,11 @@ export default async function Home() {
 			<Nav />
 			<div className="border-t border-gray-200">
 				{mixtapes?.map((mixtape) => (
-					<MixtapeItem key={mixtape.id} mixtape={mixtape} />
+					<MixtapeItem
+						key={mixtape.id}
+						mixtape={mixtape}
+						allMixtapes={mixtapes}
+					/>
 				))}
 			</div>
 		</main>
