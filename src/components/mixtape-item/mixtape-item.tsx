@@ -1,3 +1,5 @@
+"use client";
+
 // COMPONENTS
 import {
 	Accordion,
@@ -12,16 +14,50 @@ import { ExpandedDialog } from "./expanded-dialog";
 // CONSTANTS
 import { baseUrl } from "@/constants/urls";
 
+// HOOKS
+import { useAudio } from "@/contexts/AudioContext";
+
 // TYPES
 import type { Database } from "@/types/database.types";
 
 export const MixtapeItem = ({
 	mixtape,
+	allMixtapes,
 }: {
 	mixtape: Database["public"]["Tables"]["mixtapes"]["Row"];
+	allMixtapes: Database["public"]["Tables"]["mixtapes"]["Row"][];
 }) => {
-	const { number, title, duration, artwork_uri, description } = mixtape;
+	const { id, number, title, duration, artwork_uri, description, audio_uri } =
+		mixtape;
 	const URL = `${baseUrl}/mix/${number}`;
+	const { isPlaying, currentMixtape, togglePlay, setAudioSrc } = useAudio();
+
+	const isCurrentlyPlaying = isPlaying && currentMixtape?.id === id.toString();
+
+	const handlePlayClick = () => {
+		if (currentMixtape?.id === id.toString()) {
+			togglePlay();
+		} else {
+			// Find current mixtape index
+			const currentIndex = allMixtapes.findIndex((m) => m.id === id);
+
+			// Create queue of all mixtapes after the current one, excluding the current one
+			const remainingMixtapes = allMixtapes.slice(currentIndex + 1);
+			const queue =
+				remainingMixtapes.length > 0
+					? remainingMixtapes.map((m) => ({
+							audio_uri: m.audio_uri,
+							mixtapeInfo: {
+								number: m.number,
+								title: m.title,
+								id: m.id.toString(),
+							},
+						}))
+					: [];
+
+			setAudioSrc(audio_uri, { number, title, id: id.toString() }, queue);
+		}
+	};
 
 	return (
 		<Accordion type="single" collapsible>
@@ -43,9 +79,10 @@ export const MixtapeItem = ({
 								<Button
 									type="button"
 									variant="text"
-									className="hover:text-[#1500FF]"
+									className="flex items-center gap-2 hover:text-[#1500FF]"
+									onClick={handlePlayClick}
 								>
-									Play
+									{isCurrentlyPlaying ? "Pause" : "Play"}
 								</Button>
 								<span className="mx-2">|</span>
 								<CopyLinkButton url={URL} />

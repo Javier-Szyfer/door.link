@@ -1,0 +1,138 @@
+"use client";
+
+// COMPONENTS
+import { Slider } from "../ui/slider";
+import { Button } from "../ui/button";
+import {
+	PlayIcon,
+	PauseIcon,
+	Volume2Icon,
+	VolumeXIcon,
+	DownloadIcon,
+} from "lucide-react";
+
+// HOOKS
+import { useAudio } from "@/contexts/AudioContext";
+import { useState } from "react";
+import { toast } from "sonner";
+
+export function Player() {
+	const [isDownloading, setIsDownloading] = useState(false);
+	const {
+		isPlaying,
+		isMuted,
+		volume,
+		progress,
+		duration,
+		currentMixtape,
+		audioSrc,
+		togglePlay,
+		toggleMute,
+		setVolume,
+		seek,
+	} = useAudio();
+
+	const formatTime = (time: number) => {
+		const hours = Math.floor(time / 3600);
+		const minutes = Math.floor((time % 3600) / 60);
+		const seconds = Math.floor(time % 60);
+		return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds
+			.toString()
+			.padStart(2, "0")}`;
+	};
+
+	const remainingTime = duration - progress;
+
+	const handleDownload = async () => {
+		if (!audioSrc || isDownloading || !currentMixtape) return;
+		setIsDownloading(true);
+
+		try {
+			toast.info(`Downloading mixtape ${currentMixtape.title}...`);
+			const filename = `${currentMixtape.number}-${currentMixtape.title}.mp3`;
+			const downloadUrl = `/api/download?url=${encodeURIComponent(audioSrc)}&filename=${encodeURIComponent(filename)}`;
+
+			const response = await fetch(downloadUrl);
+			if (!response.ok) throw new Error("Download failed");
+
+			const blob = await response.blob();
+			const url = window.URL.createObjectURL(blob);
+
+			const a = document.createElement("a");
+			a.style.display = "none";
+			a.href = url;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+			window.URL.revokeObjectURL(url);
+			document.body.removeChild(a);
+			toast.success("Download complete");
+		} catch (error) {
+			console.error("Download error:", error);
+			toast.error("Download failed");
+		} finally {
+			setIsDownloading(false);
+		}
+	};
+
+	if (!currentMixtape || !audioSrc) return null;
+
+	return (
+		<div className="fixed bottom-0 z-40 h-20 w-screen border-t border-stone-300 bg-white p-4 dark:bg-[#121212] lg:bottom-[1rem] lg:left-[50%] lg:h-[88px] lg:w-1/2 lg:translate-x-[-50%] lg:border">
+			<div className="mx-auto flex max-w-7xl flex-col gap-2">
+				<div className="text-sm">
+					{currentMixtape.number} - {currentMixtape.title}
+				</div>
+				<div className="flex items-center justify-between gap-2">
+					<Button
+						className="h-8 w-8 rounded-lg"
+						size="icon"
+						onClick={togglePlay}
+					>
+						{isPlaying ? (
+							<PauseIcon className="h-5 w-5" />
+						) : (
+							<PlayIcon className="h-5 w-5" />
+						)}
+					</Button>
+					<Slider
+						value={[progress]}
+						max={duration}
+						step={1}
+						onValueChange={(value) => seek(value[0])}
+						className="cursor-pointer"
+					/>
+					<span className="w-12 text-xs">{formatTime(remainingTime)}</span>
+					<div className="flex items-center">
+						<Button size="icon" onClick={toggleMute}>
+							{isMuted ? (
+								<VolumeXIcon className="h-5 w-5" />
+							) : (
+								<Volume2Icon className="h-5 w-5" />
+							)}
+						</Button>
+						<Slider
+							value={[volume * 100]}
+							max={100}
+							step={1}
+							onValueChange={(value) => setVolume(value[0] / 100)}
+							className="w-24 cursor-pointer"
+						/>
+						<Button
+							variant="ghost"
+							size="icon"
+							onClick={handleDownload}
+							className="h-8 w-8"
+							title="Download"
+							disabled={isDownloading}
+						>
+							<DownloadIcon
+								className={`h-5 w-5 ${isDownloading ? "opacity-50" : ""}`}
+							/>
+						</Button>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
