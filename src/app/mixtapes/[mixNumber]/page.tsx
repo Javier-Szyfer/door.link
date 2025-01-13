@@ -37,6 +37,7 @@ export default async function MixPage(props: {
 				height={250}
 				className="mt-32"
 				priority
+				draggable={false}
 			/>
 			<h1 className="mt-24 text-base">{mixtape.title}</h1>
 			<p className="mt-4 text-center text-base">{mixtape.description}</p>
