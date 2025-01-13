@@ -16,6 +16,7 @@ const Keyhole = () => {
 				alt="Keyhole logo"
 				width={20}
 				height={28}
+				draggable={false}
 			/>
 		</Link>
 	);
