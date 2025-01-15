@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
 			},
 		],
 	},
+	env: {
+		VERCEL_URL: process.env.VERCEL_URL,
+	},
 };
 
 export default nextConfig;
