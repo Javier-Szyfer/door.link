@@ -10,7 +10,7 @@ export const getPublishedMixtapes = async () => {
 		.from("mixtapes")
 		.select("*")
 		.filter("status", "eq", "published")
-		.order("created_at", { ascending: false });
+		.order("number", { ascending: false });
 
 	return { mixtapes, error };
 };
