@@ -53,8 +53,8 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
 	for (const mixtape of mixtapes) {
 		feed.addItem({
 			title: `${mixtape.number} - ${mixtape.title}`,
-			id: `${baseUrl}/mixtapes/${mixtape.number}`,
-			link: `${baseUrl}/mixtapes/${mixtape.number}`,
+			id: mixtape.id.toString(),
+			link: baseUrl,
 			description: mixtape.description,
 			date: new Date(mixtape.created_at),
 			image: mixtape.artwork_uri,
