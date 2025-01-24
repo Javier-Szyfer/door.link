@@ -1,7 +1,6 @@
 "use client";
 
 // COMPONENTS
-import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +12,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { AudioInput } from "./audio-input";
+import { ArtworkInput } from "./artwork-input";
 import { toast } from "sonner";
 
 // HOOKS
@@ -197,7 +198,7 @@ export const UploadForm = ({
 		<div className="">
 			<form
 				onSubmit={isEditing ? handleUpdateMixtape : handleCreateMixtape}
-				className="0 mx-auto flex h-screen max-w-[1000px] flex-col gap-12 py-12"
+				className="0 mx-auto flex max-w-[1000px] flex-col gap-12 py-12"
 			>
 				<h1 className="text-2xl font-medium">
 					{isEditing ? "Edit Mixtape" : "Upload Mixtape"}
@@ -278,77 +279,15 @@ export const UploadForm = ({
 
 					{/* Second Column */}
 					<div className="flex flex-1 flex-col gap-6">
-						<div className="flex flex-col gap-2">
-							<Label htmlFor="audio">Audio File</Label>
-							<div className="flex flex-col gap-4">
-								<Input
-									id="audio"
-									name="audio_uri"
-									type="file"
-									accept="audio/*"
-									required={!formData.audio_uri}
-									onChange={(e) => {
-										const file = e.target.files?.[0];
-										if (file) handleFileUpload(file, "audio");
-									}}
-								/>
-								{formData.audio_uri && (
-									<div className="w-full">
-										<audio controls className="w-full">
-											<source src={formData.audio_uri} type="audio/mpeg" />
-											<track kind="captions" />
-											Your browser does not support the audio element.
-										</audio>
-									</div>
-								)}
-							</div>
-						</div>
+						<AudioInput
+							audioUri={formData.audio_uri}
+							onFileSelect={(file) => handleFileUpload(file, "audio")}
+						/>
 
-						<div className="flex flex-col gap-2">
-							<Label htmlFor="artwork">Artwork</Label>
-							<div className="flex gap-4">
-								{!artworkPreview ? (
-									<div className="flex-1">
-										<Input
-											id="artwork"
-											name="artwork_uri"
-											type="file"
-											accept="image/*"
-											required={!formData.artwork_uri}
-											onChange={(e) => {
-												const file = e.target.files?.[0];
-												if (file) handleFileUpload(file, "artwork");
-											}}
-										/>
-									</div>
-								) : (
-									// biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
-									<div
-										className="relative h-32 w-32 cursor-pointer overflow-hidden rounded-md border hover:opacity-75"
-										onClick={() => {
-											const input = document.createElement("input");
-											input.type = "file";
-											input.accept = "image/*";
-											input.onchange = (e) => {
-												const file = (e.target as HTMLInputElement).files?.[0];
-												if (file) handleFileUpload(file, "artwork");
-											};
-											input.click();
-										}}
-									>
-										<Image
-											src={artworkPreview}
-											alt="Artwork preview"
-											fill
-											className="rounded-[8px] object-cover"
-										/>
-										<div className="absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition-all hover:bg-black/20 hover:opacity-100">
-											<span className="text-sm">Change Image</span>
-										</div>
-									</div>
-								)}
-							</div>
-						</div>
+						<ArtworkInput
+							artworkPreview={artworkPreview}
+							onFileSelect={(file) => handleFileUpload(file, "artwork")}
+						/>
 
 						<div className="flex flex-col gap-2">
 							<Label htmlFor="status">Status</Label>
