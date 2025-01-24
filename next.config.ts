@@ -9,7 +9,8 @@ const nextConfig: NextConfig = {
 		],
 	},
 	env: {
-		VERCEL_URL: process.env.VERCEL_URL,
+		VERCEL_ENV: process.env.VERCEL_ENV, // do not remove
+		VERCEL_URL: process.env.VERCEL_URL, // do not remove
 	},
 };
 
