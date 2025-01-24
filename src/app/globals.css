@@ -11,6 +11,11 @@
   body {
     @apply dark:bg-[#121212] bg-white;
   }
+  [data-scroll-locked][data-scroll-locked] {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+    margin-right: 0 !important;
+  }
 }
 html,
 body {

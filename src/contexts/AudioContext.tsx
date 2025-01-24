@@ -42,6 +42,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 	const [progress, setProgress] = useState(0);
 	const [duration, setDuration] = useState(0);
 	const [audioSrc, setAudioSrcState] = useState<string | null>(null);
+	const [mounted, setMounted] = useState(false);
 	const [currentMixtape, setCurrentMixtape] = useState<{
 		number: string;
 		title: string;
@@ -54,13 +55,20 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 		}>
 	>([]);
 
-	// Initialize volume from localStorage
+	// Initialize mounting state
 	useEffect(() => {
-		const savedVolume = localStorage.getItem("audio-volume");
-		if (savedVolume !== null) {
-			setVolumeState(Number(savedVolume));
-		}
+		setMounted(true);
 	}, []);
+
+	// Initialize volume from localStorage only after mounting
+	useEffect(() => {
+		if (mounted) {
+			const savedVolume = localStorage.getItem("audio-volume");
+			if (savedVolume !== null) {
+				setVolumeState(Number(savedVolume));
+			}
+		}
+	}, [mounted]);
 
 	// Set up audio event listeners
 	// biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
@@ -145,6 +153,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 			}
 		};
 	}, []);
+
+	if (!mounted) {
+		return null;
+	}
 
 	const togglePlay = async () => {
 		if (!audioRef.current) return;
