@@ -21,8 +21,8 @@ export default function RootLayout({
 				<div className="mx-auto max-w-7xl pb-10 text-sm">
 					<ThemeProvider
 						attribute="class"
-						defaultTheme="system"
-						enableSystem
+						defaultTheme="light"
+						enableSystem={false}
 						disableTransitionOnChange
 					>
 						<AudioProvider>
