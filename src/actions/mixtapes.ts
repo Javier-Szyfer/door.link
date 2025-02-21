@@ -20,7 +20,8 @@ export const getAllMixtapes = async () => {
 	const { data: mixtapes, error } = await supabase
 		.from("mixtapes")
 		.select("*")
-		.order("created_at", { ascending: false });
+		.filter("status", "eq", "published")
+		.order("number", { ascending: false });
 
 	return { mixtapes, error };
 };
