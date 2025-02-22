@@ -1,13 +1,32 @@
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+
+// COMPONENTS
 import { Toaster } from "sonner";
-import { AudioProvider } from "@/contexts/AudioContext";
 import { Player } from "@/components/player/player";
 
+// CONTEXT
+import { AudioProvider } from "@/contexts/AudioContext";
+
+// CONSTANTS
+import {
+	SITE_NAME,
+	SITE_DESCRIPTION,
+	SITE_ICONS,
+	OG_IMAGE,
+} from "@/constants/metadata";
+import { PROD_URL } from "@/constants/urls";
+
 export const metadata = {
-	title: "door.link",
-	description:
-		"A curated selection of music for listening and dancing in closed spaces.",
+	title: SITE_NAME,
+	description: SITE_DESCRIPTION,
+	icons: SITE_ICONS,
+	openGraph: {
+		url: PROD_URL,
+		title: SITE_NAME,
+		description: SITE_DESCRIPTION,
+		images: OG_IMAGE,
+	},
 };
 
 export default function RootLayout({
