@@ -18,8 +18,8 @@ type ParamsType = Promise<{ mixNumber: string }>;
 export const generateMetadata = async ({ params }: { params: ParamsType }) => {
 	const { mixNumber } = await params;
 	return {
-		title: `Mixtape ${mixNumber}`,
-		description: `Mixtape ${mixNumber}`,
+		title: `${mixNumber} | door.link`,
+		description: SITE_DESCRIPTION,
 		icons: SITE_ICONS,
 		openGraph: {
 			title: `${mixNumber} | door.link`,
