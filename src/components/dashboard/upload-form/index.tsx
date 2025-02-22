@@ -185,7 +185,7 @@ export const UploadForm = ({
 			}
 
 			toast.success("Mixtape updated successfully", { id: toastId });
-			router.push("/");
+			router.push("/admin/dashboard");
 			router.refresh();
 			setIsSavingMixtape(false);
 		} catch (error) {
