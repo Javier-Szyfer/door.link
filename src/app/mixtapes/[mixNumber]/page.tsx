@@ -6,10 +6,30 @@ import { Player } from "@/components/player/player";
 // ACTIONS
 import { getMixtapeByMixNumber } from "@/actions/mixtapes";
 
+// CONSTANTS
+import { PROD_URL } from "@/constants/urls";
+import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
+
 // TYPES
 import type { Database } from "@/types/database.types";
 
 type ParamsType = Promise<{ mixNumber: string }>;
+
+export const generateMetadata = async ({ params }: { params: ParamsType }) => {
+	const { mixNumber } = await params;
+	return {
+		title: `Mixtape ${mixNumber}`,
+		description: `Mixtape ${mixNumber}`,
+		icons: SITE_ICONS,
+		openGraph: {
+			title: `${mixNumber} | door.link`,
+			description: SITE_DESCRIPTION,
+			images: OG_IMAGE,
+			url: `${PROD_URL}/mixtapes/${mixNumber}`,
+		},
+	};
+};
+
 export default async function MixPage(props: {
 	params: ParamsType;
 }) {
