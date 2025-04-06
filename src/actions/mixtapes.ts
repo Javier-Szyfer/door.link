@@ -20,7 +20,6 @@ export const getAllMixtapes = async () => {
 	const { data: mixtapes, error } = await supabase
 		.from("mixtapes")
 		.select("*")
-		.filter("status", "eq", "published")
 		.order("number", { ascending: false });
 
 	return { mixtapes, error };
@@ -55,15 +54,33 @@ export const deleteMixtape = async (id: number) => {
 		const supabase = await createClient();
 		const user = await supabase.auth.getUser();
 
+		// Convert to number if it's a string
+		const numericId = Number(id);
+
 		if (!isAdmin(user.data.user?.id ?? "")) {
 			return { error: "Not authorized to delete mixtapes" };
 		}
 
-		const { error } = await supabase.from("mixtapes").delete().eq("id", id);
+		// First try to find the mixtape
+		const { data: mixtape, error: findError } = await supabase
+			.from("mixtapes")
+			.select("id")
+			.eq("id", numericId)
+			.single();
+
+		if (findError || !mixtape) {
+			return { error: "Mixtape not found or cannot be accessed" };
+		}
+
+		// Then delete it without trying to return data
+		const { error } = await supabase
+			.from("mixtapes")
+			.delete()
+			.eq("id", numericId);
 
 		if (error) {
 			console.error("Supabase error:", error);
-			return { error: "Failed to delete mixtape" };
+			return { error: error.message || "Failed to delete mixtape" };
 		}
 
 		return { success: true };
@@ -115,21 +132,23 @@ export const updateMixtape = async (id: number, mixtapeData: MixtapeData) => {
 	try {
 		const supabase = await createClient();
 		const user = await supabase.auth.getUser();
+		console.log(user);
 
 		if (!isAdmin(user.data.user?.id ?? "")) {
 			return { error: "Not authorized to update mixtapes" };
 		}
-
+		console.log("isAdmin", isAdmin(user.data.user?.id ?? ""));
 		const { data: mixtape, error } = await supabase
 			.from("mixtapes")
 			.update(mixtapeData)
-			.eq("id", id);
+			.eq("id", id)
+			.select();
 
 		if (error) {
 			console.error("Supabase error:", error);
 			return { error: "Failed to update mixtape" };
 		}
-
+		console.log("updated mixtape", mixtape);
 		return { mixtape, success: true };
 	} catch (error) {
 		console.error("Error updating mixtape:", error);
