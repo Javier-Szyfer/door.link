@@ -156,13 +156,13 @@ export const UploadForm = ({
 			toast.success("Mixtape created successfully", { id: toastId });
 			router.push("/admin/dashboard");
 			router.refresh();
-			setIsSavingMixtape(false);
 		} catch (error) {
 			console.error("Error creating mixtape:", error);
 			toast.error(
 				`Failed to create mixtape: ${error instanceof Error ? error.message : "Unknown error"}`,
 				{ id: toastId },
 			);
+		} finally {
 			setIsSavingMixtape(false);
 		}
 	};
@@ -187,9 +187,9 @@ export const UploadForm = ({
 			toast.success("Mixtape updated successfully", { id: toastId });
 			router.push("/admin/dashboard");
 			router.refresh();
-			setIsSavingMixtape(false);
 		} catch (error) {
 			console.error("Error updating mixtape:", error);
+		} finally {
 			setIsSavingMixtape(false);
 		}
 	};

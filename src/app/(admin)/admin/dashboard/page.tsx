@@ -26,6 +26,7 @@ export default async function Dashboard() {
 				<Table>
 					<TableHeader>
 						<TableRow>
+							<TableHead className="w-[100px]">Number</TableHead>
 							<TableHead className="w-[200px]">Title</TableHead>
 							<TableHead className="w-[500px]">Description</TableHead>
 							<TableHead className="w-[150px]">Publish Date</TableHead>
