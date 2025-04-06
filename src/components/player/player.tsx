@@ -1,16 +1,14 @@
 "use client";
 
 // COMPONENTS
-import { Slider } from "../ui/slider";
-import { Button } from "../ui/button";
-import {
-	PlayIcon,
-	PauseIcon,
-	Volume2Icon,
-	VolumeXIcon,
-	DownloadIcon,
-} from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { DownloadIcon } from "lucide-react";
 import { toast } from "sonner";
+import { PlayIcon } from "./icons/play-icon";
+import { PauseIcon } from "./icons/pause-icon";
+import { VolumeIcon } from "./icons/volume-icon";
+import { MuteIcon } from "./icons/mute-icon";
 
 // HOOKS
 import { useAudio } from "@/contexts/AudioContext";
@@ -112,15 +110,15 @@ export function Player({
 	return (
 		<div className="fixed bottom-0 z-40 h-20 w-screen border-t border-stone-300 bg-white p-4 dark:bg-[#121212] lg:bottom-[1rem] lg:left-[50%] lg:h-[88px] lg:w-1/2 lg:translate-x-[-50%] lg:border">
 			<div className="mx-auto flex max-w-7xl flex-col gap-2">
-				<div className="px-2 text-sm">
+				<div className="px-2 text-xs text-[#414141] dark:text-[#f1f1f1]">
 					{currentMixtape?.number} - {currentMixtape?.title}
 				</div>
 				<div className="flex items-center justify-between gap-2">
 					<Button className="h-8 w-8 shrink-0" size="icon" onClick={togglePlay}>
 						{isPlaying ? (
-							<PauseIcon className={baseIconStyles} />
+							<PauseIcon className="text-foreground hover:text-foreground/80" />
 						) : (
-							<PlayIcon className={baseIconStyles} />
+							<PlayIcon className="text-foreground hover:text-foreground/80" />
 						)}
 					</Button>
 					<Slider
@@ -130,7 +128,9 @@ export function Player({
 						onValueChange={(value) => seek(value[0])}
 						className="cursor-pointer"
 					/>
-					<span className="w-12 text-xs">{formatTime(remainingTime)}</span>
+					<span className="w-12 text-xs text-[#414141] dark:text-[#f1f1f1]">
+						{formatTime(remainingTime)}
+					</span>
 					<div className="flex items-center gap-2">
 						<Button
 							size="icon"
@@ -138,9 +138,9 @@ export function Player({
 							onClick={toggleMute}
 						>
 							{isMuted ? (
-								<VolumeXIcon className={baseIconStyles} />
+								<MuteIcon className="text-foreground hover:text-foreground/80" />
 							) : (
-								<Volume2Icon className={baseIconStyles} />
+								<VolumeIcon className="text-foreground hover:text-foreground/80" />
 							)}
 						</Button>
 						<Slider
