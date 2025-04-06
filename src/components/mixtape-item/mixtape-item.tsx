@@ -62,14 +62,14 @@ export const MixtapeItem = ({
 	return (
 		<Accordion type="single" collapsible>
 			<AccordionItem value={mixtape.id.toString()}>
-				<AccordionTrigger className="px-4 text-left">
+				<AccordionTrigger className="px-4 text-left text-[#414141] dark:text-[#f1f1f1]">
 					<div className="grid w-full grid-cols-12 items-center">
 						<div className="col-span-12 md:col-span-2">{number}</div>
 						<div className="col-span-12 md:col-span-7">{title}</div>
 						<div className="col-span-12 md:col-span-2">{duration}</div>
 					</div>
 				</AccordionTrigger>
-				<AccordionContent className="px-4">
+				<AccordionContent className="px-4 text-[#414141] dark:text-[#f1f1f1]">
 					<div className="grid w-full grid-cols-12 items-start py-4">
 						<div className="col-span-12 md:col-span-2">
 							<ExpandedDialog artwork_uri={artwork_uri} />
