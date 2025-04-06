@@ -19,9 +19,15 @@ export default async function Dashboard() {
 	if (!mixtapes) return <p>No mixtapes found</p>;
 
 	return (
-		<div className="flex flex-col gap-12">
+		<div className="mt-12 flex flex-col gap-12">
+			<Link href="/">Home</Link>
 			<h1 className="text-2xl font-medium">Dashboard</h1>
-			<Link href="/admin/upload-mixtape">Upload Mixtape</Link>
+			<Link
+				href="/admin/upload-mixtape"
+				className="w-fit border border-gray-300 px-4 py-2"
+			>
+				Upload Mixtape
+			</Link>
 			<div className="overflow-x-auto">
 				<Table>
 					<TableHeader>
