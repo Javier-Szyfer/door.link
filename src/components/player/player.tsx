@@ -1,16 +1,14 @@
 "use client";
 
 // COMPONENTS
-import { Slider } from "../ui/slider";
-import { Button } from "../ui/button";
-import {
-	PlayIcon,
-	PauseIcon,
-	Volume2Icon,
-	VolumeXIcon,
-	DownloadIcon,
-} from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { DownloadIcon } from "lucide-react";
 import { toast } from "sonner";
+import { PlayIcon } from "./icons/play-icon";
+import { PauseIcon } from "./icons/pause-icon";
+import { VolumeIcon } from "./icons/volume-icon";
+import { MuteIcon } from "./icons/mute-icon";
 
 // HOOKS
 import { useAudio } from "@/contexts/AudioContext";
@@ -72,12 +70,26 @@ export function Player({
 
 	const remainingTime = duration - progress;
 
+	const BlueHeartIcon = () => (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="currentColor"
+			className="h-5 w-5"
+		>
+			<title>Blue Heart</title>
+			<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.54L12 21.35z" />
+		</svg>
+	);
+
 	const handleDownload = async () => {
 		if (!audioSrc || isDownloading || !currentMixtape) return;
 		setIsDownloading(true);
 
 		try {
-			toast.info(`Downloading mixtape ${currentMixtape.title}...`);
+			toast(`Downloading mixtape ${currentMixtape.title}...`, {
+				icon: <BlueHeartIcon />,
+			});
 			const filename = `${currentMixtape.number}-${currentMixtape.title}.mp3`;
 			const downloadUrl = `/api/download?url=${encodeURIComponent(audioSrc)}&filename=${encodeURIComponent(filename)}`;
 
@@ -112,15 +124,15 @@ export function Player({
 	return (
 		<div className="fixed bottom-0 z-40 h-20 w-screen border-t border-stone-300 bg-white p-4 dark:bg-[#121212] lg:bottom-[1rem] lg:left-[50%] lg:h-[88px] lg:w-1/2 lg:translate-x-[-50%] lg:border">
 			<div className="mx-auto flex max-w-7xl flex-col gap-2">
-				<div className="px-2 text-sm">
+				<div className="px-2 text-xs text-[#414141] dark:text-[#f1f1f1]">
 					{currentMixtape?.number} - {currentMixtape?.title}
 				</div>
 				<div className="flex items-center justify-between gap-2">
 					<Button className="h-8 w-8 shrink-0" size="icon" onClick={togglePlay}>
 						{isPlaying ? (
-							<PauseIcon className={baseIconStyles} />
+							<PauseIcon className="text-foreground hover:text-foreground/80" />
 						) : (
-							<PlayIcon className={baseIconStyles} />
+							<PlayIcon className="text-foreground hover:text-foreground/80" />
 						)}
 					</Button>
 					<Slider
@@ -130,7 +142,9 @@ export function Player({
 						onValueChange={(value) => seek(value[0])}
 						className="cursor-pointer"
 					/>
-					<span className="w-12 text-xs">{formatTime(remainingTime)}</span>
+					<span className="w-12 text-xs text-[#414141] dark:text-[#f1f1f1]">
+						{formatTime(remainingTime)}
+					</span>
 					<div className="flex items-center gap-2">
 						<Button
 							size="icon"
@@ -138,9 +152,9 @@ export function Player({
 							onClick={toggleMute}
 						>
 							{isMuted ? (
-								<VolumeXIcon className={baseIconStyles} />
+								<MuteIcon className="text-foreground hover:text-foreground/80" />
 							) : (
-								<Volume2Icon className={baseIconStyles} />
+								<VolumeIcon className="text-foreground hover:text-foreground/80" />
 							)}
 						</Button>
 						<Slider

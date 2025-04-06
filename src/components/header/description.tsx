@@ -13,8 +13,8 @@ export const Description = () => {
 			{!fullDescription ? (
 				<div className="mt-7 flex lg:mt-12">
 					<p>
-						A curated selection of music for listening and dancing in closed
-						spaces.
+						A handpicked music selection, grown over time, algorithm-free, made
+						for listening and dancing.
 						{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
 						<span
 							onClick={handleInfo}
@@ -27,19 +27,20 @@ export const Description = () => {
 			) : (
 				<div className="mt-7 lg:mt-12">
 					<p>
-						At the end of the 90s, we ripped albums that we found in physical
-						stores and <i> took them to the internet.</i> It was during this era
-						that we built a content channel with a noble purpose, that of
-						listening. Soulseek's directories were cities and “emigrate to a new
-						land” was a common feeling. Back then, connecting to the Internet
-						required a desktop computer, a good local provider, modem, and time.{" "}
-						<br /> <br /> Life was concretely and cybernetically constituted,a
-						division that no longer exists and -without automatic playlists or
-						advertising- finding material was the product of research so the
-						user was, at the very least, selective. With free internet on the
-						streets and the advent of the smartphone, the latest generations are
-						now easy recipients of unrequested information. All this, before
-						touching a wire or having a thoughtful moment. <br />
+						In the late 90s, we ripped albums we found in physical stores and
+						and shared them on the net. Around that time, we built a content
+						channel with a noble purpose: listening. Soulseek&apos;s directories
+						felt like cities, and <i>“emigrating to a new land”</i> was a common
+						feeling. Connecting to the internet back then required a desktop
+						computer, a solid local provider, a modem, and a good dose of
+						patience. <br /> <br /> Life was split between offline and online
+						realities, a division that no longer exists. Without automatic
+						playlists or ads, discovering music was the result of deliberate
+						research, which made the listener, at the very least, selective.
+						Today, technological advances make us passive recipients of
+						unsolicited content—and music is no exception. All of it arrives
+						before we&apos;ve even plugged in or taken a moment to truly pay
+						attention. <br />
 						<br />
 						Curated by
 						<a
@@ -52,8 +53,8 @@ export const Description = () => {
 								romi
 							</span>
 						</a>
-						, door is a music selection for listening and dancing in closed
-						spaces.
+						, door.link is a handpicked music selection, grown over time,
+						algorithm-free, made for listening and dancing.
 						{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
 						<span
 							onClick={handleInfo}
