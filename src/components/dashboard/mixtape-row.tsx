@@ -28,7 +28,8 @@ interface MixtapeRowProps {
 }
 
 export function MixtapeRow({ mixtape }: MixtapeRowProps) {
-	const { id, title, description, created_at, status, duration } = mixtape;
+	const { id, number, title, description, created_at, status, duration } =
+		mixtape;
 	const router = useRouter();
 
 	const handleDelete = async () => {
@@ -51,6 +52,7 @@ export function MixtapeRow({ mixtape }: MixtapeRowProps) {
 
 	return (
 		<TableRow>
+			<TableCell className="font-medium">{number}</TableCell>
 			<TableCell className="font-medium">{title}</TableCell>
 			<TableCell className="max-w-[500px] truncate">{description}</TableCell>
 			<TableCell>{new Date(created_at).toLocaleDateString()}</TableCell>
