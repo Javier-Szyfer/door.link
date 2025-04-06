@@ -59,8 +59,12 @@ export default async function MixPage(props: {
 				priority
 				draggable={false}
 			/>
-			<h1 className="mt-24 text-base">{mixtape.title}</h1>
-			<p className="mt-4 text-center text-base">{mixtape.description}</p>
+			<h1 className="mt-24 text-base text-[#414141] dark:text-[#f1f1f1]">
+				{mixtape.title}
+			</h1>
+			<p className="mt-4 text-center text-base text-[#414141] dark:text-[#f1f1f1]">
+				{mixtape.description}
+			</p>
 			<Player mixtape={mixtape} />
 		</div>
 	);

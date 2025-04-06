@@ -2,7 +2,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 
 // COMPONENTS
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/sonner";
 import { Player } from "@/components/player/player";
 
 // CONTEXT
