@@ -1,7 +1,2 @@
-export const baseUrl =
-	process.env.NEXT_PUBLIC_BASE_URL ||
-	(process.env.VERCEL_URL
-		? `https://${process.env.VERCEL_URL}`
-		: "http://localhost:3000");
-
+export const baseUrl = "https://door.link";
 export const PROD_URL = "https://door.link";
