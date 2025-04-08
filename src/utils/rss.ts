@@ -74,7 +74,6 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
 
 	// Debug the output to see what's happening with enclosures
 	const enclosureMatch = rssOutput.match(/<enclosure.*?>/g);
-	console.log("First few enclosures:", enclosureMatch?.slice(0, 3));
 
 	// Add atom namespace to the rss tag
 	rssOutput = rssOutput.replace(
@@ -92,8 +91,6 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
 	// Create a custom XML output with correct audio enclosures
 	// This is a workaround if the feed library is not setting enclosures correctly
 	if (enclosureMatch?.some((e) => e.includes("/media/images/"))) {
-		console.log("Found image enclosures, fixing them...");
-
 		// Method 1: Create custom enclosure elements by directly replacing the XML
 		for (const mixtape of mixtapes) {
 			const imageEnclosurePattern = new RegExp(
