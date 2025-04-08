@@ -53,8 +53,8 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
 	for (const mixtape of mixtapes) {
 		feed.addItem({
 			title: `${mixtape.number} - ${mixtape.title}`,
-			id: mixtape.id.toString(),
-			link: baseUrl,
+			id: `${baseUrl}/mixtapes/${mixtape.number}`,
+			link: `${baseUrl}/mixtapes/${mixtape.number}`,
 			description: mixtape.description,
 			date: new Date(mixtape.created_at),
 			image: mixtape.artwork_uri,
@@ -66,5 +66,18 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
 		});
 	}
 
-	return feed.rss2();
+	let rssOutput = feed.rss2();
+
+	rssOutput = rssOutput.replace(
+		'<rss version="2.0">',
+		'<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+	);
+
+	rssOutput = rssOutput.replace(
+		"<channel>",
+		`<channel>
+    <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml" />`,
+	);
+
+	return rssOutput;
 }
