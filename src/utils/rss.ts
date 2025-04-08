@@ -30,7 +30,6 @@ function getAudioMimeType(url: string): string {
 
 export function generateRssFeed(mixtapes: Mixtape[]) {
 	// Debug what's in the mixtapes data
-	console.log("First mixtape data:", JSON.stringify(mixtapes[0], null, 2));
 
 	const feed = new Feed({
 		title: "door.link",
@@ -85,7 +84,7 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
 	rssOutput = rssOutput.replace(
 		"<channel>",
 		`<channel>
-    <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml" />`,
+    <atom:link href="https://www.door.link/rss.xml" rel="self" type="application/rss+xml" />`,
 	);
 
 	// Create a custom XML output with correct audio enclosures
