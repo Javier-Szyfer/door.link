@@ -29,6 +29,9 @@ function getAudioMimeType(url: string): string {
 }
 
 export function generateRssFeed(mixtapes: Mixtape[]) {
+	// Debug what's in the mixtapes data
+	console.log("First mixtape data:", JSON.stringify(mixtapes[0], null, 2));
+
 	const feed = new Feed({
 		title: "door.link",
 		description: "Latest mixtapes from door.link",
@@ -53,7 +56,7 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
 	for (const mixtape of mixtapes) {
 		feed.addItem({
 			title: `${mixtape.number} - ${mixtape.title}`,
-			id: `${baseUrl}/mixtapes/${mixtape.number}`,
+			id: `${baseUrl}/mixtapes/${mixtape.number}`, // Use the mixtape URL as the guid (valid permalink)
 			link: `${baseUrl}/mixtapes/${mixtape.number}`,
 			description: mixtape.description,
 			date: new Date(mixtape.created_at),
@@ -66,18 +69,44 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
 		});
 	}
 
+	// Get the RSS output
 	let rssOutput = feed.rss2();
 
+	// Debug the output to see what's happening with enclosures
+	const enclosureMatch = rssOutput.match(/<enclosure.*?>/g);
+	console.log("First few enclosures:", enclosureMatch?.slice(0, 3));
+
+	// Add atom namespace to the rss tag
 	rssOutput = rssOutput.replace(
 		'<rss version="2.0">',
 		'<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
 	);
 
+	// Add atom:link with rel="self" after the opening channel tag
 	rssOutput = rssOutput.replace(
 		"<channel>",
 		`<channel>
     <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml" />`,
 	);
+
+	// Create a custom XML output with correct audio enclosures
+	// This is a workaround if the feed library is not setting enclosures correctly
+	if (enclosureMatch?.some((e) => e.includes("/media/images/"))) {
+		console.log("Found image enclosures, fixing them...");
+
+		// Method 1: Create custom enclosure elements by directly replacing the XML
+		for (const mixtape of mixtapes) {
+			const imageEnclosurePattern = new RegExp(
+				`<enclosure url="${mixtape.artwork_uri.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*>`,
+				"g",
+			);
+
+			const audioMimeType = getAudioMimeType(mixtape.audio_uri);
+			const newEnclosure = `<enclosure url="${mixtape.audio_uri}" length="0" type="${audioMimeType}"/>`;
+
+			rssOutput = rssOutput.replace(imageEnclosurePattern, newEnclosure);
+		}
+	}
 
 	return rssOutput;
 }
