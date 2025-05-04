@@ -9,17 +9,38 @@ export async function GET(request: Request) {
 
 	try {
 		const response = await fetch(url);
-		const blob = await response.blob();
 
+		if (!response.ok) {
+			return new NextResponse(`Upstream server error: ${response.status}`, {
+				status: response.status,
+			});
+		}
+
+		// Get all headers from the original response
 		const headers = new Headers();
-		headers.set("Content-Type", "audio/mpeg");
+		response.headers.forEach((value, key) => {
+			// Copy all headers except those we want to override
+			if (!["content-disposition"].includes(key.toLowerCase())) {
+				headers.set(key, value);
+			}
+		});
+
+		// Ensure we have the correct content type
+		if (!headers.has("content-type")) {
+			headers.set("content-type", "audio/mpeg");
+		}
+
+		// Set the filename for download
 		headers.set(
 			"Content-Disposition",
 			`attachment; filename="${filename || "download.mp3"}"`,
 		);
 
-		return new NextResponse(blob, {
+		// Forward the actual response body as a stream instead of buffering
+		// This is critical for large files to avoid timeout issues
+		return new NextResponse(response.body, {
 			headers,
+			status: 200,
 		});
 	} catch (error) {
 		console.error("Download error:", error);
