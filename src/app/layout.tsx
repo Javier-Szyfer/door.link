@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 // COMPONENTS
 import { Toaster } from "@/components/ui/sonner";
 import { Player } from "@/components/player/player";
+import { BlueHeartIcon } from "@/components/BlueHeartIcon";
 
 // CONTEXT
 import { AudioProvider } from "@/contexts/AudioContext";
@@ -47,7 +48,11 @@ export default function RootLayout({
 						<AudioProvider>
 							{children}
 							<Player />
-							<Toaster />
+							<Toaster
+								icons={{
+									loading: <BlueHeartIcon />,
+								}}
+							/>
 						</AudioProvider>
 					</ThemeProvider>
 				</div>
