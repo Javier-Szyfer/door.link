@@ -83,7 +83,66 @@ export function Player({
 					fetch(downloadUrl)
 						.then((response) => {
 							if (!response.ok) throw new Error("Download failed");
-							return response.blob();
+
+							// If content-length is not available, fall back to simple blob download
+							const contentLength = response.headers.get("content-length");
+							if (!contentLength) {
+								console.warn(
+									"Content-Length header missing, cannot verify complete download",
+								);
+								return response.blob();
+							}
+
+							// Create a new ReadableStream to handle the download
+							const reader = response.body?.getReader();
+							if (!reader) {
+								console.warn(
+									"ReadableStream not supported, falling back to blob",
+								);
+								return response.blob();
+							}
+
+							const totalLength = Number.parseInt(contentLength, 10);
+							let receivedLength = 0;
+							const chunks: Uint8Array[] = [];
+
+							return new Promise<Blob>((resolveStream, rejectStream) => {
+								const pushChunk = async (): Promise<void> => {
+									try {
+										const { done, value } = await reader.read();
+										if (done) {
+											const receivedBytes = chunks.reduce(
+												(acc, chunk) => acc + chunk.length,
+												0,
+											);
+											if (receivedBytes !== totalLength) {
+												rejectStream(
+													new Error(
+														`Incomplete download: expected ${totalLength} bytes but got ${receivedBytes}`,
+													),
+												);
+												return;
+											}
+											const blob = new Blob(chunks, {
+												type:
+													response.headers.get("content-type") || "audio/mpeg",
+											});
+											resolveStream(blob);
+											return;
+										}
+
+										if (value) {
+											chunks.push(value);
+											receivedLength += value.length;
+										}
+										return pushChunk();
+									} catch (error) {
+										rejectStream(error);
+									}
+								};
+
+								pushChunk();
+							});
 						})
 						.then((blob) => {
 							const url = window.URL.createObjectURL(blob);
@@ -104,7 +163,7 @@ export function Player({
 			toast.promise(downloadPromise, {
 				loading: `Downloading mixtape ${currentMixtape.title}`,
 				success: (data) => `Downloaded ${data.title}`,
-				error: "Download failed",
+				error: (err) => err.message || "Download failed",
 			});
 		} catch (error) {
 			console.error("Download error:", error);
