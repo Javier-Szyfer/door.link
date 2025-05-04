@@ -70,47 +70,44 @@ export function Player({
 
 	const remainingTime = duration - progress;
 
-	const BlueHeartIcon = () => (
-		<svg
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 24 24"
-			fill="currentColor"
-			className="h-5 w-5"
-		>
-			<title>Blue Heart</title>
-			<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.27 2 8.5 2 5.41 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.41 22 8.5c0 3.77-3.4 6.86-8.55 11.54L12 21.35z" />
-		</svg>
-	);
-
 	const handleDownload = async () => {
 		if (!audioSrc || isDownloading || !currentMixtape) return;
 		setIsDownloading(true);
 
 		try {
-			toast(`Downloading mixtape ${currentMixtape.title}...`, {
-				icon: <BlueHeartIcon />,
-			});
 			const filename = `${currentMixtape.number}-${currentMixtape.title}.mp3`;
 			const downloadUrl = `/api/download?url=${encodeURIComponent(audioSrc)}&filename=${encodeURIComponent(filename)}`;
 
-			const response = await fetch(downloadUrl);
-			if (!response.ok) throw new Error("Download failed");
+			const downloadPromise = new Promise<{ title: string }>(
+				(resolve, reject) => {
+					fetch(downloadUrl)
+						.then((response) => {
+							if (!response.ok) throw new Error("Download failed");
+							return response.blob();
+						})
+						.then((blob) => {
+							const url = window.URL.createObjectURL(blob);
+							const a = document.createElement("a");
+							a.style.display = "none";
+							a.href = url;
+							a.download = filename;
+							document.body.appendChild(a);
+							a.click();
+							window.URL.revokeObjectURL(url);
+							document.body.removeChild(a);
+							resolve({ title: currentMixtape.title });
+						})
+						.catch(reject);
+				},
+			);
 
-			const blob = await response.blob();
-			const url = window.URL.createObjectURL(blob);
-
-			const a = document.createElement("a");
-			a.style.display = "none";
-			a.href = url;
-			a.download = filename;
-			document.body.appendChild(a);
-			a.click();
-			window.URL.revokeObjectURL(url);
-			document.body.removeChild(a);
-			toast.success("Download complete");
+			toast.promise(downloadPromise, {
+				loading: `Downloading mixtape ${currentMixtape.title}`,
+				success: (data) => `Downloaded ${data.title}`,
+				error: "Download failed",
+			});
 		} catch (error) {
 			console.error("Download error:", error);
-			toast.error("Download failed");
 		} finally {
 			setIsDownloading(false);
 		}
