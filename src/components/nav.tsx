@@ -6,6 +6,13 @@ export const Nav = () => {
 			<a target="_blank" rel="noopener noreferrer" href="/rss.xml">
 				<h2>RSS</h2>
 			</a>
+			<Link
+				href="https://shop.door.link"
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				Shop
+			</Link>
 			<Link href="mailto:contact@door.link">
 				<h2>Contact</h2>
 			</Link>
