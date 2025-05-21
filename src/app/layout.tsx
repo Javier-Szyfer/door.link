@@ -1,5 +1,6 @@
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 // COMPONENTS
 import { Toaster } from "@/components/ui/sonner";
@@ -37,11 +38,12 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
+			<GoogleTagManager gtmId="GTM-4BZFL0TX5S" />
 			<body>
 				<div className="mx-auto max-w-7xl pb-10 text-sm">
 					<ThemeProvider
 						attribute="class"
-						defaultTheme="light"
+						defaultTheme="dark"
 						enableSystem={false}
 						disableTransitionOnChange
 					>
