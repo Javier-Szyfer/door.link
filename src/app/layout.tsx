@@ -38,7 +38,7 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<GoogleTagManager gtmId="GTM-4BZFL0TX5S" />
+			<GoogleTagManager gtmId="GTM-T9SNDX3F" />
 			<body>
 				<div className="mx-auto max-w-7xl pb-10 text-sm">
 					<ThemeProvider
