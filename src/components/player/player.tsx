@@ -81,8 +81,12 @@ export function Player({
 			const downloadPromise = new Promise<{ title: string }>(
 				(resolve, reject) => {
 					fetch(downloadUrl)
-						.then((response) => {
-							if (!response.ok) throw new Error("Download failed");
+						.then(async (response) => {
+							if (!response.ok) {
+								// Extract the error message from the response
+								const errorText = await response.text();
+								throw new Error(errorText || `HTTP ${response.status}: Download failed`);
+							}
 
 							// If content-length is not available, fall back to simple blob download
 							const contentLength = response.headers.get("content-length");

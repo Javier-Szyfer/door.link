@@ -20,6 +20,7 @@ export const ExpandedDialog = ({ artwork_uri }: { artwork_uri: string }) => {
 					height={100}
 					className="cursor-pointer select-none hover:opacity-80"
 					draggable={false}
+					unoptimized
 				/>
 			</DialogTrigger>
 			<DialogContent className="place-items-center">
@@ -31,6 +32,7 @@ export const ExpandedDialog = ({ artwork_uri }: { artwork_uri: string }) => {
 						width={1000}
 						height={1000}
 						className="select-none"
+						unoptimized
 					/>
 				</div>
 			</DialogContent>
