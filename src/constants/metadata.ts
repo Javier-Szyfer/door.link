@@ -1,6 +1,6 @@
 export const SITE_NAME = "door.link";
 export const SITE_DESCRIPTION =
-  "A handpicked music selection, grown over time, algorithm-free, madefor listening and dancing.";
+  "A handpicked music selection, grown over time, algorithm-free, made for listening and dancing.";
 export const OG_IMAGE =
   "https://res.cloudinary.com/aldi/image/upload/v1607370937/ogcard_bmltnc.jpg";
 export const SITE_ICONS = [
