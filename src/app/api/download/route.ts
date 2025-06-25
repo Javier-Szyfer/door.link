@@ -10,7 +10,15 @@ const RATE_LIMIT = {
 };
 
 // Allowed content types
-const ALLOWED_CONTENT_TYPES = ["audio/mpeg", "audio/mp3", "audio/wav", "audio/m4a"];
+const ALLOWED_CONTENT_TYPES = [
+  "audio/mpeg",
+  "audio/mp3",
+  "audio/wav",
+  "audio/m4a",
+  "audio/mp4", // M4A files are often served as audio/mp4
+  "audio/x-m4a", // Alternative MIME type for M4A
+  "audio/aac", // AAC audio (similar to M4A)
+];
 
 function getRateLimitKey(request: Request): string {
   // In production, consider using a more sophisticated key
@@ -133,7 +141,10 @@ export async function GET(request: Request) {
     }
 
     // Set the filename for download
-    headers.set("Content-Disposition", `attachment; filename="${filename || "download.mp3"}"`);
+    // Handle Unicode characters in filename by using RFC 5987 encoding
+    const safeFilename = filename || "download.mp3";
+    const encodedFilename = encodeURIComponent(safeFilename);
+    headers.set("Content-Disposition", `attachment; filename*=UTF-8''${encodedFilename}`);
 
     // Forward the actual response body as a stream instead of buffering
     // This is critical for large files to avoid timeout issues
