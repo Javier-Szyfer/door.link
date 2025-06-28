@@ -15,6 +15,10 @@ interface AudioContextType {
     audio_uri: string;
     mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
   }>;
+  previousTracks: Array<{
+    audio_uri: string;
+    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
+  }>;
   togglePlay: () => void;
   toggleMute: () => void;
   setVolume: (volume: number) => void;
@@ -50,6 +54,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     artwork_uri?: string;
   } | null>(null);
   const [queue, setQueue] = useState<
+    Array<{
+      audio_uri: string;
+      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
+    }>
+  >([]);
+  const [previousTracks, setPreviousTracks] = useState<
     Array<{
       audio_uri: string;
       mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
@@ -132,6 +142,17 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           audio.pause();
           setIsPlaying(false);
 
+          // Add current track to previous tracks history
+          if (currentMixtape && audioSrc) {
+            setPreviousTracks((prev) => [
+              ...prev,
+              {
+                audio_uri: audioSrc,
+                mixtapeInfo: currentMixtape,
+              },
+            ]);
+          }
+
           audio.src = nextTrack.audio_uri;
           audio.load();
           setAudioSrcState(nextTrack.audio_uri);
@@ -148,11 +169,81 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       });
 
       // Previous track handler
-      navigator.mediaSession.setActionHandler("previoustrack", () => {
+      navigator.mediaSession.setActionHandler("previoustrack", async () => {
         if (!audioRef.current) return;
-        // Simple implementation: restart current track
-        audioRef.current.currentTime = 0;
-        setProgress(0);
+
+        // If more than 3 seconds into track, restart current track
+        if (progress > 3) {
+          const clampedTime = Math.max(0, Math.min(0, audioRef.current.duration || 0));
+          audioRef.current.currentTime = clampedTime;
+          setProgress(clampedTime);
+
+          try {
+            if (duration > 0) {
+              navigator.mediaSession.setPositionState({
+                duration: duration,
+                playbackRate: 1,
+                position: 0,
+              });
+            }
+          } catch (e) {
+            // Ignore position state errors
+          }
+          return;
+        }
+
+        // If less than 3 seconds and we have previous tracks, go to previous track
+        if (previousTracks.length > 0) {
+          const previousTrack = previousTracks[previousTracks.length - 1];
+          const newPreviousTracks = previousTracks.slice(0, -1);
+
+          try {
+            const audio = audioRef.current;
+            audio.pause();
+            setIsPlaying(false);
+
+            // Add current track to front of queue for "next" functionality
+            if (currentMixtape && audioSrc) {
+              setQueue((prev) => [
+                {
+                  audio_uri: audioSrc,
+                  mixtapeInfo: currentMixtape,
+                },
+                ...prev,
+              ]);
+            }
+
+            audio.src = previousTrack.audio_uri;
+            audio.load();
+            setAudioSrcState(previousTrack.audio_uri);
+            setCurrentMixtape(previousTrack.mixtapeInfo);
+            setPreviousTracks(newPreviousTracks);
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            await audio.play();
+            setIsPlaying(true);
+          } catch (error) {
+            console.log("Previous track error:", error);
+            setIsPlaying(false);
+          }
+        } else {
+          // No previous tracks, just restart current track
+          const clampedTime = Math.max(0, Math.min(0, audioRef.current.duration || 0));
+          audioRef.current.currentTime = clampedTime;
+          setProgress(clampedTime);
+
+          try {
+            if (duration > 0) {
+              navigator.mediaSession.setPositionState({
+                duration: duration,
+                playbackRate: 1,
+                position: 0,
+              });
+            }
+          } catch (e) {
+            // Ignore position state errors
+          }
+        }
       });
 
       // Set position state if available
@@ -166,7 +257,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.log("Media Session API error:", error);
     }
-  }, [currentMixtape, isPlaying, progress, duration, queue]);
+  }, [currentMixtape, isPlaying, progress, duration, queue, audioSrc, previousTracks]);
 
   // Set up audio event listeners
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
@@ -203,6 +294,17 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         const remainingQueue = queue.slice(1);
 
         try {
+          // Add current track to previous tracks history
+          if (currentMixtape && audioSrc) {
+            setPreviousTracks((prev) => [
+              ...prev,
+              {
+                audio_uri: audioSrc,
+                mixtapeInfo: currentMixtape,
+              },
+            ]);
+          }
+
           audio.pause();
           audio.src = nextTrack.audio_uri;
           audio.load();
@@ -326,6 +428,18 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
     try {
       setIsLoading(true);
+
+      // Add current track to previous tracks history if we're switching tracks
+      if (audioRef.current.src && currentMixtape && audioSrc && audioSrc !== src) {
+        setPreviousTracks((prev) => [
+          ...prev,
+          {
+            audio_uri: audioSrc,
+            mixtapeInfo: currentMixtape,
+          },
+        ]);
+      }
+
       // Pause and reset any existing playback
       if (audioRef.current.src) {
         audioRef.current.pause();
@@ -380,6 +494,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         audioSrc,
         isLoading,
         queue,
+        previousTracks,
         togglePlay,
         toggleMute,
         setVolume,
