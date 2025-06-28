@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 
 interface AudioContextType {
   isPlaying: boolean;
@@ -8,12 +8,16 @@ interface AudioContextType {
   volume: number;
   progress: number;
   duration: number;
-  currentMixtape: { number: string; title: string; id: string } | null;
+  currentMixtape: { number: string; title: string; id: string; artwork_uri?: string } | null;
   audioSrc: string | null;
   isLoading: boolean;
   queue: Array<{
     audio_uri: string;
-    mixtapeInfo: { number: string; title: string; id: string };
+    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
+  }>;
+  previousTracks: Array<{
+    audio_uri: string;
+    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
   }>;
   togglePlay: () => void;
   toggleMute: () => void;
@@ -21,10 +25,10 @@ interface AudioContextType {
   seek: (time: number) => void;
   setAudioSrc: (
     src: string,
-    mixtapeInfo: { number: string; title: string; id: string },
+    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string },
     queue?: Array<{
       audio_uri: string;
-      mixtapeInfo: { number: string; title: string; id: string };
+      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
     }>,
     autoPlay?: boolean,
   ) => void;
@@ -47,11 +51,18 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     number: string;
     title: string;
     id: string;
+    artwork_uri?: string;
   } | null>(null);
   const [queue, setQueue] = useState<
     Array<{
       audio_uri: string;
-      mixtapeInfo: { number: string; title: string; id: string };
+      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
+    }>
+  >([]);
+  const [previousTracks, setPreviousTracks] = useState<
+    Array<{
+      audio_uri: string;
+      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
     }>
   >([]);
 
@@ -70,6 +81,184 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   }, [mounted]);
 
+  // Update Media Session API when track or play state changes
+  const updateMediaSession = useCallback(() => {
+    if (!currentMixtape || typeof navigator === "undefined" || !("mediaSession" in navigator))
+      return;
+
+    try {
+      // Set metadata
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentMixtape.title,
+        artist: "door.link",
+        album: `Mix ${currentMixtape.number}`,
+        artwork: [
+          // Always use the keyhole logo
+          { src: "/android-chrome-256x256.png", sizes: "256x256", type: "image/png" },
+          { src: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+          { src: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+          { src: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+          { src: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+        ],
+      });
+
+      // Set playback state
+      navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
+
+      // Set action handlers
+      navigator.mediaSession.setActionHandler("play", () => {
+        togglePlay();
+      });
+
+      navigator.mediaSession.setActionHandler("pause", () => {
+        togglePlay();
+      });
+
+      navigator.mediaSession.setActionHandler("seekbackward", (details) => {
+        const skipTime = details.seekOffset || 10;
+        seek(Math.max(progress - skipTime, 0));
+      });
+
+      navigator.mediaSession.setActionHandler("seekforward", (details) => {
+        const skipTime = details.seekOffset || 10;
+        seek(Math.min(progress + skipTime, duration));
+      });
+
+      navigator.mediaSession.setActionHandler("seekto", (details) => {
+        if (details.seekTime !== null && details.seekTime !== undefined) {
+          seek(details.seekTime);
+        }
+      });
+
+      // Next track handler
+      navigator.mediaSession.setActionHandler("nexttrack", async () => {
+        if (!audioRef.current || queue.length === 0) return;
+
+        const nextTrack = queue[0];
+        const remainingQueue = queue.slice(1);
+
+        try {
+          const audio = audioRef.current;
+          audio.pause();
+          setIsPlaying(false);
+
+          // Add current track to previous tracks history
+          if (currentMixtape && audioSrc) {
+            setPreviousTracks((prev) => [
+              ...prev,
+              {
+                audio_uri: audioSrc,
+                mixtapeInfo: currentMixtape,
+              },
+            ]);
+          }
+
+          audio.src = nextTrack.audio_uri;
+          audio.load();
+          setAudioSrcState(nextTrack.audio_uri);
+          setCurrentMixtape(nextTrack.mixtapeInfo);
+          setQueue(remainingQueue);
+
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          await audio.play();
+          setIsPlaying(true);
+        } catch (error) {
+          console.log("Next track error:", error);
+          setIsPlaying(false);
+        }
+      });
+
+      // Previous track handler
+      navigator.mediaSession.setActionHandler("previoustrack", async () => {
+        if (!audioRef.current) return;
+
+        // If more than 3 seconds into track, restart current track
+        if (progress > 3) {
+          const clampedTime = Math.max(0, Math.min(0, audioRef.current.duration || 0));
+          audioRef.current.currentTime = clampedTime;
+          setProgress(clampedTime);
+
+          try {
+            if (duration > 0) {
+              navigator.mediaSession.setPositionState({
+                duration: duration,
+                playbackRate: 1,
+                position: 0,
+              });
+            }
+          } catch (e) {
+            // Ignore position state errors
+          }
+          return;
+        }
+
+        // If less than 3 seconds and we have previous tracks, go to previous track
+        if (previousTracks.length > 0) {
+          const previousTrack = previousTracks[previousTracks.length - 1];
+          const newPreviousTracks = previousTracks.slice(0, -1);
+
+          try {
+            const audio = audioRef.current;
+            audio.pause();
+            setIsPlaying(false);
+
+            // Add current track to front of queue for "next" functionality
+            if (currentMixtape && audioSrc) {
+              setQueue((prev) => [
+                {
+                  audio_uri: audioSrc,
+                  mixtapeInfo: currentMixtape,
+                },
+                ...prev,
+              ]);
+            }
+
+            audio.src = previousTrack.audio_uri;
+            audio.load();
+            setAudioSrcState(previousTrack.audio_uri);
+            setCurrentMixtape(previousTrack.mixtapeInfo);
+            setPreviousTracks(newPreviousTracks);
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+            await audio.play();
+            setIsPlaying(true);
+          } catch (error) {
+            console.log("Previous track error:", error);
+            setIsPlaying(false);
+          }
+        } else {
+          // No previous tracks, just restart current track
+          const clampedTime = Math.max(0, Math.min(0, audioRef.current.duration || 0));
+          audioRef.current.currentTime = clampedTime;
+          setProgress(clampedTime);
+
+          try {
+            if (duration > 0) {
+              navigator.mediaSession.setPositionState({
+                duration: duration,
+                playbackRate: 1,
+                position: 0,
+              });
+            }
+          } catch (e) {
+            // Ignore position state errors
+          }
+        }
+      });
+
+      // Set position state if available
+      if (duration > 0) {
+        navigator.mediaSession.setPositionState({
+          duration: duration,
+          playbackRate: 1,
+          position: progress,
+        });
+      }
+    } catch (error) {
+      console.log("Media Session API error:", error);
+    }
+  }, [currentMixtape, isPlaying, progress, duration, queue, audioSrc, previousTracks]);
+
   // Set up audio event listeners
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
@@ -84,6 +273,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
       setIsLoading(false);
+
+      // Update Media Session metadata when audio loads
+      updateMediaSession();
     };
 
     const handleLoadStart = () => {
@@ -102,6 +294,17 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         const remainingQueue = queue.slice(1);
 
         try {
+          // Add current track to previous tracks history
+          if (currentMixtape && audioSrc) {
+            setPreviousTracks((prev) => [
+              ...prev,
+              {
+                audio_uri: audioSrc,
+                mixtapeInfo: currentMixtape,
+              },
+            ]);
+          }
+
           audio.pause();
           audio.src = nextTrack.audio_uri;
           audio.load();
@@ -153,6 +356,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       }
     };
   }, []);
+
+  // Update Media Session when state changes
+  useEffect(() => {
+    updateMediaSession();
+  }, [updateMediaSession]);
 
   if (!mounted) {
     return null;
@@ -209,10 +417,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   const setAudioSrc = async (
     src: string,
-    mixtapeInfo: { number: string; title: string; id: string },
+    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string },
     newQueue?: Array<{
       audio_uri: string;
-      mixtapeInfo: { number: string; title: string; id: string };
+      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
     }>,
     autoPlay?: boolean,
   ) => {
@@ -220,6 +428,18 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
     try {
       setIsLoading(true);
+
+      // Add current track to previous tracks history if we're switching tracks
+      if (audioRef.current.src && currentMixtape && audioSrc && audioSrc !== src) {
+        setPreviousTracks((prev) => [
+          ...prev,
+          {
+            audio_uri: audioSrc,
+            mixtapeInfo: currentMixtape,
+          },
+        ]);
+      }
+
       // Pause and reset any existing playback
       if (audioRef.current.src) {
         audioRef.current.pause();
@@ -274,6 +494,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         audioSrc,
         isLoading,
         queue,
+        previousTracks,
         togglePlay,
         toggleMute,
         setVolume,
