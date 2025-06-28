@@ -3,7 +3,7 @@
 // COMPONENTS
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { DownloadIcon } from "lucide-react";
+import { DownloadIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { PlayIcon } from "./icons/play-icon";
 import { PauseIcon } from "./icons/pause-icon";
@@ -36,6 +36,7 @@ export function Player({
     setVolume,
     seek,
     setAudioSrc,
+    isLoading,
   } = useAudio();
 
   // If player is receiving a mixtape, set the current mixtape
@@ -176,8 +177,15 @@ export function Player({
           {currentMixtape?.number} - {currentMixtape?.title}
         </div>
         <div className="flex items-center justify-between gap-2">
-          <Button className="h-8 w-8 shrink-0" size="icon" onClick={togglePlay}>
-            {isPlaying ? (
+          <Button
+            className="h-8 w-8 shrink-0"
+            size="icon"
+            onClick={togglePlay}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin text-foreground" />
+            ) : isPlaying ? (
               <PauseIcon className="text-foreground hover:text-foreground/80" />
             ) : (
               <PlayIcon className="text-foreground hover:text-foreground/80" />
