@@ -120,6 +120,41 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         }
       });
 
+      // Next track handler
+      navigator.mediaSession.setActionHandler("nexttrack", async () => {
+        if (!audioRef.current || queue.length === 0) return;
+
+        const nextTrack = queue[0];
+        const remainingQueue = queue.slice(1);
+
+        try {
+          const audio = audioRef.current;
+          audio.pause();
+          setIsPlaying(false);
+
+          audio.src = nextTrack.audio_uri;
+          audio.load();
+          setAudioSrcState(nextTrack.audio_uri);
+          setCurrentMixtape(nextTrack.mixtapeInfo);
+          setQueue(remainingQueue);
+
+          await new Promise((resolve) => setTimeout(resolve, 100));
+          await audio.play();
+          setIsPlaying(true);
+        } catch (error) {
+          console.log("Next track error:", error);
+          setIsPlaying(false);
+        }
+      });
+
+      // Previous track handler
+      navigator.mediaSession.setActionHandler("previoustrack", () => {
+        if (!audioRef.current) return;
+        // Simple implementation: restart current track
+        audioRef.current.currentTime = 0;
+        setProgress(0);
+      });
+
       // Set position state if available
       if (duration > 0) {
         navigator.mediaSession.setPositionState({
@@ -131,7 +166,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.log("Media Session API error:", error);
     }
-  }, [currentMixtape, isPlaying, progress, duration]);
+  }, [currentMixtape, isPlaying, progress, duration, queue]);
 
   // Set up audio event listeners
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
