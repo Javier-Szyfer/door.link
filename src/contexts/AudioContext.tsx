@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
 
 interface AudioContextType {
   isPlaying: boolean;
@@ -8,12 +8,12 @@ interface AudioContextType {
   volume: number;
   progress: number;
   duration: number;
-  currentMixtape: { number: string; title: string; id: string } | null;
+  currentMixtape: { number: string; title: string; id: string; artwork_uri?: string } | null;
   audioSrc: string | null;
   isLoading: boolean;
   queue: Array<{
     audio_uri: string;
-    mixtapeInfo: { number: string; title: string; id: string };
+    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
   }>;
   togglePlay: () => void;
   toggleMute: () => void;
@@ -21,10 +21,10 @@ interface AudioContextType {
   seek: (time: number) => void;
   setAudioSrc: (
     src: string,
-    mixtapeInfo: { number: string; title: string; id: string },
+    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string },
     queue?: Array<{
       audio_uri: string;
-      mixtapeInfo: { number: string; title: string; id: string };
+      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
     }>,
     autoPlay?: boolean,
   ) => void;
@@ -47,11 +47,12 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     number: string;
     title: string;
     id: string;
+    artwork_uri?: string;
   } | null>(null);
   const [queue, setQueue] = useState<
     Array<{
       audio_uri: string;
-      mixtapeInfo: { number: string; title: string; id: string };
+      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
     }>
   >([]);
 
@@ -70,6 +71,68 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   }, [mounted]);
 
+  // Update Media Session API when track or play state changes
+  const updateMediaSession = useCallback(() => {
+    if (!currentMixtape || typeof navigator === "undefined" || !("mediaSession" in navigator))
+      return;
+
+    try {
+      // Set metadata
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentMixtape.title,
+        artist: "door.link",
+        album: `Mix ${currentMixtape.number}`,
+        artwork: [
+          // Always use the keyhole logo
+          { src: "/android-chrome-256x256.png", sizes: "256x256", type: "image/png" },
+          { src: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+          { src: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+          { src: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+          { src: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+        ],
+      });
+
+      // Set playback state
+      navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
+
+      // Set action handlers
+      navigator.mediaSession.setActionHandler("play", () => {
+        togglePlay();
+      });
+
+      navigator.mediaSession.setActionHandler("pause", () => {
+        togglePlay();
+      });
+
+      navigator.mediaSession.setActionHandler("seekbackward", (details) => {
+        const skipTime = details.seekOffset || 10;
+        seek(Math.max(progress - skipTime, 0));
+      });
+
+      navigator.mediaSession.setActionHandler("seekforward", (details) => {
+        const skipTime = details.seekOffset || 10;
+        seek(Math.min(progress + skipTime, duration));
+      });
+
+      navigator.mediaSession.setActionHandler("seekto", (details) => {
+        if (details.seekTime !== null && details.seekTime !== undefined) {
+          seek(details.seekTime);
+        }
+      });
+
+      // Set position state if available
+      if (duration > 0) {
+        navigator.mediaSession.setPositionState({
+          duration: duration,
+          playbackRate: 1,
+          position: progress,
+        });
+      }
+    } catch (error) {
+      console.log("Media Session API error:", error);
+    }
+  }, [currentMixtape, isPlaying, progress, duration]);
+
   // Set up audio event listeners
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
@@ -84,6 +147,9 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
       setIsLoading(false);
+
+      // Update Media Session metadata when audio loads
+      updateMediaSession();
     };
 
     const handleLoadStart = () => {
@@ -154,6 +220,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  // Update Media Session when state changes
+  useEffect(() => {
+    updateMediaSession();
+  }, [updateMediaSession]);
+
   if (!mounted) {
     return null;
   }
@@ -209,10 +280,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   const setAudioSrc = async (
     src: string,
-    mixtapeInfo: { number: string; title: string; id: string },
+    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string },
     newQueue?: Array<{
       audio_uri: string;
-      mixtapeInfo: { number: string; title: string; id: string };
+      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
     }>,
     autoPlay?: boolean,
   ) => {

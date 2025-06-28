@@ -47,6 +47,7 @@ export function Player({
           number: mixtape.number,
           title: mixtape.title,
           id: mixtape.id.toString(),
+          artwork_uri: mixtape.artwork_uri,
         },
         undefined,
         false,

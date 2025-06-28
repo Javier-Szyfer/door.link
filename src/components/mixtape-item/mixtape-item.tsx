@@ -45,11 +45,12 @@ export const MixtapeItem = ({
                 number: m.number,
                 title: m.title,
                 id: m.id.toString(),
+                artwork_uri: m.artwork_uri,
               },
             }))
           : [];
 
-      setAudioSrc(audio_uri, { number, title, id: id.toString() }, queue, true);
+      setAudioSrc(audio_uri, { number, title, id: id.toString(), artwork_uri }, queue, true);
     }
   };
 
