@@ -27,19 +27,14 @@ export const PlaybackModeToggle = () => {
       aria-checked={isContinuousPlayback}
       onClick={handleToggle}
       onKeyDown={handleKeyDown}
-      className="group flex items-center gap-[6px] bg-[#1f1f1f] px-[6px] py-[4px] text-[10px] uppercase tracking-[0.18em] text-[#dcdcdc] transition-colors  dark:bg-[#111] dark:text-[#f6f6f6] "
-    >
-      <span className="pointer-events-none">CP</span>
-      <span
-        aria-hidden
-        className={`pointer-events-none flex h-[18px] w-[32px] items-center justify-center border border-[#2b2b2b] bg-[#161616] px-[4px] text-[10px] tracking-[0.12em] text-white transition-colors dark:border-[#f1f1f1] ${
-          isContinuousPlayback
-            ? "text-white"
-            : "text-[#84858C]"
+
+      className={`cursor-pointer flex text-[18px] font-bold w-[30px] h-[20px] leading-none items-center justify-center tracking-tighter  ${isContinuousPlayback
+        ? "text-white bg-[#0000ff] dark:text-[#f1f1f1] dark:bg-[#202020] border-2 border-transparent"
+
+        : "text-[#0000ff] bg-[#fff] border-2 border-[#0000ff] dark:bg-transparent dark:border-[#84858C] dark:text-[#84858C]"
         }`}
-      >
-        {isContinuousPlayback ? "ON" : "OFF"}
-      </span>
+    >
+ <span className="-mt-1">∞</span>
     </button>
   );
 };
