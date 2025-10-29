@@ -28,13 +28,13 @@ export const PlaybackModeToggle = () => {
       onClick={handleToggle}
       onKeyDown={handleKeyDown}
 
-      className={`cursor-pointer flex text-[18px] font-bold w-[30px] h-[20px] leading-none items-center justify-center tracking-tighter  ${isContinuousPlayback
-        ? "text-white bg-[#0000ff] dark:text-[#f1f1f1] dark:bg-[#202020] border-2 border-transparent"
-
-        : "text-[#0000ff] bg-[#fff] border-2 border-[#0000ff] dark:bg-transparent dark:border-[#84858C] dark:text-[#84858C]"
+      className={`cursor-pointer flex text-[18px]  font-bold w-[30px] h-[20px] leading-none items-center justify-center tracking-tighter 
+         ${isContinuousPlayback
+          ? "text-white bg-[#1500ff] dark:text-[#f1f1f1] dark:bg-[#202020]"
+          : "text-[#414141] bg-transparent dark:border-[#84858C] dark:text-[#84858C]"
         }`}
     >
- <span className="-mt-1">∞</span>
+      <span className="-mt-1">∞</span>
     </button>
   );
 };
