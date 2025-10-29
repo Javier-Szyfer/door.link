@@ -14,7 +14,7 @@ export default async function Dashboard() {
 
   return (
     <div className="mt-12 flex flex-col gap-12">
-      <Link href="/">Home</Link>
+    
       <h1 className="text-2xl font-medium">Dashboard</h1>
       <Link href="/admin/upload-mixtape" className="w-fit border border-gray-300 px-4 py-2">
         Upload Mixtape
