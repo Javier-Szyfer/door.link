@@ -1,6 +1,15 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState, useCallback } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 
 interface AudioContextType {
   isPlaying: boolean;
@@ -19,6 +28,8 @@ interface AudioContextType {
     audio_uri: string;
     mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
   }>;
+  isContinuousPlayback: boolean;
+  setContinuousPlayback: Dispatch<SetStateAction<boolean>>;
   togglePlay: () => void;
   toggleMute: () => void;
   setVolume: (volume: number) => void;
@@ -59,6 +70,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
     }>
   >([]);
+  const [isContinuousPlayback, setIsContinuousPlayback] = useState(true);
   const [previousTracks, setPreviousTracks] = useState<
     Array<{
       audio_uri: string;
@@ -78,8 +90,18 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       if (savedVolume !== null) {
         setVolumeState(Number(savedVolume));
       }
+      const savedContinuousPlayback = localStorage.getItem("audio-continuous-playback");
+      if (savedContinuousPlayback !== null) {
+        setIsContinuousPlayback(savedContinuousPlayback === "true");
+      }
     }
   }, [mounted]);
+
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem("audio-continuous-playback", String(isContinuousPlayback));
+    }
+  }, [isContinuousPlayback, mounted]);
 
   // Update Media Session API when track or play state changes
   const updateMediaSession = useCallback(() => {
@@ -289,7 +311,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       setProgress(0);
 
       // Play next track if available
-      if (queue.length > 0) {
+      if (isContinuousPlayback && queue.length > 0) {
         const nextTrack = queue[0];
         const remainingQueue = queue.slice(1);
 
@@ -327,16 +349,13 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     audio.addEventListener("loadstart", handleLoadStart);
     audio.addEventListener("ended", handleEnded);
 
-    // If audio source exists, trigger metadata load
-    if (audio.src) audio.load();
-
     return () => {
       audio.removeEventListener("timeupdate", handleTimeUpdate);
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("loadstart", handleLoadStart);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [queue, audioSrc]);
+  }, [queue, audioSrc, isContinuousPlayback, currentMixtape]);
 
   // Update audio volume when volume state changes
   useEffect(() => {
@@ -495,6 +514,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         queue,
         previousTracks,
+        isContinuousPlayback,
+        setContinuousPlayback: setIsContinuousPlayback,
         togglePlay,
         toggleMute,
         setVolume,
