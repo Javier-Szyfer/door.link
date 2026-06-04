@@ -134,10 +134,13 @@ export const updateMixtape = async (id: number, mixtapeData: MixtapeData) => {
       return { error: "Not authorized to update mixtapes" };
     }
 
-    // console.log("updating mixtape", id);
+    // Never send `id` in the update payload — we only ever mutate the row matched
+    // by `.eq("id", id)`. This keeps an update strictly an update, never an upsert.
+    const { id: _id, ...updateData } = mixtapeData as MixtapeData & { id?: number };
+
     const { data: mixtape, error } = await supabase
       .from("mixtapes")
-      .update(mixtapeData)
+      .update(updateData)
       .eq("id", id)
       .select();
 
@@ -145,7 +148,15 @@ export const updateMixtape = async (id: number, mixtapeData: MixtapeData) => {
       console.error("Supabase error:", error);
       return { error: "Failed to update mixtape" };
     }
-    console.log("updated mixtape", mixtape);
+
+    // A matched-zero update returns no error and an empty array. Treat that as a
+    // failure so the UI never reports a phantom success (e.g. wrong id or RLS).
+    if (!mixtape || mixtape.length === 0) {
+      return {
+        error: `No mixtape was updated (id ${id}). It may not exist or you may not have permission.`,
+      };
+    }
+
     return { mixtape, success: true };
   } catch (error) {
     console.error("Error updating mixtape:", error);
