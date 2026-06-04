@@ -1,17 +1,35 @@
 -- Safeguards against duplicate mixtapes.
 --
--- Context: editing a mixtape was producing a second row (a *draft* clone) on the
--- frontpage / dashboard. The app's edit path only issues `UPDATE ... WHERE id`,
--- which cannot create a row — so a "new draft row on edit" points at the database,
--- most likely a TRIGGER that inserts a copy on UPDATE. Run these in the Supabase
--- SQL editor (or psql with the service-role connection string). Run STEP 1 and
--- STEP 2 first and read the output before running the destructive/DDL steps.
+-- Background: editing a mixtape was producing a second row on the dashboard. The
+-- duplicates always came as one draft + one published with DIFFERENT statuses,
+-- where the newer row's status matched whatever was in the form at save time.
+-- That rules out a row-cloning trigger (which would copy the source status and
+-- yield same-status pairs) and points at the edit flow performing an INSERT that
+-- carried the form's status instead of an in-place UPDATE. The app fix lives in
+-- this PR (Save button disabled while saving + re-entry guard; updateMixtape now
+-- strips `id` and treats a matched-zero update as an error). The constraint below
+-- is the DB-level catch-all that makes a recurrence impossible regardless of
+-- which frontend/code path is running.
+--
+-- Run in the Supabase SQL editor (or psql with the service-role connection).
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- STEP 1 — PRIME SUSPECT: list triggers on the mixtapes table.
--- If anything shows up here (other than nothing), that trigger is almost certainly
--- what clones the row on edit. Inspect its definition, then drop/fix it:
---   DROP TRIGGER <tgname> ON public.mixtapes;
+-- STEP 1 — Lock it down. Enforce uniqueness so a duplicate can NEVER silently
+-- persist again: any duplicate write fails loudly with a unique-violation error.
+--
+-- The 4 known duplicate drafts (ids 372, 375, 376, 382 for numbers 203/204/205/
+-- 208) were removed manually on 2026-06-04, so this should apply cleanly. If it
+-- errors with "could not create unique index ... duplicate key value", a leftover
+-- duplicate remains — run the OPTIONAL block below to find and clear it first.
+-- ─────────────────────────────────────────────────────────────────────────────
+alter table mixtapes
+  add constraint mixtapes_number_unique unique (number);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- STEP 2 (optional sanity check) — list any triggers on the mixtapes table.
+-- Expected: no rows. (If something shows up that inserts/clones on UPDATE, that
+-- would be a second source of duplicates — inspect and drop it:
+--   DROP TRIGGER <tgname> ON public.mixtapes; )
 -- ─────────────────────────────────────────────────────────────────────────────
 select tgname,
        case tgenabled when 'O' then 'enabled' when 'D' then 'disabled' else tgenabled end as state,
@@ -21,32 +39,23 @@ where tgrelid = 'public.mixtapes'::regclass
   and not tgisinternal;
 
 -- ─────────────────────────────────────────────────────────────────────────────
--- STEP 2 — See the current duplicates (grouped by mixtape number).
+-- OPTIONAL — only if STEP 1 fails because duplicates still exist.
+-- Inspect duplicates by number, then delete the unwanted copy (review first!),
+-- and re-run STEP 1.
 -- ─────────────────────────────────────────────────────────────────────────────
-select number,
-       count(*)                          as copies,
-       array_agg(id     order by id)     as ids,
-       array_agg(status order by id)     as statuses
-from mixtapes
-group by number
-having count(*) > 1
-order by number;
-
--- ─────────────────────────────────────────────────────────────────────────────
--- STEP 3 — Clean up: delete the *draft* duplicate of any number that also has
--- another row. (Review STEP 2 output first — this is destructive.)
--- ─────────────────────────────────────────────────────────────────────────────
-delete from mixtapes a
-using mixtapes b
-where a.number = b.number
-  and a.id     <> b.id
-  and a.status = 'draft';
-
--- ─────────────────────────────────────────────────────────────────────────────
--- STEP 4 — Enforce uniqueness so a duplicate can NEVER silently persist again,
--- regardless of source (app double-submit, a stray trigger, manual edit, etc.).
--- A duplicate write will now fail loudly with a unique-violation error instead.
--- (Run STEP 3 first; this fails if duplicates still exist.)
--- ─────────────────────────────────────────────────────────────────────────────
-alter table mixtapes
-  add constraint mixtapes_number_unique unique (number);
+-- select number,
+--        count(*)                      as copies,
+--        array_agg(id     order by id) as ids,
+--        array_agg(status order by id) as statuses
+-- from mixtapes
+-- group by number
+-- having count(*) > 1
+-- order by number;
+--
+-- -- Delete the draft duplicate of any number that also has another row.
+-- -- (Confirm the row you want to KEEP holds the correct content before deleting.)
+-- delete from mixtapes a
+-- using mixtapes b
+-- where a.number = b.number
+--   and a.id     <> b.id
+--   and a.status = 'draft';
