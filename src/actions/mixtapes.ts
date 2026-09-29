@@ -3,17 +3,6 @@
 import { isAdmin } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
 
-export const getPublishedMixtapes = async () => {
-  const supabase = await createClient();
-  const { data: mixtapes, error } = await supabase
-    .from("mixtapes")
-    .select("*")
-    .filter("status", "eq", "published")
-    .order("number", { ascending: false });
-
-  return { mixtapes, error };
-};
-
 export const getAllMixtapes = async () => {
   const supabase = await createClient();
   const { data: mixtapes, error } = await supabase
@@ -22,18 +11,6 @@ export const getAllMixtapes = async () => {
     .order("number", { ascending: false });
 
   return { mixtapes, error };
-};
-
-export const getMixtapeByMixNumber = async (mixNumber: string) => {
-  const supabase = await createClient();
-
-  const { data: mixtape, error } = await supabase
-    .from("mixtapes")
-    .select("*")
-    .eq("number", mixNumber)
-    .single();
-
-  return { mixtape, error };
 };
 
 export const getMixtapeById = async (id: number) => {

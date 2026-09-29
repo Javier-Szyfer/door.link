@@ -1,12 +1,22 @@
 import Image from "next/image";
-import { getMixtapeByMixNumber } from "@/actions/mixtapes";
 import Keyhole from "@/components/keyhole";
 import { Player } from "@/components/player/player";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
 import { PROD_URL } from "@/constants/urls";
+import { getMixtapeByMixNumber, getPublishedMixtapes } from "@/lib/mixtapes";
 import type { Database } from "@/types/database.types";
 
 type ParamsType = Promise<{ mixNumber: string }>;
+
+// Mixtapes change rarely; serve from cache and refresh in the background.
+export const revalidate = 300;
+
+// Prerender every published mixtape so the page is served from cache instead of
+// querying Supabase per visit.
+export const generateStaticParams = async () => {
+  const { mixtapes } = await getPublishedMixtapes();
+  return mixtapes?.map(({ number }) => ({ mixNumber: number })) ?? [];
+};
 
 export const generateMetadata = async ({ params }: { params: ParamsType }) => {
   const { mixNumber } = await params;
