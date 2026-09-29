@@ -5,6 +5,12 @@ import { createClient } from "@/utils/supabase/server";
 
 export const getAllMixtapes = async () => {
   const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  if (!isAdmin(user.data.user?.id ?? "")) {
+    return { mixtapes: null, error: new Error("Not authorized to list mixtapes") };
+  }
+
   const { data: mixtapes, error } = await supabase
     .from("mixtapes")
     .select("*")
@@ -15,6 +21,11 @@ export const getAllMixtapes = async () => {
 
 export const getMixtapeById = async (id: number) => {
   const supabase = await createClient();
+  const user = await supabase.auth.getUser();
+
+  if (!isAdmin(user.data.user?.id ?? "")) {
+    return { mixtape: null, error: new Error("Not authorized to read this mixtape") };
+  }
 
   const { data: mixtape, error } = await supabase
     .from("mixtapes")

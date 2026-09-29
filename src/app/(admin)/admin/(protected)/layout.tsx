@@ -3,13 +3,15 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { signOut } from "@/actions/sign-out";
 import { SubmitButton } from "@/components/dashboard/submit-button";
+import { isAdmin } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function ProtectedAdminLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
-  const user = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
 
-  if (!user.data.user) {
+  // A session is not enough: every account in the Supabase project would pass.
+  if (!isAdmin(data.user?.id ?? "")) {
     return redirect("/admin");
   }
 
