@@ -35,8 +35,8 @@ bun dev
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key |
 | `ADMIN_UUIDS` | comma-separated Supabase user ids allowed into `/admin` |
 
-Row level security is what protects the data — the `NEXT_PUBLIC_` values ship in
-the browser bundle, as they are meant to.
+The `NEXT_PUBLIC_` values ship in the browser bundle by design, so configure row
+level security on every table and bucket before pointing this at real data.
 
 ### Scripts
 
