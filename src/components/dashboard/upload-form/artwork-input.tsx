@@ -1,6 +1,6 @@
+import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Image from "next/image";
 
 interface ArtworkInputProps {
   artworkPreview: string | null;
@@ -38,8 +38,9 @@ export const ArtworkInput = ({ artworkPreview, onFileSelect }: ArtworkInputProps
             />
           </div>
         ) : (
-          // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
-          <div
+          <button
+            type="button"
+            aria-label="Change artwork"
             className="relative h-32 w-32 cursor-pointer overflow-hidden rounded-md transition-all duration-100 hover:opacity-75 active:scale-95"
             onClick={handleClick}
           >
@@ -52,7 +53,7 @@ export const ArtworkInput = ({ artworkPreview, onFileSelect }: ArtworkInputProps
             <div className="absolute inset-0 flex items-center justify-center bg-black/0 text-white opacity-0 transition-all hover:bg-black/70 hover:opacity-100">
               <span className="text-sm">Change Image</span>
             </div>
-          </div>
+          </button>
         )}
       </div>
     </div>

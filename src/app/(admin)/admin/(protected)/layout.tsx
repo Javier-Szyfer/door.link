@@ -1,15 +1,11 @@
-import { signOut } from "@/actions/sign-out";
-import { SubmitButton } from "@/components/dashboard/submit-button";
-import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
+import { signOut } from "@/actions/sign-out";
+import { SubmitButton } from "@/components/dashboard/submit-button";
+import { createClient } from "@/utils/supabase/server";
 
-export default async function ProtectedAdminLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default async function ProtectedAdminLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 

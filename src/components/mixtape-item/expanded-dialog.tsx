@@ -1,7 +1,7 @@
 "use client";
 
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import Image from "next/image";
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export const ExpandedDialog = ({ artwork_uri }: { artwork_uri: string }) => {
   return (

@@ -1,22 +1,18 @@
 "use client";
 
+import { DownloadIcon, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useAudio } from "@/contexts/audio-context";
 import type { Database } from "@/types/database.types";
-import { DownloadIcon, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
 import { MuteIcon } from "./icons/mute-icon";
 import { PauseIcon } from "./icons/pause-icon";
 import { PlayIcon } from "./icons/play-icon";
 import { VolumeIcon } from "./icons/volume-icon";
 
-export function Player({
-  mixtape,
-}: {
-  mixtape?: Database["public"]["Tables"]["mixtapes"]["Row"];
-}) {
+export function Player({ mixtape }: { mixtape?: Database["public"]["Tables"]["mixtapes"]["Row"] }) {
   const [isDownloading, setIsDownloading] = useState(false);
   const {
     isPlaying,
@@ -96,7 +92,7 @@ export function Player({
             }
 
             const totalLength = Number.parseInt(contentLength, 10);
-            let receivedLength = 0;
+            let _receivedLength = 0;
             const chunks: Uint8Array[] = [];
 
             return new Promise<Blob>((resolveStream, rejectStream) => {
@@ -122,7 +118,7 @@ export function Player({
 
                   if (value) {
                     chunks.push(value);
-                    receivedLength += value.length;
+                    _receivedLength += value.length;
                   }
                   return pushChunk();
                 } catch (error) {

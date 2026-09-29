@@ -1,13 +1,13 @@
 import "./globals.css";
+import { GoogleTagManager } from "@next/third-parties/google";
+import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "next-themes";
 import { BlueHeartIcon } from "@/components/blue-heart-icon";
 import { Player } from "@/components/player/player";
 import { Toaster } from "@/components/ui/sonner";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS, SITE_NAME } from "@/constants/metadata";
 import { PROD_URL } from "@/constants/urls";
 import { AudioProvider } from "@/contexts/audio-context";
-import { GoogleTagManager } from "@next/third-parties/google";
-import { Analytics } from "@vercel/analytics/next";
-import { ThemeProvider } from "next-themes";
 
 export const metadata = {
   title: SITE_NAME,
@@ -21,11 +21,7 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <GoogleTagManager gtmId="GTM-T9SNDX3F" />

@@ -1,7 +1,7 @@
 "use client";
 
-import { useAudio } from "@/contexts/audio-context";
 import { type KeyboardEvent, useCallback } from "react";
+import { useAudio } from "@/contexts/audio-context";
 
 export const PlaybackModeToggle = () => {
   const { isContinuousPlayback, setContinuousPlayback } = useAudio();

@@ -1,10 +1,10 @@
+import Image from "next/image";
 import { getMixtapeByMixNumber } from "@/actions/mixtapes";
 import Keyhole from "@/components/keyhole";
 import { Player } from "@/components/player/player";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
 import { PROD_URL } from "@/constants/urls";
 import type { Database } from "@/types/database.types";
-import Image from "next/image";
 
 type ParamsType = Promise<{ mixNumber: string }>;
 
@@ -23,9 +23,7 @@ export const generateMetadata = async ({ params }: { params: ParamsType }) => {
   };
 };
 
-export default async function MixPage(props: {
-  params: ParamsType;
-}) {
+export default async function MixPage(props: { params: ParamsType }) {
   const { mixNumber } = await props.params;
   const { mixtape, error } = (await getMixtapeByMixNumber(mixNumber)) as {
     mixtape: Database["public"]["Tables"]["mixtapes"]["Row"] | null;

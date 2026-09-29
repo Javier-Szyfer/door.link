@@ -1,7 +1,7 @@
+import Link from "next/link";
 import { getAllMixtapes } from "@/actions/mixtapes";
 import { MixtapeRow } from "@/components/dashboard/mixtape-row";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import Link from "next/link";
 
 export default async function Dashboard() {
   const { mixtapes, error } = await getAllMixtapes();
