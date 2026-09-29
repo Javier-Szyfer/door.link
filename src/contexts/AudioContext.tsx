@@ -185,7 +185,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           await audio.play();
           setIsPlaying(true);
         } catch (error) {
-          console.log("Next track error:", error);
+          console.error("Next track error:", error);
           setIsPlaying(false);
         }
       });
@@ -245,7 +245,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             await audio.play();
             setIsPlaying(true);
           } catch (error) {
-            console.log("Previous track error:", error);
+            console.error("Previous track error:", error);
             setIsPlaying(false);
           }
         } else {
@@ -277,7 +277,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         });
       }
     } catch (error) {
-      console.log("Media Session API error:", error);
+      console.error("Media Session API error:", error);
     }
   }, [currentMixtape, isPlaying, progress, duration, queue, audioSrc, previousTracks]);
 
@@ -338,7 +338,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           await audio.play();
           setIsPlaying(true);
         } catch (error) {
-          console.log("Auto-play next track error:", error);
+          console.error("Auto-play next track error:", error);
           setIsPlaying(false);
         }
       }
@@ -398,7 +398,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         setIsPlaying(true);
       }
     } catch (error) {
-      console.log("Toggle play error:", error);
+      console.error("Toggle play error:", error);
       setIsPlaying(false);
     }
   };
@@ -494,7 +494,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         setIsPlaying(true);
       }
     } catch (error) {
-      console.log("Playback error:", error);
+      console.error("Playback error:", error);
       setIsPlaying(false);
     } finally {
       setIsLoading(false);
