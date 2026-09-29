@@ -1,4 +1,12 @@
+// Callers pass `user?.id ?? ""`, so an empty uuid — or an empty ADMIN_UUIDS,
+// which would parse to `[""]` — must never match.
 export const isAdmin = (uuid: string) => {
-  const adminUuids = process.env.ADMIN_UUIDS?.split(",") || [];
+  if (!uuid) return false;
+
+  const adminUuids = (process.env.ADMIN_UUIDS ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+
   return adminUuids.includes(uuid);
 };
