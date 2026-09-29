@@ -2,13 +2,13 @@
 
 import {
   createContext,
+  type Dispatch,
+  type SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
-  useCallback,
-  type Dispatch,
-  type SetStateAction,
 } from "react";
 
 interface AudioContextType {
@@ -103,6 +103,30 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isContinuousPlayback, mounted]);
 
+  const togglePlay = useCallback(async () => {
+    if (!audioRef.current) return;
+
+    try {
+      if (isPlaying) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      } else {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      }
+    } catch (error) {
+      console.error("Toggle play error:", error);
+      setIsPlaying(false);
+    }
+  }, [isPlaying]);
+
+  const seek = useCallback((time: number) => {
+    if (!audioRef.current) return;
+    const clampedTime = Math.max(0, Math.min(time, audioRef.current.duration));
+    audioRef.current.currentTime = clampedTime;
+    setProgress(clampedTime);
+  }, []);
+
   // Update Media Session API when track or play state changes
   const updateMediaSession = useCallback(() => {
     if (!currentMixtape || typeof navigator === "undefined" || !("mediaSession" in navigator))
@@ -185,7 +209,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           await audio.play();
           setIsPlaying(true);
         } catch (error) {
-          console.log("Next track error:", error);
+          console.error("Next track error:", error);
           setIsPlaying(false);
         }
       });
@@ -208,7 +232,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
                 position: 0,
               });
             }
-          } catch (e) {
+          } catch (_e) {
             // Ignore position state errors
           }
           return;
@@ -245,7 +269,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             await audio.play();
             setIsPlaying(true);
           } catch (error) {
-            console.log("Previous track error:", error);
+            console.error("Previous track error:", error);
             setIsPlaying(false);
           }
         } else {
@@ -262,7 +286,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
                 position: 0,
               });
             }
-          } catch (e) {
+          } catch (_e) {
             // Ignore position state errors
           }
         }
@@ -277,12 +301,22 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         });
       }
     } catch (error) {
-      console.log("Media Session API error:", error);
+      console.error("Media Session API error:", error);
     }
-  }, [currentMixtape, isPlaying, progress, duration, queue, audioSrc, previousTracks]);
+  }, [
+    currentMixtape,
+    isPlaying,
+    progress,
+    duration,
+    queue,
+    audioSrc,
+    previousTracks,
+    togglePlay,
+    seek,
+  ]);
 
   // Set up audio event listeners
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  // biome-ignore lint/correctness/useExhaustiveDependencies: listeners are attached once per track; re-running on every state change would tear them down mid-playback
   useEffect(() => {
     if (!audioRef.current) return;
 
@@ -338,7 +372,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           await audio.play();
           setIsPlaying(true);
         } catch (error) {
-          console.log("Auto-play next track error:", error);
+          console.error("Auto-play next track error:", error);
           setIsPlaying(false);
         }
       }
@@ -385,24 +419,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  const togglePlay = async () => {
-    if (!audioRef.current) return;
-
-    try {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        const playPromise = audioRef.current.play();
-        await playPromise;
-        setIsPlaying(true);
-      }
-    } catch (error) {
-      console.log("Toggle play error:", error);
-      setIsPlaying(false);
-    }
-  };
-
   const toggleMute = () => {
     if (!audioRef.current) return;
 
@@ -425,13 +441,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (!audioRef.current) return;
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
     setVolumeState(clampedVolume);
-  };
-
-  const seek = (time: number) => {
-    if (!audioRef.current) return;
-    const clampedTime = Math.max(0, Math.min(time, audioRef.current.duration));
-    audioRef.current.currentTime = clampedTime;
-    setProgress(clampedTime);
   };
 
   const setAudioSrc = async (
@@ -494,7 +503,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         setIsPlaying(true);
       }
     } catch (error) {
-      console.log("Playback error:", error);
+      console.error("Playback error:", error);
       setIsPlaying(false);
     } finally {
       setIsLoading(false);

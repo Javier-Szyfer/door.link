@@ -1,10 +1,7 @@
 "use client";
 
-// COMPONENTS
 import Image from "next/image";
 import Link from "next/link";
-
-// HOOKS
 import { useTheme } from "next-themes";
 
 const Keyhole = () => {

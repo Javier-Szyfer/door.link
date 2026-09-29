@@ -1,10 +1,7 @@
 "use client";
 
-// COMPONENTS
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-
-// HOOKS
-import { useState, useEffect } from "react";
 
 export const CopyLinkButton = ({ url }: { url: string }) => {
   const [clicked, setClicked] = useState(false);

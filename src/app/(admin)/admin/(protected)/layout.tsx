@@ -1,15 +1,11 @@
-import { createClient } from "@/utils/supabase/server";
-import { signOut } from "@/actions/sign-out";
-import { SubmitButton } from "@/components/dashboard/submit-button";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import Link from "next/link";
+import { signOut } from "@/actions/sign-out";
+import { SubmitButton } from "@/components/dashboard/submit-button";
+import { createClient } from "@/utils/supabase/server";
 
-export default async function ProtectedAdminLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default async function ProtectedAdminLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient();
   const user = await supabase.auth.getUser();
 
@@ -23,7 +19,7 @@ export default async function ProtectedAdminLayout({
         <div className="flex gap-2">
           <Link href="/">Home</Link>
           <Link href="/admin/dashboard">Dashboard</Link>
-          </div>
+        </div>
         <form action={signOut}>
           <SubmitButton variant="outline" pendingText="Signing Out...">
             Log out

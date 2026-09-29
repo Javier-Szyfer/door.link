@@ -15,13 +15,13 @@ export const Description = () => {
           <p>
             A handpicked music selection, grown over time, algorithm-free, made for listening and
             dancing.
-            {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-            <span
+            <button
+              type="button"
               onClick={handleInfo}
               className="ml-2 cursor-pointer whitespace-nowrap text-[#1500FF] dark:text-[#84858C]"
             >
               [ more ]
-            </span>
+            </button>
           </p>
         </div>
       ) : (
@@ -48,13 +48,13 @@ export const Description = () => {
             </a>
             , door.link is a handpicked music selection, grown over time, algorithm-free, made for
             listening and dancing.
-            {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-            <span
+            <button
+              type="button"
               onClick={handleInfo}
               className="ml-2 cursor-pointer whitespace-nowrap text-[#1500FF] dark:text-[#84858C]"
             >
               [ less ]
-            </span>
+            </button>
           </p>
         </div>
       )}

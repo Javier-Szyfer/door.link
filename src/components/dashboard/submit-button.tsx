@@ -1,13 +1,8 @@
 "use client";
 
-// COMPONENTS
-import { Button } from "@/components/ui/button";
-
-// HOOKS
-import { useFormStatus } from "react-dom";
-
-// TYPES
 import type { ComponentProps } from "react";
+import { useFormStatus } from "react-dom";
+import { Button } from "@/components/ui/button";
 
 type Props = ComponentProps<typeof Button> & {
   pendingText?: string;

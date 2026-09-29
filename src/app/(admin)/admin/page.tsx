@@ -1,11 +1,8 @@
-// COMPONENTS
+import { signIn } from "@/actions/sign-in";
+import { FormMessage, type Message } from "@/components/dashboard/form-message";
+import { SubmitButton } from "@/components/dashboard/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SubmitButton } from "@/components/dashboard/submit-button";
-import { FormMessage, type Message } from "@/components/dashboard/form-message";
-
-// ACTIONS
-import { signIn } from "@/actions/sign-in";
 
 export default async function Login(props: { searchParams: Promise<Message> }) {
   const searchParams = await props.searchParams;

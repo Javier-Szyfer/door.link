@@ -1,8 +1,7 @@
-// UTILS
+import { getPublishedMixtapes } from "@/lib/mixtapes";
 import { generateRssFeed } from "@/utils/rss";
 
-// ACTIONS
-import { getPublishedMixtapes } from "@/actions/mixtapes";
+export const revalidate = 3600;
 
 export async function GET() {
   const { mixtapes, error } = await getPublishedMixtapes();

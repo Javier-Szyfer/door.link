@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # The test runner is node --test, which strips TypeScript natively.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - run: bun install --frozen-lockfile
+
+      - name: Lint and format
+        run: bunx biome check .
+
+      - name: Typecheck
+        run: bunx tsc --noEmit
+
+      - name: Test
+        run: bun run test
+
+      - name: Build
+        run: bun run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: build-time-placeholder

@@ -1,9 +1,12 @@
 "use client";
 
-// COMPONENTS
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { createMixtape, updateMixtape } from "@/actions/mixtapes";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -11,23 +14,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { AudioInput } from "./audio-input";
-import { ArtworkInput } from "./artwork-input";
-import { toast } from "sonner";
-
-// HOOKS
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-
-// SUPABASE
-import { createClient } from "@/utils/supabase/client";
-
-// ACTIONS
-import { createMixtape, updateMixtape } from "@/actions/mixtapes";
-
-// TYPES
+import { Textarea } from "@/components/ui/textarea";
 import type { Database } from "@/types/database.types";
+import { createClient } from "@/utils/supabase/client";
+import { ArtworkInput } from "./artwork-input";
+import { AudioInput } from "./audio-input";
 
 type FormData = {
   id?: number;
@@ -66,6 +57,9 @@ export const UploadForm = ({
   const [isUploading, setIsUploading] = useState(false);
   const [isSavingMixtape, setIsSavingMixtape] = useState(false);
   const [artworkPreview, setArtworkPreview] = useState<string | null>(null);
+  // Synchronous guard against double-submits: state updates are async and can lag
+  // behind a rapid second click, so we also gate on a ref that flips immediately.
+  const isSubmittingRef = useRef(false);
 
   const supabase = createClient();
   const router = useRouter();
@@ -138,6 +132,9 @@ export const UploadForm = ({
 
   const handleCreateMixtape = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Bail out if a submit is already in flight (prevents duplicate inserts).
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
     setIsSavingMixtape(true);
 
     const toastId = toast.loading("Creating mixtape...");
@@ -160,21 +157,26 @@ export const UploadForm = ({
       );
     } finally {
       setIsSavingMixtape(false);
+      isSubmittingRef.current = false;
     }
   };
 
   const handleUpdateMixtape = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSavingMixtape(true);
-    const toastId = toast.loading("Updating mixtape...");
 
     if (!mixtape?.id) {
-      toast.error("Mixtape ID is required", { id: toastId });
+      toast.error("Mixtape ID is required");
       return;
     }
 
+    // Bail out if a submit is already in flight (prevents duplicate writes).
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    setIsSavingMixtape(true);
+    const toastId = toast.loading("Updating mixtape...");
+
     try {
-      const response = await updateMixtape(mixtape?.id, formData);
+      const response = await updateMixtape(mixtape.id, formData);
 
       if (response.error) {
         throw new Error(response.error);
@@ -185,8 +187,13 @@ export const UploadForm = ({
       router.refresh();
     } catch (error) {
       console.error("Error updating mixtape:", error);
+      toast.error(
+        `Failed to update mixtape: ${error instanceof Error ? error.message : "Unknown error"}`,
+        { id: toastId },
+      );
     } finally {
       setIsSavingMixtape(false);
+      isSubmittingRef.current = false;
     }
   };
 
@@ -300,7 +307,7 @@ export const UploadForm = ({
             </div>
             <Button
               type="submit"
-              disabled={!isFormValid() || isUploading}
+              disabled={!isFormValid() || isUploading || isSavingMixtape}
               className="h-12 w-min px-4"
             >
               {isSavingMixtape ? "Saving..." : "Save"}

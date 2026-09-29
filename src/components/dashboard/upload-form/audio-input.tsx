@@ -41,13 +41,13 @@ export const AudioInput = ({ audioUri, onFileSelect }: AudioInputProps) => {
               <track kind="captions" />
               Your browser does not support the audio element.
             </audio>
-            {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-            <div
+            <button
+              type="button"
               onClick={handleClick}
-              className="cursor-pointer text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="cursor-pointer text-left text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               Change audio
-            </div>
+            </button>
           </div>
         )}
       </div>

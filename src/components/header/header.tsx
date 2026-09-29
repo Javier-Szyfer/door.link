@@ -10,7 +10,6 @@ export const Header = () => {
       <div className="flex items-center justify-between gap-4 pt-6 lg:pt-12">
         <h1 className="font-medium">[ door ]</h1>
         <div className="flex items-center gap-4">
-
           <ToggleThemeIcon />
         </div>
       </div>

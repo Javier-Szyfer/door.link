@@ -1,9 +1,5 @@
 import { Feed } from "feed";
-
-// CONSTANTS
 import { baseUrl } from "@/constants/urls";
-
-// TYPES
 import type { Database } from "@/types/database.types";
 
 type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
@@ -24,13 +20,11 @@ function getAudioMimeType(url: string): string {
     case "flac":
       return "audio/flac";
     default:
-      return "audio/mpeg"; // fallback to mp3 if unknown
+      return "audio/mpeg";
   }
 }
 
 export function generateRssFeed(mixtapes: Mixtape[]) {
-  // Debug what's in the mixtapes data
-
   const feed = new Feed({
     title: "door.link",
     description: "Latest mixtapes from door.link",
@@ -54,54 +48,29 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
   for (const mixtape of mixtapes) {
     feed.addItem({
       title: `${mixtape.number} - ${mixtape.title}`,
-      id: `${baseUrl}/mixtapes/${mixtape.number}`, // Use the mixtape URL as the guid (valid permalink)
       link: `${baseUrl}/mixtapes/${mixtape.number}`,
       description: mixtape.description,
       date: new Date(mixtape.created_at),
-      image: mixtape.artwork_uri,
       enclosure: {
         url: mixtape.audio_uri,
         type: getAudioMimeType(mixtape.audio_uri),
-        length: 0, // Optional: You could add file size here if available
+        length: 0,
       },
     });
   }
 
-  // Get the RSS output
   let rssOutput = feed.rss2();
 
-  // Debug the output to see what's happening with enclosures
-  const enclosureMatch = rssOutput.match(/<enclosure.*?>/g);
-
-  // Add atom namespace to the rss tag
   rssOutput = rssOutput.replace(
     '<rss version="2.0">',
     '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
   );
 
-  // Add atom:link with rel="self" after the opening channel tag
   rssOutput = rssOutput.replace(
     "<channel>",
     `<channel>
-    <atom:link href="https://www.door.link/rss.xml" rel="self" type="application/rss+xml" />`,
+    <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml" />`,
   );
-
-  // Create a custom XML output with correct audio enclosures
-  // This is a workaround if the feed library is not setting enclosures correctly
-  if (enclosureMatch?.some((e) => e.includes("/media/images/"))) {
-    // Method 1: Create custom enclosure elements by directly replacing the XML
-    for (const mixtape of mixtapes) {
-      const imageEnclosurePattern = new RegExp(
-        `<enclosure url="${mixtape.artwork_uri.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"[^>]*>`,
-        "g",
-      );
-
-      const audioMimeType = getAudioMimeType(mixtape.audio_uri);
-      const newEnclosure = `<enclosure url="${mixtape.audio_uri}" length="0" type="${audioMimeType}"/>`;
-
-      rssOutput = rssOutput.replace(imageEnclosurePattern, newEnclosure);
-    }
-  }
 
   return rssOutput;
 }

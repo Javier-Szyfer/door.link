@@ -1,19 +1,22 @@
-// COMPONENTS
-import Keyhole from "../components/keyhole";
 import Image from "next/image";
+import Keyhole from "@/components/keyhole";
 import { Player } from "@/components/player/player";
-
-// ACTIONS
-import { getMixtapeByMixNumber } from "@/actions/mixtapes";
-
-// CONSTANTS
-import { PROD_URL } from "@/constants/urls";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
-
-// TYPES
+import { PROD_URL } from "@/constants/urls";
+import { getMixtapeByMixNumber, getPublishedMixtapes } from "@/lib/mixtapes";
 import type { Database } from "@/types/database.types";
 
 type ParamsType = Promise<{ mixNumber: string }>;
+
+// Mixtapes change rarely; serve from cache and refresh in the background.
+export const revalidate = 300;
+
+// Prerender every published mixtape so the page is served from cache instead of
+// querying Supabase per visit.
+export const generateStaticParams = async () => {
+  const { mixtapes } = await getPublishedMixtapes();
+  return mixtapes?.map(({ number }) => ({ mixNumber: number })) ?? [];
+};
 
 export const generateMetadata = async ({ params }: { params: ParamsType }) => {
   const { mixNumber } = await params;
@@ -30,9 +33,7 @@ export const generateMetadata = async ({ params }: { params: ParamsType }) => {
   };
 };
 
-export default async function MixPage(props: {
-  params: ParamsType;
-}) {
+export default async function MixPage(props: { params: ParamsType }) {
   const { mixNumber } = await props.params;
   const { mixtape, error } = (await getMixtapeByMixNumber(mixNumber)) as {
     mixtape: Database["public"]["Tables"]["mixtapes"]["Row"] | null;

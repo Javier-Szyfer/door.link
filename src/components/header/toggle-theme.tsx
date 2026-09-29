@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-// HOOKS
 import { useTheme } from "next-themes";
 
 export const ToggleThemeIcon = () => {

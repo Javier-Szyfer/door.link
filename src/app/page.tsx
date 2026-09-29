@@ -1,10 +1,10 @@
-// COMPONENTS
 import { Header } from "@/components/header/header";
-import { Nav } from "@/components/nav";
 import { MixtapeItem } from "@/components/mixtape-item/mixtape-item";
+import { Nav } from "@/components/nav";
+import { getPublishedMixtapes } from "@/lib/mixtapes";
 
-// ACTIONS
-import { getPublishedMixtapes } from "@/actions/mixtapes";
+// Mixtapes change rarely; serve from cache and refresh in the background.
+export const revalidate = 300;
 
 export default async function Home() {
   const { mixtapes, error } = await getPublishedMixtapes();

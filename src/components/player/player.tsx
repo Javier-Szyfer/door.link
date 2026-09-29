@@ -1,28 +1,20 @@
 "use client";
 
-// COMPONENTS
-import { Slider } from "@/components/ui/slider";
-import { Button } from "@/components/ui/button";
 import { DownloadIcon, Loader2 } from "lucide-react";
+import { useEffect } from "react";
 import { toast } from "sonner";
-import { PlayIcon } from "./icons/play-icon";
-import { PauseIcon } from "./icons/pause-icon";
-import { VolumeIcon } from "./icons/volume-icon";
-import { MuteIcon } from "./icons/mute-icon";
-
-// HOOKS
-import { useAudio } from "@/contexts/AudioContext";
-import { useEffect, useState } from "react";
-
-// TYPES
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { getDownloadUrl } from "@/constants/media-hosts";
+import { useAudio } from "@/contexts/audio-context";
 import type { Database } from "@/types/database.types";
 
-export function Player({
-  mixtape,
-}: {
-  mixtape?: Database["public"]["Tables"]["mixtapes"]["Row"];
-}) {
-  const [isDownloading, setIsDownloading] = useState(false);
+import { MuteIcon } from "./icons/mute-icon";
+import { PauseIcon } from "./icons/pause-icon";
+import { PlayIcon } from "./icons/play-icon";
+import { VolumeIcon } from "./icons/volume-icon";
+
+export function Player({ mixtape }: { mixtape?: Database["public"]["Tables"]["mixtapes"]["Row"] }) {
   const {
     isPlaying,
     isMuted,
@@ -69,100 +61,22 @@ export function Player({
 
   const remainingTime = duration - progress;
 
-  const handleDownload = async () => {
-    if (!audioSrc || isDownloading || !currentMixtape) return;
-    setIsDownloading(true);
+  const handleDownload = () => {
+    if (!audioSrc || !currentMixtape) return;
 
-    try {
-      const filename = `${currentMixtape.number}-${currentMixtape.title}.mp3`;
-      const downloadUrl = `/api/download?url=${encodeURIComponent(audioSrc)}&filename=${encodeURIComponent(filename)}`;
+    const filename = `${currentMixtape.number}-${currentMixtape.title}.mp3`;
 
-      const downloadPromise = new Promise<{ title: string }>((resolve, reject) => {
-        fetch(downloadUrl)
-          .then(async (response) => {
-            if (!response.ok) {
-              // Extract the error message from the response
-              const errorText = await response.text();
-              throw new Error(errorText || `HTTP ${response.status}: Download failed`);
-            }
+    // Let the browser own the transfer: it streams to disk, survives a tab
+    // change and can resume. Reading the response into a Blob first meant
+    // holding a ~100MB file in memory before anything was written.
+    const link = document.createElement("a");
+    link.href = getDownloadUrl(audioSrc, filename);
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
 
-            // If content-length is not available, fall back to simple blob download
-            const contentLength = response.headers.get("content-length");
-            if (!contentLength) {
-              console.warn("Content-Length header missing, cannot verify complete download");
-              return response.blob();
-            }
-
-            // Create a new ReadableStream to handle the download
-            const reader = response.body?.getReader();
-            if (!reader) {
-              console.warn("ReadableStream not supported, falling back to blob");
-              return response.blob();
-            }
-
-            const totalLength = Number.parseInt(contentLength, 10);
-            let receivedLength = 0;
-            const chunks: Uint8Array[] = [];
-
-            return new Promise<Blob>((resolveStream, rejectStream) => {
-              const pushChunk = async (): Promise<void> => {
-                try {
-                  const { done, value } = await reader.read();
-                  if (done) {
-                    const receivedBytes = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
-                    if (receivedBytes !== totalLength) {
-                      rejectStream(
-                        new Error(
-                          `Incomplete download: expected ${totalLength} bytes but got ${receivedBytes}`,
-                        ),
-                      );
-                      return;
-                    }
-                    const blob = new Blob(chunks, {
-                      type: response.headers.get("content-type") || "audio/mpeg",
-                    });
-                    resolveStream(blob);
-                    return;
-                  }
-
-                  if (value) {
-                    chunks.push(value);
-                    receivedLength += value.length;
-                  }
-                  return pushChunk();
-                } catch (error) {
-                  rejectStream(error);
-                }
-              };
-
-              pushChunk();
-            });
-          })
-          .then((blob) => {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.style.display = "none";
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-            resolve({ title: currentMixtape.title });
-          })
-          .catch(reject);
-      });
-
-      toast.promise(downloadPromise, {
-        loading: `Downloading mixtape ${currentMixtape.title}`,
-        success: (data) => `Downloaded ${data.title}`,
-        error: (err) => err.message || "Download failed",
-      });
-    } catch (error) {
-      console.error("Download error:", error);
-    } finally {
-      setIsDownloading(false);
-    }
+    toast.success(`Downloading ${currentMixtape.title}`);
   };
 
   // Show player if we have either a mixtape prop or an audioSrc
@@ -221,9 +135,8 @@ export function Player({
               onClick={handleDownload}
               className="h-8 w-8 shrink-0"
               title="Download"
-              disabled={isDownloading}
             >
-              <DownloadIcon className={`${baseIconStyles} ${isDownloading ? "opacity-50" : ""}`} />
+              <DownloadIcon className={baseIconStyles} />
             </Button>
           </div>
         </div>

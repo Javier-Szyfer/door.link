@@ -1,0 +1,23 @@
+import { createPublicClient } from "@/utils/supabase/public";
+
+export const getPublishedMixtapes = async () => {
+  const supabase = createPublicClient();
+  const { data: mixtapes, error } = await supabase
+    .from("mixtapes")
+    .select("*")
+    .filter("status", "eq", "published")
+    .order("number", { ascending: false });
+
+  return { mixtapes, error };
+};
+
+export const getMixtapeByMixNumber = async (mixNumber: string) => {
+  const supabase = createPublicClient();
+  const { data: mixtape, error } = await supabase
+    .from("mixtapes")
+    .select("*")
+    .eq("number", mixNumber)
+    .single();
+
+  return { mixtape, error };
+};
