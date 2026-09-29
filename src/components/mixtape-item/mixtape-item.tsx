@@ -1,7 +1,7 @@
 "use client";
 
 import { baseUrl } from "@/constants/urls";
-import { useAudio } from "@/contexts/AudioContext";
+import { useAudio } from "@/contexts/audio-context";
 import type { Database } from "@/types/database.types";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { Button } from "../ui/button";

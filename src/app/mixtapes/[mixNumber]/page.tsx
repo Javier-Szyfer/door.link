@@ -1,10 +1,10 @@
 import { getMixtapeByMixNumber } from "@/actions/mixtapes";
+import Keyhole from "@/components/keyhole";
 import { Player } from "@/components/player/player";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
 import { PROD_URL } from "@/constants/urls";
 import type { Database } from "@/types/database.types";
 import Image from "next/image";
-import Keyhole from "../components/keyhole";
 
 type ParamsType = Promise<{ mixNumber: string }>;
 

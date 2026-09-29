@@ -1,10 +1,10 @@
 import "./globals.css";
-import { BlueHeartIcon } from "@/components/BlueHeartIcon";
+import { BlueHeartIcon } from "@/components/blue-heart-icon";
 import { Player } from "@/components/player/player";
 import { Toaster } from "@/components/ui/sonner";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS, SITE_NAME } from "@/constants/metadata";
 import { PROD_URL } from "@/constants/urls";
-import { AudioProvider } from "@/contexts/AudioContext";
+import { AudioProvider } from "@/contexts/audio-context";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "next-themes";

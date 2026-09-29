@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { useAudio } from "@/contexts/AudioContext";
+import { useAudio } from "@/contexts/audio-context";
 import type { Database } from "@/types/database.types";
 import { DownloadIcon, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
