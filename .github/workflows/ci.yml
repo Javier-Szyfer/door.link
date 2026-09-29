@@ -15,6 +15,11 @@ jobs:
         with:
           bun-version: latest
 
+      # The test runner is node --test, which strips TypeScript natively.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
       - run: bun install --frozen-lockfile
 
       - name: Lint and format
@@ -24,7 +29,7 @@ jobs:
         run: bunx tsc --noEmit
 
       - name: Test
-        run: bun test
+        run: bun run test
 
       - name: Build
         run: bun run build

@@ -93,7 +93,7 @@ export function Player({ mixtape }: { mixtape?: Database["public"]["Tables"]["mi
 
             const totalLength = Number.parseInt(contentLength, 10);
             let _receivedLength = 0;
-            const chunks: Uint8Array[] = [];
+            const chunks: Uint8Array<ArrayBuffer>[] = [];
 
             return new Promise<Blob>((resolveStream, rejectStream) => {
               const pushChunk = async (): Promise<void> => {
