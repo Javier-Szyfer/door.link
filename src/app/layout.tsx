@@ -1,19 +1,13 @@
 import "./globals.css";
-import { ThemeProvider } from "next-themes";
-import { GoogleTagManager } from "@next/third-parties/google";
-
-// COMPONENTS
-import { Toaster } from "@/components/ui/sonner";
-import { Player } from "@/components/player/player";
 import { BlueHeartIcon } from "@/components/BlueHeartIcon";
-
-// CONTEXT
-import { AudioProvider } from "@/contexts/AudioContext";
-import { Analytics } from "@vercel/analytics/next";
-
-// CONSTANTS
-import { SITE_NAME, SITE_DESCRIPTION, SITE_ICONS, OG_IMAGE } from "@/constants/metadata";
+import { Player } from "@/components/player/player";
+import { Toaster } from "@/components/ui/sonner";
+import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS, SITE_NAME } from "@/constants/metadata";
 import { PROD_URL } from "@/constants/urls";
+import { AudioProvider } from "@/contexts/AudioContext";
+import { GoogleTagManager } from "@next/third-parties/google";
+import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "next-themes";
 
 export const metadata = {
   title: SITE_NAME,

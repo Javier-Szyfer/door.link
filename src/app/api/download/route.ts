@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { isAllowedMediaUrl } from "@/constants/media-hosts";
+import { NextResponse } from "next/server";
 
 const ALLOWED_CONTENT_TYPES = [
   "audio/mpeg",

@@ -1,8 +1,7 @@
 "use server";
 
-// UTILS
-import { createClient } from "@/utils/supabase/server";
 import { isAdmin } from "@/utils/auth";
+import { createClient } from "@/utils/supabase/server";
 
 export const getPublishedMixtapes = async () => {
   const supabase = await createClient();

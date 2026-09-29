@@ -1,9 +1,9 @@
 "use client";
 
-// COMPONENTS
+import { createMixtape, updateMixtape } from "@/actions/mixtapes";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -11,23 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { AudioInput } from "./audio-input";
-import { ArtworkInput } from "./artwork-input";
-import { toast } from "sonner";
-
-// HOOKS
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
-
-// SUPABASE
-import { createClient } from "@/utils/supabase/client";
-
-// ACTIONS
-import { createMixtape, updateMixtape } from "@/actions/mixtapes";
-
-// TYPES
+import { Textarea } from "@/components/ui/textarea";
 import type { Database } from "@/types/database.types";
+import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { ArtworkInput } from "./artwork-input";
+import { AudioInput } from "./audio-input";
 
 type FormData = {
   id?: number;

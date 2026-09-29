@@ -1,10 +1,6 @@
-import { Feed } from "feed";
-
-// CONSTANTS
 import { baseUrl } from "@/constants/urls";
-
-// TYPES
 import type { Database } from "@/types/database.types";
+import { Feed } from "feed";
 
 type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
 

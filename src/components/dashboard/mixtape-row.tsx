@@ -1,25 +1,18 @@
 "use client";
 
-// COMPONENTS
-import { TableCell, TableRow } from "@/components/ui/table";
+import { deleteMixtape } from "@/actions/mixtapes";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
+import { TableCell, TableRow } from "@/components/ui/table";
+import type { Database } from "@/types/database.types";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-
-// HOOKS
 import { useRouter } from "next/navigation";
-
-// ACTIONS
-import { deleteMixtape } from "@/actions/mixtapes";
-
-// TYPES
-import type { Database } from "@/types/database.types";
 
 type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
 

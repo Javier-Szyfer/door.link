@@ -1,19 +1,12 @@
 "use client";
 
-// COMPONENTS
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../ui/accordion";
+import { baseUrl } from "@/constants/urls";
+import { useAudio } from "@/contexts/AudioContext";
+import type { Database } from "@/types/database.types";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { Button } from "../ui/button";
 import { CopyLinkButton } from "./copy-link";
 import { ExpandedDialog } from "./expanded-dialog";
-
-// CONSTANTS
-import { baseUrl } from "@/constants/urls";
-
-// HOOKS
-import { useAudio } from "@/contexts/AudioContext";
-
-// TYPES
-import type { Database } from "@/types/database.types";
 
 export const MixtapeItem = ({
   mixtape,

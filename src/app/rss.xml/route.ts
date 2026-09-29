@@ -1,8 +1,5 @@
-// UTILS
-import { generateRssFeed } from "@/utils/rss";
-
-// ACTIONS
 import { getPublishedMixtapes } from "@/actions/mixtapes";
+import { generateRssFeed } from "@/utils/rss";
 
 export async function GET() {
   const { mixtapes, error } = await getPublishedMixtapes();

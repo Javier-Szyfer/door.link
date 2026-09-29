@@ -1,8 +1,5 @@
-// COMPONENTS
-import { UploadForm } from "@/components/dashboard/upload-form";
-
-// ACTIONS
 import { getMixtapeById } from "@/actions/mixtapes";
+import { UploadForm } from "@/components/dashboard/upload-form";
 
 type ParamsType = Promise<{ mixId: number }>;
 

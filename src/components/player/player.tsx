@@ -1,21 +1,16 @@
 "use client";
 
-// COMPONENTS
-import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
-import { DownloadIcon, Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { PlayIcon } from "./icons/play-icon";
-import { PauseIcon } from "./icons/pause-icon";
-import { VolumeIcon } from "./icons/volume-icon";
-import { MuteIcon } from "./icons/mute-icon";
-
-// HOOKS
+import { Slider } from "@/components/ui/slider";
 import { useAudio } from "@/contexts/AudioContext";
-import { useEffect, useState } from "react";
-
-// TYPES
 import type { Database } from "@/types/database.types";
+import { DownloadIcon, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { MuteIcon } from "./icons/mute-icon";
+import { PauseIcon } from "./icons/pause-icon";
+import { PlayIcon } from "./icons/play-icon";
+import { VolumeIcon } from "./icons/volume-icon";
 
 export function Player({
   mixtape,
