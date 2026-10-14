@@ -1,10 +1,10 @@
 import Image from "next/image";
+import { notFound } from "next/navigation";
 import Keyhole from "@/components/keyhole";
 import { Player } from "@/components/player/player";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
 import { PROD_URL } from "@/constants/urls";
 import { getMixtapeByMixNumber, getPublishedMixtapes } from "@/lib/mixtapes";
-import type { Database } from "@/types/database.types";
 
 type ParamsType = Promise<{ mixNumber: string }>;
 
@@ -35,18 +35,12 @@ export const generateMetadata = async ({ params }: { params: ParamsType }) => {
 
 export default async function MixPage(props: { params: ParamsType }) {
   const { mixNumber } = await props.params;
-  const { mixtape, error } = (await getMixtapeByMixNumber(mixNumber)) as {
-    mixtape: Database["public"]["Tables"]["mixtapes"]["Row"] | null;
-    error: Error | null;
-  };
+  const { mixtape, error } = await getMixtapeByMixNumber(mixNumber);
 
-  if (error)
-    return (
-      <p>
-        Error fetching mixtape {mixNumber}, error: {error.message}
-      </p>
-    );
-  if (!mixtape) return <p>Mixtape not found</p>;
+  // Thrown rather than rendered so a failed revalidation keeps serving the
+  // cached page instead of caching the error.
+  if (error) throw error;
+  if (!mixtape) notFound();
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center justify-center px-8 py-24">

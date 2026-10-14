@@ -17,7 +17,8 @@ export const getMixtapeByMixNumber = async (mixNumber: string) => {
     .from("mixtapes")
     .select("*")
     .eq("number", mixNumber)
-    .single();
+    .eq("status", "published")
+    .maybeSingle();
 
   return { mixtape, error };
 };
