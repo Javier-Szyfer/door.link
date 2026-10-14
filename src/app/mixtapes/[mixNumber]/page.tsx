@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import Keyhole from "@/components/keyhole";
-import { Player } from "@/components/player/player";
+import { LoadMixtape } from "@/components/player/load-mixtape";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
 import { PROD_URL } from "@/constants/urls";
 import { getMixtapeByMixNumber, getPublishedMixtapes } from "@/lib/mixtapes";
@@ -58,7 +58,7 @@ export default async function MixPage(props: { params: ParamsType }) {
       <p className="mt-4 text-center text-base text-[#414141] dark:text-[#f1f1f1]">
         {mixtape.description}
       </p>
-      <Player mixtape={mixtape} />
+      <LoadMixtape mixtape={mixtape} />
     </div>
   );
 }
