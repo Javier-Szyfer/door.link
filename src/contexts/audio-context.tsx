@@ -415,10 +415,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     updateMediaSession();
   }, [updateMediaSession]);
 
-  if (!mounted) {
-    return null;
-  }
-
   const toggleMute = () => {
     if (!audioRef.current) return;
 
