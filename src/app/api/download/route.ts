@@ -34,40 +34,44 @@ export async function GET(request: Request) {
     return new NextResponse("Invalid filename", { status: 400 });
   }
 
+  let response: Response;
   try {
-    const response = await fetch(url, {
+    // A redirect would leave the allowlisted host, so it is refused, not followed.
+    // Neither media host redirects for the files it actually serves.
+    response = await fetch(url, {
+      redirect: "error",
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
-
-    if (!response.ok) {
-      return new NextResponse(`Upstream server error: ${response.status}`, {
-        status: response.status,
-      });
-    }
-
-    // A missing content-type is rejected too, rather than passed through unknown.
-    const contentType = response.headers.get("content-type");
-    if (!contentType || !ALLOWED_CONTENT_TYPES.some((type) => contentType.includes(type))) {
-      return new NextResponse("File type not allowed", { status: 415 });
-    }
-
-    const headers = new Headers({
-      "content-type": contentType,
-      "content-disposition": `attachment; filename*=UTF-8''${encodeURIComponent(
-        filename || "download.mp3",
-      )}`,
-    });
-
-    const contentLength = response.headers.get("content-length");
-    if (contentLength) headers.set("content-length", contentLength);
-
-    // Streamed, not buffered: these files are large enough to risk a timeout.
-    return new NextResponse(response.body, { headers, status: 200 });
   } catch (error) {
     if (error instanceof Error && error.name === "TimeoutError") {
       return new NextResponse("Request timeout", { status: 408 });
     }
     console.error("Download error:", error);
-    return new NextResponse("Failed to download file", { status: 500 });
+    return new NextResponse("Failed to fetch upstream file", { status: 502 });
   }
+
+  if (!response.ok) {
+    return new NextResponse(`Upstream server error: ${response.status}`, {
+      status: response.status,
+    });
+  }
+
+  // A missing content-type is rejected too, rather than passed through unknown.
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !ALLOWED_CONTENT_TYPES.some((type) => contentType.includes(type))) {
+    return new NextResponse("File type not allowed", { status: 415 });
+  }
+
+  const headers = new Headers({
+    "content-type": contentType,
+    "content-disposition": `attachment; filename*=UTF-8''${encodeURIComponent(
+      filename || "download.mp3",
+    )}`,
+  });
+
+  const contentLength = response.headers.get("content-length");
+  if (contentLength) headers.set("content-length", contentLength);
+
+  // Streamed, not buffered: these files are large enough to risk a timeout.
+  return new NextResponse(response.body, { headers, status: 200 });
 }
