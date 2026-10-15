@@ -6,7 +6,7 @@ import { BlueHeartIcon } from "@/components/blue-heart-icon";
 import { Player } from "@/components/player/player";
 import { Toaster } from "@/components/ui/sonner";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS, SITE_NAME } from "@/constants/metadata";
-import { PROD_URL } from "@/constants/urls";
+import { SITE_URL } from "@/constants/urls";
 import { AudioProvider } from "@/contexts/audio-context";
 
 export const metadata = {
@@ -14,7 +14,7 @@ export const metadata = {
   description: SITE_DESCRIPTION,
   icons: SITE_ICONS,
   openGraph: {
-    url: PROD_URL,
+    url: SITE_URL,
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
     images: OG_IMAGE,

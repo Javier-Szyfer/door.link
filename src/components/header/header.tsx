@@ -1,6 +1,3 @@
-"use client";
-
-//Components
 import { Description } from "./description";
 import { ToggleThemeIcon } from "./toggle-theme";
 

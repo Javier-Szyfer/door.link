@@ -1,5 +1,5 @@
 import { Feed } from "feed";
-import { baseUrl } from "@/constants/urls";
+import { SITE_URL } from "@/constants/urls";
 import type { Database } from "@/types/database.types";
 
 type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
@@ -28,27 +28,27 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
   const feed = new Feed({
     title: "door.link",
     description: "Latest mixtapes from door.link",
-    id: baseUrl,
-    link: baseUrl,
+    id: SITE_URL,
+    link: SITE_URL,
     language: "en",
-    favicon: `${baseUrl}/favicon.ico`,
-    image: `${baseUrl}/android-chrome-256x256.png`,
+    favicon: `${SITE_URL}/favicon.ico`,
+    image: `${SITE_URL}/android-chrome-256x256.png`,
     copyright: `All rights reserved ${new Date().getFullYear()}`,
     updated: mixtapes.length > 0 ? new Date(mixtapes[0].created_at) : new Date(),
     generator: "Door RSS Feed",
     feedLinks: {
-      rss2: `${baseUrl}/rss.xml`,
+      rss2: `${SITE_URL}/rss.xml`,
     },
     author: {
       name: "door.link",
-      link: baseUrl,
+      link: SITE_URL,
     },
   });
 
   for (const mixtape of mixtapes) {
     feed.addItem({
       title: `${mixtape.number} - ${mixtape.title}`,
-      link: `${baseUrl}/mixtapes/${mixtape.number}`,
+      link: `${SITE_URL}/mixtapes/${mixtape.number}`,
       description: mixtape.description,
       date: new Date(mixtape.created_at),
       enclosure: {
@@ -69,7 +69,7 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
   rssOutput = rssOutput.replace(
     "<channel>",
     `<channel>
-    <atom:link href="${baseUrl}/rss.xml" rel="self" type="application/rss+xml" />`,
+    <atom:link href="${SITE_URL}/rss.xml" rel="self" type="application/rss+xml" />`,
   );
 
   return rssOutput;

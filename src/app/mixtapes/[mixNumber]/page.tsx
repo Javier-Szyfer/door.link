@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Keyhole from "@/components/keyhole";
 import { LoadMixtape } from "@/components/player/load-mixtape";
 import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
-import { PROD_URL } from "@/constants/urls";
+import { SITE_URL } from "@/constants/urls";
 import { getMixtapeByMixNumber, getPublishedMixtapes } from "@/lib/mixtapes";
 
 type ParamsType = Promise<{ mixNumber: string }>;
@@ -28,7 +28,7 @@ export const generateMetadata = async ({ params }: { params: ParamsType }) => {
       title: `${mixNumber} | door.link`,
       description: SITE_DESCRIPTION,
       images: OG_IMAGE,
-      url: `${PROD_URL}/mixtapes/${mixNumber}`,
+      url: `${SITE_URL}/mixtapes/${mixNumber}`,
     },
   };
 };
