@@ -30,6 +30,7 @@ interface AudioContextType {
   isReady: boolean;
   isPlaying: boolean;
   isLoading: boolean;
+  isBuffering: boolean;
   isMuted: boolean;
   volume: number;
   currentTrack: Track | null;
@@ -85,6 +86,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
   const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
   const [volume, setVolumeState] = useState(DEFAULT_VOLUME);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -199,8 +201,13 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       },
       pause: () => {
         setIsPlaying(false);
+        setIsBuffering(false);
         updatePositionState();
       },
+      playing: () => setIsBuffering(false),
+      waiting: () => setIsBuffering(true),
+      seeking: () => setIsBuffering(true),
+      canplay: () => setIsBuffering(false),
       timeupdate: () => setProgress(audio.currentTime),
       seeked: updatePositionState,
       loadstart: () => {
@@ -213,7 +220,10 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         setDuration(audio.duration);
         updatePositionState();
       },
-      error: () => setIsLoading(false),
+      error: () => {
+        setIsLoading(false);
+        setIsBuffering(false);
+      },
       ended: () => {
         setProgress(0);
         if (continuousPlaybackRef.current) next();
@@ -287,6 +297,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       isReady,
       isPlaying,
       isLoading,
+      isBuffering,
       isMuted: volume === 0,
       volume,
       currentTrack,
@@ -303,6 +314,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       isReady,
       isPlaying,
       isLoading,
+      isBuffering,
       volume,
       currentTrack,
       isContinuousPlayback,
