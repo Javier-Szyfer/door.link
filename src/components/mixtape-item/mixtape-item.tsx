@@ -13,6 +13,15 @@ import type { Database } from "@/types/database.types";
 import { CopyLinkButton } from "./copy-link";
 import { ExpandedDialog } from "./expanded-dialog";
 
+const preloadedArtwork = new Set<string>();
+
+// Loads the artwork into the browser cache.
+const preloadArtwork = (src: string) => {
+  if (preloadedArtwork.has(src)) return;
+  preloadedArtwork.add(src);
+  new Image().src = src;
+};
+
 export const MixtapeItem = ({
   mixtape,
   allMixtapes,
@@ -24,6 +33,7 @@ export const MixtapeItem = ({
   const { isPlaying, currentTrack, togglePlay, playTrack } = useAudio();
 
   const isCurrent = currentTrack?.id === id;
+  const handleIntent = () => preloadArtwork(artwork_uri);
 
   const handlePlayClick = () => {
     if (isCurrent) return togglePlay();
@@ -35,7 +45,12 @@ export const MixtapeItem = ({
   return (
     <Accordion type="single" collapsible>
       <AccordionItem value={id.toString()}>
-        <AccordionTrigger className="px-4 text-left text-[#414141] dark:text-[#f1f1f1]">
+        <AccordionTrigger
+          className="px-4 text-left text-[#414141] dark:text-[#f1f1f1]"
+          onPointerEnter={handleIntent}
+          onPointerDown={handleIntent}
+          onFocus={handleIntent}
+        >
           <div className="grid w-full grid-cols-12 items-center">
             <div className="col-span-12 md:col-span-2">{number}</div>
             <div className="col-span-12 md:col-span-7">{title}</div>
