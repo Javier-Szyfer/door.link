@@ -7,7 +7,7 @@ const OTHER = "22222222-2222-2222-2222-222222222222";
 
 describe("isAdmin", () => {
   afterEach(() => {
-    process.env.ADMIN_UUIDS = undefined;
+    delete process.env.ADMIN_UUIDS;
   });
 
   it("accepts a uuid present in ADMIN_UUIDS", () => {
@@ -27,7 +27,7 @@ describe("isAdmin", () => {
   });
 
   it("rejects everyone when ADMIN_UUIDS is unset", () => {
-    process.env.ADMIN_UUIDS = undefined;
+    delete process.env.ADMIN_UUIDS;
     assert.equal(isAdmin(ADMIN), false);
   });
 

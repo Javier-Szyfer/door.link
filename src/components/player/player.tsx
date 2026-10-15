@@ -1,20 +1,18 @@
 "use client";
 
 import { DownloadIcon, Loader2 } from "lucide-react";
-import { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { getDownloadUrl } from "@/constants/media-hosts";
 import { useAudio } from "@/contexts/audio-context";
-import type { Database } from "@/types/database.types";
 
 import { MuteIcon } from "./icons/mute-icon";
 import { PauseIcon } from "./icons/pause-icon";
 import { PlayIcon } from "./icons/play-icon";
 import { VolumeIcon } from "./icons/volume-icon";
 
-export function Player({ mixtape }: { mixtape?: Database["public"]["Tables"]["mixtapes"]["Row"] }) {
+export function Player() {
   const {
     isPlaying,
     isMuted,
@@ -27,26 +25,8 @@ export function Player({ mixtape }: { mixtape?: Database["public"]["Tables"]["mi
     toggleMute,
     setVolume,
     seek,
-    setAudioSrc,
     isLoading,
   } = useAudio();
-
-  // If player is receiving a mixtape, set the current mixtape
-  useEffect(() => {
-    if (mixtape && (!currentMixtape || mixtape.id.toString() !== currentMixtape.id)) {
-      setAudioSrc(
-        mixtape.audio_uri,
-        {
-          number: mixtape.number,
-          title: mixtape.title,
-          id: mixtape.id.toString(),
-          artwork_uri: mixtape.artwork_uri,
-        },
-        undefined,
-        false,
-      );
-    }
-  }, [mixtape, setAudioSrc, currentMixtape]);
 
   const formatTime = (time: number) => {
     const hours = Math.floor(time / 3600);
@@ -79,8 +59,7 @@ export function Player({ mixtape }: { mixtape?: Database["public"]["Tables"]["mi
     toast.success(`Downloading ${currentMixtape.title}`);
   };
 
-  // Show player if we have either a mixtape prop or an audioSrc
-  if (!mixtape && !audioSrc) return null;
+  if (!audioSrc) return null;
 
   const baseIconStyles = "h-5 w-5";
 

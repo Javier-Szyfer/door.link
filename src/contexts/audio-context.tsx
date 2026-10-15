@@ -12,6 +12,9 @@ import {
 } from "react";
 
 interface AudioContextType {
+  // The audio element exists. Child effects run before the provider's, so a
+  // child loading a track on mount must wait for this.
+  isReady: boolean;
   isPlaying: boolean;
   isMuted: boolean;
   volume: number;
@@ -415,10 +418,6 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     updateMediaSession();
   }, [updateMediaSession]);
 
-  if (!mounted) {
-    return null;
-  }
-
   const toggleMute = () => {
     if (!audioRef.current) return;
 
@@ -513,6 +512,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   return (
     <AudioContext.Provider
       value={{
+        isReady: mounted,
         isPlaying,
         isMuted: isMuted || volume === 0,
         volume,
