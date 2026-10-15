@@ -1,10 +1,15 @@
 "use client";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/constants/urls";
 import { toTrack, useAudio } from "@/contexts/audio-context";
 import type { Database } from "@/types/database.types";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
-import { Button } from "../ui/button";
 import { CopyLinkButton } from "./copy-link";
 import { ExpandedDialog } from "./expanded-dialog";
 

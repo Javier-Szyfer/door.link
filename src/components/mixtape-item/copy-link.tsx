@@ -1,30 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 export const CopyLinkButton = ({ url }: { url: string }) => {
-  const [clicked, setClicked] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (clicked) {
-      setTimeout(() => {
-        setClicked(false);
-      }, 1000);
+    if (!copied) return;
+    const timeout = setTimeout(() => setCopied(false), 1000);
+    return () => clearTimeout(timeout);
+  }, [copied]);
+
+  const handleClick = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch (error) {
+      console.error("Copy link error:", error);
     }
-  }, [clicked]);
+  };
 
   return (
-    <Button
-      type="button"
-      variant="text"
-      onClick={() => {
-        navigator.clipboard.writeText(url);
-        setClicked(true);
-      }}
-      className="hover:text-[#1500FF]"
-    >
-      {clicked ? "Copied" : "Get Url"}
+    <Button type="button" variant="text" onClick={handleClick} className="hover:text-[#1500FF]">
+      {copied ? "Copied" : "Get Url"}
     </Button>
   );
 };

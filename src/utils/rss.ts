@@ -37,7 +37,7 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
     updated: mixtapes.length > 0 ? new Date(mixtapes[0].created_at) : new Date(),
     generator: "Door RSS Feed",
     feedLinks: {
-      rss2: `${SITE_URL}/rss.xml`,
+      rss: `${SITE_URL}/rss.xml`,
     },
     author: {
       name: "door.link",
@@ -59,18 +59,5 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
     });
   }
 
-  let rssOutput = feed.rss2();
-
-  rssOutput = rssOutput.replace(
-    '<rss version="2.0">',
-    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
-  );
-
-  rssOutput = rssOutput.replace(
-    "<channel>",
-    `<channel>
-    <atom:link href="${SITE_URL}/rss.xml" rel="self" type="application/rss+xml" />`,
-  );
-
-  return rssOutput;
+  return feed.rss2();
 }

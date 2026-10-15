@@ -4,9 +4,7 @@ import { useState } from "react";
 export const Description = () => {
   const [fullDescription, setFullDescription] = useState(false);
 
-  const handleInfo = () => {
-    setFullDescription(!fullDescription);
-  };
+  const handleInfo = () => setFullDescription((full) => !full);
 
   return (
     <div className="max-w-[18rem] sm:max-w-[60rem]">
