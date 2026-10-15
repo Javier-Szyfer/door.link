@@ -11,6 +11,8 @@ import { PauseIcon } from "./icons/pause-icon";
 import { PlayIcon } from "./icons/play-icon";
 import { VolumeIcon } from "./icons/volume-icon";
 
+const CONTROL_CLASS_NAME = "relative h-8 w-8 shrink-0 after:absolute after:-inset-1.5";
+
 const pad = (value: number) => value.toString().padStart(2, "0");
 
 const formatTime = (time: number) => {
@@ -25,6 +27,7 @@ export function Player() {
   const {
     isPlaying,
     isLoading,
+    isBuffering,
     isMuted,
     volume,
     currentTrack,
@@ -56,12 +59,13 @@ export function Player() {
         <div className="px-2 text-xs text-[#414141] dark:text-[#f1f1f1]">
           {currentTrack.number} - {currentTrack.title}
         </div>
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 px-2">
           <Button
-            className="h-8 w-8 shrink-0"
+            className={CONTROL_CLASS_NAME}
             size="icon"
             onClick={togglePlay}
             disabled={isLoading}
+            aria-label={isPlaying ? "Pause" : "Play"}
           >
             {isLoading ? (
               <Loader2 className="h-5 w-5 animate-spin text-foreground" />
@@ -76,31 +80,40 @@ export function Player() {
             max={duration}
             step={1}
             onValueChange={(value) => seek(value[0])}
+            isBuffering={isBuffering}
             className="cursor-pointer"
           />
           <span className="w-12 text-xs text-[#414141] dark:text-[#f1f1f1]">
             {formatTime(duration - progress)}
           </span>
           <div className="flex items-center gap-2">
-            <Button size="icon" className="h-8 w-8 shrink-0" onClick={toggleMute}>
-              {isMuted ? (
-                <MuteIcon className="text-foreground hover:text-foreground/80" />
-              ) : (
-                <VolumeIcon className="text-foreground hover:text-foreground/80" />
-              )}
-            </Button>
-            <Slider
-              value={[volume * 100]}
-              max={100}
-              step={1}
-              onValueChange={(value) => setVolume(value[0] / 100)}
-              className="w-24 cursor-pointer"
-            />
+            <div className="hidden items-center gap-2 md:flex">
+              <Button
+                size="icon"
+                className={CONTROL_CLASS_NAME}
+                onClick={toggleMute}
+                aria-label={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? (
+                  <MuteIcon className="text-foreground hover:text-foreground/80" />
+                ) : (
+                  <VolumeIcon className="text-foreground hover:text-foreground/80" />
+                )}
+              </Button>
+              <Slider
+                value={[volume * 100]}
+                max={100}
+                step={1}
+                onValueChange={(value) => setVolume(value[0] / 100)}
+                className="w-24 cursor-pointer"
+              />
+            </div>
             <Button
               size="icon"
               onClick={handleDownload}
-              className="h-8 w-8 shrink-0"
+              className={CONTROL_CLASS_NAME}
               title="Download"
+              aria-label="Download"
             >
               <DownloadIcon className="h-5 w-5" />
             </Button>
