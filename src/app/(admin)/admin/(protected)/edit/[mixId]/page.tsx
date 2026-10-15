@@ -1,19 +1,21 @@
+import { notFound } from "next/navigation";
 import { getMixtapeById } from "@/actions/mixtapes";
 import { UploadForm } from "@/components/dashboard/upload-form";
 
-type ParamsType = Promise<{ mixId: number }>;
-
-export default async function EditPage({ params }: { params: ParamsType }) {
+export default async function EditPage({ params }: { params: Promise<{ mixId: string }> }) {
   const { mixId } = await params;
-  const { mixtape, error } = await getMixtapeById(mixId);
+  const id = Number(mixId);
+  if (!Number.isInteger(id)) notFound();
+
+  const { mixtape, error } = await getMixtapeById(id);
 
   if (error)
     return (
       <p>
-        Error fetching mixtape {mixId}, error: {error.message}
+        Error fetching mixtape {mixId}: {error.message}
       </p>
     );
-  if (!mixtape) return <p>Mixtape not found</p>;
+  if (!mixtape) notFound();
 
-  return <UploadForm mixtape={mixtape} isEditing={true} />;
+  return <UploadForm mixtape={mixtape} />;
 }

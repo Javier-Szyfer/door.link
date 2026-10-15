@@ -11,7 +11,7 @@ export default async function ProtectedAdminLayout({ children }: { children: Rea
   const { data } = await supabase.auth.getUser();
 
   // A session is not enough: every account in the Supabase project would pass.
-  if (!isAdmin(data.user?.id ?? "")) {
+  if (!isAdmin(data.user?.id)) {
     return redirect("/admin");
   }
 

@@ -2,7 +2,7 @@
 
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { deleteMixtape } from "@/actions/mixtapes";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,30 +16,16 @@ import type { Database } from "@/types/database.types";
 
 type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
 
-interface MixtapeRowProps {
-  mixtape: Mixtape;
-}
-
-export function MixtapeRow({ mixtape }: MixtapeRowProps) {
+export function MixtapeRow({ mixtape }: { mixtape: Mixtape }) {
   const { id, number, title, description, created_at, status, duration } = mixtape;
-  const router = useRouter();
 
+  // The action revalidates, which refreshes this page's data on its own.
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this mixtape?")) return;
 
-    try {
-      const result = await deleteMixtape(id);
-      if (result.error) {
-        console.error(result.error);
-        return;
-      }
-      // Force a hard refresh of the page data
-      router.refresh();
-      // Also reload the page to ensure we get fresh data
-      window.location.reload();
-    } catch (error) {
-      console.error("Error deleting mixtape:", error);
-    }
+    const result = await deleteMixtape(id);
+    if (result.error) toast.error(result.error);
+    else toast.success(`Deleted ${number} - ${title}`);
   };
 
   return (
@@ -58,7 +44,7 @@ export function MixtapeRow({ mixtape }: MixtapeRowProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link href={`/admin/edit/${id}`}>Edit</Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleDelete}>Delete</DropdownMenuItem>
