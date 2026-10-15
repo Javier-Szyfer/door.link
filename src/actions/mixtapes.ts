@@ -1,15 +1,29 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+import type { Database } from "@/types/database.types";
 import { isAdmin } from "@/utils/auth";
 import { createClient } from "@/utils/supabase/server";
 
-export const getAllMixtapes = async () => {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
+export type MixtapeInput = Omit<Database["public"]["Tables"]["mixtapes"]["Insert"], "id">;
 
-  if (!isAdmin(user.data.user?.id ?? "")) {
-    return { mixtapes: null, error: new Error("Not authorized to list mixtapes") };
-  }
+// Returns null for anyone but an admin, so a missing check fails closed.
+const getAdminClient = async () => {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getUser();
+  return isAdmin(data.user?.id) ? supabase : null;
+};
+
+// The public pages are cached; publish changes without waiting for them to expire.
+const revalidatePublicPages = () => revalidatePath("/", "layout");
+
+// The input comes from the client, so an `id` in it is dropped rather than
+// trusted: the row to write is chosen by the `id` argument alone.
+const withoutId = ({ id: _id, ...fields }: MixtapeInput & { id?: unknown }) => fields;
+
+export const getAllMixtapes = async () => {
+  const supabase = await getAdminClient();
+  if (!supabase) return { mixtapes: null, error: new Error("Not authorized to list mixtapes") };
 
   const { data: mixtapes, error } = await supabase
     .from("mixtapes")
@@ -20,133 +34,75 @@ export const getAllMixtapes = async () => {
 };
 
 export const getMixtapeById = async (id: number) => {
-  const supabase = await createClient();
-  const user = await supabase.auth.getUser();
-
-  if (!isAdmin(user.data.user?.id ?? "")) {
-    return { mixtape: null, error: new Error("Not authorized to read this mixtape") };
-  }
+  const supabase = await getAdminClient();
+  if (!supabase) return { mixtape: null, error: new Error("Not authorized to read this mixtape") };
 
   const { data: mixtape, error } = await supabase
     .from("mixtapes")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   return { mixtape, error };
 };
 
 export const deleteMixtape = async (id: number) => {
-  try {
-    const supabase = await createClient();
-    const user = await supabase.auth.getUser();
+  const supabase = await getAdminClient();
+  if (!supabase) return { error: "Not authorized to delete mixtapes" };
 
-    // Convert to number if it's a string
-    const numericId = Number(id);
+  const { data, error } = await supabase.from("mixtapes").delete().eq("id", id).select("id");
 
-    if (!isAdmin(user.data.user?.id ?? "")) {
-      return { error: "Not authorized to delete mixtapes" };
-    }
-
-    // First try to find the mixtape
-    const { data: mixtape, error: findError } = await supabase
-      .from("mixtapes")
-      .select("id")
-      .eq("id", numericId)
-      .single();
-
-    if (findError || !mixtape) {
-      return { error: "Mixtape not found or cannot be accessed" };
-    }
-
-    // Then delete it without trying to return data
-    const { error } = await supabase.from("mixtapes").delete().eq("id", numericId);
-
-    if (error) {
-      console.error("Supabase error:", error);
-      return { error: error.message || "Failed to delete mixtape" };
-    }
-
-    return { success: true };
-  } catch (error) {
+  if (error) {
     console.error("Error deleting mixtape:", error);
     return { error: "Failed to delete mixtape" };
   }
+  // RLS filters rows out silently, so a refused delete also matches zero rows.
+  if (data.length === 0) return { error: "Mixtape not found or cannot be deleted" };
+
+  revalidatePublicPages();
+  return { success: true };
 };
 
-type MixtapeData = {
-  number: string;
-  title: string;
-  created_at: string;
-  description: string;
-  duration: string;
-  status: "draft" | "published";
-  audio_uri: string;
-  artwork_uri: string;
-};
+export const createMixtape = async (input: MixtapeInput) => {
+  const supabase = await getAdminClient();
+  if (!supabase) return { error: "Not authorized to create mixtapes" };
 
-export const createMixtape = async (mixtapeData: MixtapeData) => {
-  try {
-    const supabase = await createClient();
-    const user = await supabase.auth.getUser();
+  const { data: mixtape, error } = await supabase
+    .from("mixtapes")
+    .insert(withoutId(input))
+    .select()
+    .single();
 
-    if (!isAdmin(user.data.user?.id ?? "")) {
-      return { error: "Not authorized to create mixtapes" };
-    }
-
-    const { data: mixtape, error } = await supabase
-      .from("mixtapes")
-      .insert(mixtapeData)
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Supabase error:", error);
-      return { error: "Failed to create mixtape" };
-    }
-
-    return { mixtape, success: true };
-  } catch (error) {
+  if (error) {
     console.error("Error creating mixtape:", error);
     return { error: "Failed to create mixtape" };
   }
+
+  revalidatePublicPages();
+  return { mixtape, success: true };
 };
 
-export const updateMixtape = async (id: number, mixtapeData: MixtapeData) => {
-  try {
-    const supabase = await createClient();
-    const user = await supabase.auth.getUser();
+export const updateMixtape = async (id: number, input: MixtapeInput) => {
+  const supabase = await getAdminClient();
+  if (!supabase) return { error: "Not authorized to update mixtapes" };
 
-    if (!isAdmin(user.data.user?.id ?? "")) {
-      return { error: "Not authorized to update mixtapes" };
-    }
+  const { data, error } = await supabase
+    .from("mixtapes")
+    .update(withoutId(input))
+    .eq("id", id)
+    .select();
 
-    // Never send `id` in the update payload — we only ever mutate the row matched
-    // by `.eq("id", id)`. This keeps an update strictly an update, never an upsert.
-    const { id: _id, ...updateData } = mixtapeData as MixtapeData & { id?: number };
-
-    const { data: mixtape, error } = await supabase
-      .from("mixtapes")
-      .update(updateData)
-      .eq("id", id)
-      .select();
-
-    if (error) {
-      console.error("Supabase error:", error);
-      return { error: "Failed to update mixtape" };
-    }
-
-    // A matched-zero update returns no error and an empty array. Treat that as a
-    // failure so the UI never reports a phantom success (e.g. wrong id or RLS).
-    if (!mixtape || mixtape.length === 0) {
-      return {
-        error: `No mixtape was updated (id ${id}). It may not exist or you may not have permission.`,
-      };
-    }
-
-    return { mixtape, success: true };
-  } catch (error) {
+  if (error) {
     console.error("Error updating mixtape:", error);
     return { error: "Failed to update mixtape" };
   }
+  // RLS filters rows out silently, so a refused update also matches zero rows.
+  if (data.length === 0) {
+    return {
+      error: `No mixtape was updated (id ${id}). It may not exist or you may not have permission.`,
+    };
+  }
+
+  revalidatePublicPages();
+  return { mixtape: data[0], success: true };
 };

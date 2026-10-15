@@ -5,7 +5,7 @@ export const getPublishedMixtapes = async () => {
   const { data: mixtapes, error } = await supabase
     .from("mixtapes")
     .select("*")
-    .filter("status", "eq", "published")
+    .eq("status", "published")
     .order("number", { ascending: false });
 
   return { mixtapes, error };

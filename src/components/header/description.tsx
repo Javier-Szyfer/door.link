@@ -4,9 +4,7 @@ import { useState } from "react";
 export const Description = () => {
   const [fullDescription, setFullDescription] = useState(false);
 
-  const handleInfo = () => {
-    setFullDescription(!fullDescription);
-  };
+  const handleInfo = () => setFullDescription((full) => !full);
 
   return (
     <div className="max-w-[18rem] sm:max-w-[60rem]">
@@ -27,7 +25,7 @@ export const Description = () => {
       ) : (
         <div className="mt-7 lg:mt-12">
           <p>
-            In the late 90s, we ripped albums we found in physical stores and and shared them on the
+            In the late 90s, we ripped albums we found in physical stores and shared them on the
             net. Around that time, we built a content channel with a noble purpose: listening.
             Soulseek&apos;s directories felt like cities, and <i>“emigrating to a new land”</i> was
             a common feeling. Connecting to the internet back then required a desktop computer, a

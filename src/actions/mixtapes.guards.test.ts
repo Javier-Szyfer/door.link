@@ -17,7 +17,7 @@ describe("mixtape server actions", () => {
 
   for (const [body, name] of actions) {
     it(`${name} authorizes the caller`, () => {
-      assert.ok(body.includes("isAdmin("), `${name} does not call isAdmin`);
+      assert.ok(body.includes("await getAdminClient()"), `${name} does not call getAdminClient`);
     });
   }
 });

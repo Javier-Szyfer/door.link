@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { createMixtape, updateMixtape } from "@/actions/mixtapes";
+import { createMixtape, type MixtapeInput, updateMixtape } from "@/actions/mixtapes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,86 +20,54 @@ import { createClient } from "@/utils/supabase/client";
 import { ArtworkInput } from "./artwork-input";
 import { AudioInput } from "./audio-input";
 
-type FormData = {
-  id?: number;
-  number: string;
-  created_at: string;
-  title: string;
-  description: string;
-  duration: string;
-  status: "draft" | "published";
-  audio_uri: string;
-  artwork_uri: string;
-};
+type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
 
-const defaultFormData = (mixtape?: Database["public"]["Tables"]["mixtapes"]["Row"]) => {
-  return {
-    id: mixtape?.id,
-    number: mixtape?.number || "",
-    created_at: mixtape?.created_at || "",
-    title: mixtape?.title || "",
-    description: mixtape?.description || "",
-    duration: mixtape?.duration || "",
-    status: mixtape?.status || "draft",
-    audio_uri: mixtape?.audio_uri || "",
-    artwork_uri: mixtape?.artwork_uri || "",
-  };
-};
+const toFormData = (mixtape?: Mixtape): MixtapeInput => ({
+  number: mixtape?.number ?? "",
+  created_at: mixtape?.created_at ?? "",
+  title: mixtape?.title ?? "",
+  description: mixtape?.description ?? "",
+  duration: mixtape?.duration ?? "",
+  status: mixtape?.status ?? "draft",
+  audio_uri: mixtape?.audio_uri ?? "",
+  artwork_uri: mixtape?.artwork_uri ?? "",
+});
 
-export const UploadForm = ({
-  mixtape,
-  isEditing,
-}: {
-  mixtape?: Database["public"]["Tables"]["mixtapes"]["Row"];
-  isEditing?: boolean;
-}) => {
-  const [formData, setFormData] = useState<FormData>(defaultFormData(mixtape));
+export const UploadForm = ({ mixtape }: { mixtape?: Mixtape }) => {
+  const isEditing = mixtape !== undefined;
+  const [formData, setFormData] = useState(() => toFormData(mixtape));
   const [isUploading, setIsUploading] = useState(false);
   const [isSavingMixtape, setIsSavingMixtape] = useState(false);
-  const [artworkPreview, setArtworkPreview] = useState<string | null>(null);
+  const [artworkPreview, setArtworkPreview] = useState(mixtape?.artwork_uri ?? null);
   // Synchronous guard against double-submits: state updates are async and can lag
   // behind a rapid second click, so we also gate on a ref that flips immediately.
   const isSubmittingRef = useRef(false);
 
-  const supabase = createClient();
   const router = useRouter();
 
-  // Initialize artwork preview if mixtape is provided
   useEffect(() => {
-    if (mixtape?.artwork_uri) {
-      setArtworkPreview(mixtape.artwork_uri);
-    }
-  }, [mixtape]);
+    if (!artworkPreview?.startsWith("blob:")) return;
+    return () => URL.revokeObjectURL(artworkPreview);
+  }, [artworkPreview]);
 
-  const isFormValid = () => {
-    return (
-      formData.number !== "" &&
-      formData.title !== "" &&
-      formData.description !== "" &&
-      formData.duration !== "" &&
-      formData.audio_uri !== "" &&
-      formData.artwork_uri !== ""
-    );
-  };
+  const isFormValid = Object.entries(formData).every(
+    ([field, value]) => field === "status" || value !== "",
+  );
 
   const handleFileUpload = async (file: File, type: "audio" | "artwork") => {
-    if (!file) return;
-
-    if (type === "artwork") {
-      const previewUrl = URL.createObjectURL(file);
-      setArtworkPreview(previewUrl);
-    }
+    if (type === "artwork") setArtworkPreview(URL.createObjectURL(file));
 
     setIsUploading(true);
     const folder = type === "audio" ? "audio" : "images";
-    const filePath = `${folder}/${file.name}`;
+    // Prefixed so a file that shares a name with an existing one can't replace it.
+    const filePath = `${folder}/${Date.now()}-${file.name}`;
     const toastId = toast.loading(`Uploading ${file.name}...`);
+    const supabase = createClient();
 
     try {
-      const { error: uploadError } = await supabase.storage.from("media").upload(filePath, file, {
-        cacheControl: "3600",
-        upsert: true,
-      });
+      const { error: uploadError } = await supabase.storage
+        .from("media")
+        .upload(filePath, file, { cacheControl: "3600" });
 
       if (uploadError) throw uploadError;
 
@@ -130,65 +98,31 @@ export const UploadForm = ({
     }
   };
 
-  const handleCreateMixtape = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Bail out if a submit is already in flight (prevents duplicate inserts).
-    if (isSubmittingRef.current) return;
-    isSubmittingRef.current = true;
-    setIsSavingMixtape(true);
-
-    const toastId = toast.loading("Creating mixtape...");
-
-    try {
-      const response = await createMixtape(formData);
-
-      if (response.error) {
-        throw new Error(response.error);
-      }
-
-      toast.success("Mixtape created successfully", { id: toastId });
-      router.push("/admin/dashboard");
-      router.refresh();
-    } catch (error) {
-      console.error("Error creating mixtape:", error);
-      toast.error(
-        `Failed to create mixtape: ${error instanceof Error ? error.message : "Unknown error"}`,
-        { id: toastId },
-      );
-    } finally {
-      setIsSavingMixtape(false);
-      isSubmittingRef.current = false;
-    }
-  };
-
-  const handleUpdateMixtape = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!mixtape?.id) {
-      toast.error("Mixtape ID is required");
-      return;
-    }
-
     // Bail out if a submit is already in flight (prevents duplicate writes).
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     setIsSavingMixtape(true);
-    const toastId = toast.loading("Updating mixtape...");
+
+    const action = isEditing ? "update" : "create";
+    const toastId = toast.loading(isEditing ? "Updating mixtape..." : "Creating mixtape...");
 
     try {
-      const response = await updateMixtape(mixtape.id, formData);
+      const response = isEditing
+        ? await updateMixtape(mixtape.id, formData)
+        : await createMixtape(formData);
 
-      if (response.error) {
-        throw new Error(response.error);
-      }
+      if (response.error) throw new Error(response.error);
 
-      toast.success("Mixtape updated successfully", { id: toastId });
+      toast.success(isEditing ? "Mixtape updated successfully" : "Mixtape created successfully", {
+        id: toastId,
+      });
       router.push("/admin/dashboard");
-      router.refresh();
     } catch (error) {
-      console.error("Error updating mixtape:", error);
+      console.error(`Error trying to ${action} mixtape:`, error);
       toast.error(
-        `Failed to update mixtape: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Failed to ${action} mixtape: ${error instanceof Error ? error.message : "Unknown error"}`,
         { id: toastId },
       );
     } finally {
@@ -198,123 +132,116 @@ export const UploadForm = ({
   };
 
   return (
-    <div className="">
-      <form
-        onSubmit={isEditing ? handleUpdateMixtape : handleCreateMixtape}
-        className="0 mx-auto flex max-w-[1000px] flex-col gap-12 py-12"
-      >
-        <h1 className="text-2xl font-medium">{isEditing ? "Edit Mixtape" : "Upload Mixtape"}</h1>
-        <div className="flex gap-24">
-          {/* First Column */}
-          <div className="flex flex-1 flex-col gap-6">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="number">Number</Label>
-              <Input
-                id="number"
-                name="number"
-                required
-                value={formData.number}
-                onChange={(e) => setFormData((prev) => ({ ...prev, number: e.target.value }))}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="date">Date</Label>
-              <Input
-                id="date"
-                name="date"
-                type="date"
-                required
-                value={formData.created_at}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    created_at: e.target.value,
-                  }))
-                }
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                name="title"
-                required
-                value={formData.title}
-                onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
-              />
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
-                required
-                value={formData.description}
-                onChange={(e) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="duration">Duration</Label>
-              <Input
-                id="duration"
-                name="duration"
-                required
-                value={formData.duration}
-                onChange={(e) => setFormData((prev) => ({ ...prev, duration: e.target.value }))}
-              />
-            </div>
+    <form onSubmit={handleSubmit} className="mx-auto flex max-w-[1000px] flex-col gap-12 py-12">
+      <h1 className="text-2xl font-medium">{isEditing ? "Edit Mixtape" : "Upload Mixtape"}</h1>
+      <div className="flex gap-24">
+        <div className="flex flex-1 flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="number">Number</Label>
+            <Input
+              id="number"
+              name="number"
+              required
+              value={formData.number}
+              onChange={(e) => setFormData((prev) => ({ ...prev, number: e.target.value }))}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="date">Date</Label>
+            <Input
+              id="date"
+              name="date"
+              type="date"
+              required
+              value={formData.created_at}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  created_at: e.target.value,
+                }))
+              }
+            />
           </div>
 
-          {/* Second Column */}
-          <div className="flex flex-1 flex-col gap-6">
-            <AudioInput
-              audioUri={formData.audio_uri}
-              onFileSelect={(file) => handleFileUpload(file, "audio")}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="title">Title</Label>
+            <Input
+              id="title"
+              name="title"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
             />
+          </div>
 
-            <ArtworkInput
-              artworkPreview={artworkPreview}
-              onFileSelect={(file) => handleFileUpload(file, "artwork")}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              name="description"
+              required
+              value={formData.description}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
             />
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                name="status"
-                defaultValue={formData.status}
-                onValueChange={(value) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    status: value as "draft" | "published",
-                  }))
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button
-              type="submit"
-              disabled={!isFormValid() || isUploading || isSavingMixtape}
-              className="h-12 w-min px-4"
-            >
-              {isSavingMixtape ? "Saving..." : "Save"}
-            </Button>
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="duration">Duration</Label>
+            <Input
+              id="duration"
+              name="duration"
+              required
+              value={formData.duration}
+              onChange={(e) => setFormData((prev) => ({ ...prev, duration: e.target.value }))}
+            />
           </div>
         </div>
-      </form>
-    </div>
+
+        <div className="flex flex-1 flex-col gap-6">
+          <AudioInput
+            audioUri={formData.audio_uri}
+            onFileSelect={(file) => handleFileUpload(file, "audio")}
+          />
+
+          <ArtworkInput
+            artworkPreview={artworkPreview}
+            onFileSelect={(file) => handleFileUpload(file, "artwork")}
+          />
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="status">Status</Label>
+            <Select
+              name="status"
+              defaultValue={formData.status}
+              onValueChange={(value) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  status: value as MixtapeInput["status"],
+                }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="published">Published</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button
+            type="submit"
+            disabled={!isFormValid || isUploading || isSavingMixtape}
+            className="h-12 w-min px-4"
+          >
+            {isSavingMixtape ? "Saving..." : "Save"}
+          </Button>
+        </div>
+      </div>
+    </form>
   );
 };
