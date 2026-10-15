@@ -1,7 +1,7 @@
 "use client";
 
 import { SITE_URL } from "@/constants/urls";
-import { useAudio } from "@/contexts/audio-context";
+import { toTrack, useAudio } from "@/contexts/audio-context";
 import type { Database } from "@/types/database.types";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "../ui/accordion";
 import { Button } from "../ui/button";
@@ -15,41 +15,22 @@ export const MixtapeItem = ({
   mixtape: Database["public"]["Tables"]["mixtapes"]["Row"];
   allMixtapes: Database["public"]["Tables"]["mixtapes"]["Row"][];
 }) => {
-  const { id, number, title, duration, artwork_uri, description, audio_uri } = mixtape;
-  const URL = `${SITE_URL}/mixtapes/${number}`;
-  const { isPlaying, currentMixtape, togglePlay, setAudioSrc } = useAudio();
+  const { id, number, title, duration, artwork_uri, description } = mixtape;
+  const { isPlaying, currentTrack, togglePlay, playTrack } = useAudio();
 
-  const isCurrentlyPlaying = isPlaying && currentMixtape?.id === id.toString();
+  const isCurrent = currentTrack?.id === id;
 
   const handlePlayClick = () => {
-    if (currentMixtape?.id === id.toString()) {
-      togglePlay();
-    } else {
-      // Find current mixtape index
-      const currentIndex = allMixtapes.findIndex((m) => m.id === id);
+    if (isCurrent) return togglePlay();
 
-      // Create queue of all mixtapes after the current one, excluding the current one
-      const remainingMixtapes = allMixtapes.slice(currentIndex + 1);
-      const queue =
-        remainingMixtapes.length > 0
-          ? remainingMixtapes.map((m) => ({
-              audio_uri: m.audio_uri,
-              mixtapeInfo: {
-                number: m.number,
-                title: m.title,
-                id: m.id.toString(),
-                artwork_uri: m.artwork_uri,
-              },
-            }))
-          : [];
-
-      setAudioSrc(audio_uri, { number, title, id: id.toString(), artwork_uri }, queue, true);
-    }
+    // Continuous playback carries on down the list from here.
+    const index = allMixtapes.findIndex((m) => m.id === id);
+    playTrack(toTrack(mixtape), allMixtapes.slice(index + 1).map(toTrack));
   };
 
   return (
     <Accordion type="single" collapsible>
-      <AccordionItem value={mixtape.id.toString()}>
+      <AccordionItem value={id.toString()}>
         <AccordionTrigger className="px-4 text-left text-[#414141] dark:text-[#f1f1f1]">
           <div className="grid w-full grid-cols-12 items-center">
             <div className="col-span-12 md:col-span-2">{number}</div>
@@ -70,10 +51,10 @@ export const MixtapeItem = ({
                   className="flex items-center gap-2 hover:text-[#1500FF]"
                   onClick={handlePlayClick}
                 >
-                  {isCurrentlyPlaying ? "Pause" : "Play"}
+                  {isCurrent && isPlaying ? "Pause" : "Play"}
                 </Button>
                 <span className="mx-2">|</span>
-                <CopyLinkButton url={URL} />
+                <CopyLinkButton url={`${SITE_URL}/mixtapes/${number}`} />
               </div>
               <p>{description}</p>
             </div>

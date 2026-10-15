@@ -3,544 +3,341 @@
 import {
   createContext,
   type Dispatch,
+  type ReactNode,
   type SetStateAction,
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
+import type { Database } from "@/types/database.types";
+
+type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
+
+export type Track = Pick<Mixtape, "id" | "number" | "title"> & { src: string };
+
+export const toTrack = ({ id, number, title, audio_uri }: Mixtape): Track => ({
+  id,
+  number,
+  title,
+  src: audio_uri,
+});
 
 interface AudioContextType {
   // The audio element exists. Child effects run before the provider's, so a
   // child loading a track on mount must wait for this.
   isReady: boolean;
   isPlaying: boolean;
+  isLoading: boolean;
   isMuted: boolean;
   volume: number;
-  progress: number;
-  duration: number;
-  currentMixtape: { number: string; title: string; id: string; artwork_uri?: string } | null;
-  audioSrc: string | null;
-  isLoading: boolean;
-  queue: Array<{
-    audio_uri: string;
-    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
-  }>;
-  previousTracks: Array<{
-    audio_uri: string;
-    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
-  }>;
+  currentTrack: Track | null;
   isContinuousPlayback: boolean;
   setContinuousPlayback: Dispatch<SetStateAction<boolean>>;
+  playTrack: (track: Track, queue: Track[]) => void;
+  loadTrack: (track: Track) => void;
   togglePlay: () => void;
   toggleMute: () => void;
   setVolume: (volume: number) => void;
   seek: (time: number) => void;
-  setAudioSrc: (
-    src: string,
-    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string },
-    queue?: Array<{
-      audio_uri: string;
-      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
-    }>,
-    autoPlay?: boolean,
-  ) => void;
 }
 
-const AudioContext = createContext<AudioContextType | undefined>(undefined);
+// Kept apart so the many consumers that ignore playback position don't
+// re-render on every timeupdate.
+interface AudioProgressType {
+  progress: number;
+  duration: number;
+}
 
-export function AudioProvider({ children }: { children: React.ReactNode }) {
+const AudioContext = createContext<AudioContextType | null>(null);
+const AudioProgressContext = createContext<AudioProgressType>({ progress: 0, duration: 0 });
+
+const VOLUME_KEY = "audio-volume";
+const CONTINUOUS_PLAYBACK_KEY = "audio-continuous-playback";
+const DEFAULT_VOLUME = 0.5;
+const SEEK_OFFSET_S = 10;
+// Past this point "previous" restarts the current track instead.
+const RESTART_THRESHOLD_S = 3;
+
+const MEDIA_SESSION_ARTWORK = [
+  { src: "/android-chrome-256x256.png", sizes: "256x256", type: "image/png" },
+  { src: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+  { src: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+  { src: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+  { src: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+];
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
+const play = (audio: HTMLAudioElement) =>
+  audio.play().catch((error: unknown) => {
+    // Switching tracks aborts the pending play() of the previous one.
+    if (error instanceof DOMException && error.name === "AbortError") return;
+    console.error("Playback error:", error);
+  });
+
+export function AudioProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Read from event and media session handlers, which outlive any one render.
+  const currentTrackRef = useRef<Track | null>(null);
+  const queueRef = useRef<Track[]>([]);
+  const historyRef = useRef<Track[]>([]);
+  const continuousPlaybackRef = useRef(true);
+  const lastVolumeRef = useRef(DEFAULT_VOLUME);
+
+  const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [volume, setVolumeState] = useState(0.5);
-  const [lastVolume, setLastVolume] = useState(0.5);
+  const [volume, setVolumeState] = useState(DEFAULT_VOLUME);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [audioSrc, setAudioSrcState] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [currentMixtape, setCurrentMixtape] = useState<{
-    number: string;
-    title: string;
-    id: string;
-    artwork_uri?: string;
-  } | null>(null);
-  const [queue, setQueue] = useState<
-    Array<{
-      audio_uri: string;
-      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
-    }>
-  >([]);
-  const [isContinuousPlayback, setIsContinuousPlayback] = useState(true);
-  const [previousTracks, setPreviousTracks] = useState<
-    Array<{
-      audio_uri: string;
-      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
-    }>
-  >([]);
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [isContinuousPlayback, setContinuousPlayback] = useState(true);
 
-  // Initialize mounting state
-  useEffect(() => {
-    setMounted(true);
+  const switchTo = useCallback((track: Track, autoPlay: boolean) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.src = track.src;
+    currentTrackRef.current = track;
+    setCurrentTrack(track);
+    if (autoPlay) play(audio);
   }, []);
 
-  // Initialize volume from localStorage only after mounting
-  useEffect(() => {
-    if (mounted) {
-      const savedVolume = localStorage.getItem("audio-volume");
-      if (savedVolume !== null) {
-        setVolumeState(Number(savedVolume));
-      }
-      const savedContinuousPlayback = localStorage.getItem("audio-continuous-playback");
-      if (savedContinuousPlayback !== null) {
-        setIsContinuousPlayback(savedContinuousPlayback === "true");
-      }
-    }
-  }, [mounted]);
+  const select = useCallback(
+    (track: Track, autoPlay: boolean) => {
+      const current = currentTrackRef.current;
+      if (current && current.id !== track.id) historyRef.current.push(current);
+      switchTo(track, autoPlay);
+    },
+    [switchTo],
+  );
 
-  useEffect(() => {
-    if (mounted) {
-      localStorage.setItem("audio-continuous-playback", String(isContinuousPlayback));
-    }
-  }, [isContinuousPlayback, mounted]);
+  const playTrack = useCallback(
+    (track: Track, queue: Track[]) => {
+      queueRef.current = queue;
+      select(track, true);
+    },
+    [select],
+  );
 
-  const togglePlay = useCallback(async () => {
-    if (!audioRef.current) return;
+  const loadTrack = useCallback((track: Track) => select(track, false), [select]);
 
-    try {
-      if (isPlaying) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      }
-    } catch (error) {
-      console.error("Toggle play error:", error);
-      setIsPlaying(false);
+  const next = useCallback(() => {
+    const [nextTrack, ...rest] = queueRef.current;
+    if (!nextTrack) return;
+
+    queueRef.current = rest;
+    select(nextTrack, true);
+  }, [select]);
+
+  const previous = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const previousTrack = historyRef.current.at(-1);
+    if (!previousTrack || audio.currentTime > RESTART_THRESHOLD_S) {
+      audio.currentTime = 0;
+      return;
     }
-  }, [isPlaying]);
+
+    historyRef.current = historyRef.current.slice(0, -1);
+    const current = currentTrackRef.current;
+    if (current) queueRef.current = [current, ...queueRef.current];
+    switchTo(previousTrack, true);
+  }, [switchTo]);
+
+  const togglePlay = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (audio.paused) play(audio);
+    else audio.pause();
+  }, []);
 
   const seek = useCallback((time: number) => {
-    if (!audioRef.current) return;
-    const clampedTime = Math.max(0, Math.min(time, audioRef.current.duration));
-    audioRef.current.currentTime = clampedTime;
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const clampedTime = clamp(time, 0, audio.duration || 0);
+    audio.currentTime = clampedTime;
     setProgress(clampedTime);
   }, []);
 
-  // Update Media Session API when track or play state changes
-  const updateMediaSession = useCallback(() => {
-    if (!currentMixtape || typeof navigator === "undefined" || !("mediaSession" in navigator))
-      return;
+  const setVolume = useCallback((value: number) => setVolumeState(clamp(value, 0, 1)), []);
 
-    try {
-      // Set metadata
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: currentMixtape.title,
-        artist: "door.link",
-        album: `Mix ${currentMixtape.number}`,
-        artwork: [
-          // Always use the keyhole logo
-          { src: "/android-chrome-256x256.png", sizes: "256x256", type: "image/png" },
-          { src: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-          { src: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-          { src: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-          { src: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-        ],
-      });
-
-      // Set playback state
-      navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
-
-      // Set action handlers
-      navigator.mediaSession.setActionHandler("play", () => {
-        togglePlay();
-      });
-
-      navigator.mediaSession.setActionHandler("pause", () => {
-        togglePlay();
-      });
-
-      navigator.mediaSession.setActionHandler("seekbackward", (details) => {
-        const skipTime = details.seekOffset || 10;
-        seek(Math.max(progress - skipTime, 0));
-      });
-
-      navigator.mediaSession.setActionHandler("seekforward", (details) => {
-        const skipTime = details.seekOffset || 10;
-        seek(Math.min(progress + skipTime, duration));
-      });
-
-      navigator.mediaSession.setActionHandler("seekto", (details) => {
-        if (details.seekTime !== null && details.seekTime !== undefined) {
-          seek(details.seekTime);
-        }
-      });
-
-      // Next track handler
-      navigator.mediaSession.setActionHandler("nexttrack", async () => {
-        if (!audioRef.current || queue.length === 0) return;
-
-        const nextTrack = queue[0];
-        const remainingQueue = queue.slice(1);
-
-        try {
-          const audio = audioRef.current;
-          audio.pause();
-          setIsPlaying(false);
-
-          // Add current track to previous tracks history
-          if (currentMixtape && audioSrc) {
-            setPreviousTracks((prev) => [
-              ...prev,
-              {
-                audio_uri: audioSrc,
-                mixtapeInfo: currentMixtape,
-              },
-            ]);
-          }
-
-          audio.src = nextTrack.audio_uri;
-          audio.load();
-          setAudioSrcState(nextTrack.audio_uri);
-          setCurrentMixtape(nextTrack.mixtapeInfo);
-          setQueue(remainingQueue);
-
-          await new Promise((resolve) => setTimeout(resolve, 100));
-          await audio.play();
-          setIsPlaying(true);
-        } catch (error) {
-          console.error("Next track error:", error);
-          setIsPlaying(false);
-        }
-      });
-
-      // Previous track handler
-      navigator.mediaSession.setActionHandler("previoustrack", async () => {
-        if (!audioRef.current) return;
-
-        // If more than 3 seconds into track, restart current track
-        if (progress > 3) {
-          const clampedTime = Math.max(0, Math.min(0, audioRef.current.duration || 0));
-          audioRef.current.currentTime = clampedTime;
-          setProgress(clampedTime);
-
-          try {
-            if (duration > 0) {
-              navigator.mediaSession.setPositionState({
-                duration: duration,
-                playbackRate: 1,
-                position: 0,
-              });
-            }
-          } catch (_e) {
-            // Ignore position state errors
-          }
-          return;
-        }
-
-        // If less than 3 seconds and we have previous tracks, go to previous track
-        if (previousTracks.length > 0) {
-          const previousTrack = previousTracks[previousTracks.length - 1];
-          const newPreviousTracks = previousTracks.slice(0, -1);
-
-          try {
-            const audio = audioRef.current;
-            audio.pause();
-            setIsPlaying(false);
-
-            // Add current track to front of queue for "next" functionality
-            if (currentMixtape && audioSrc) {
-              setQueue((prev) => [
-                {
-                  audio_uri: audioSrc,
-                  mixtapeInfo: currentMixtape,
-                },
-                ...prev,
-              ]);
-            }
-
-            audio.src = previousTrack.audio_uri;
-            audio.load();
-            setAudioSrcState(previousTrack.audio_uri);
-            setCurrentMixtape(previousTrack.mixtapeInfo);
-            setPreviousTracks(newPreviousTracks);
-
-            await new Promise((resolve) => setTimeout(resolve, 100));
-            await audio.play();
-            setIsPlaying(true);
-          } catch (error) {
-            console.error("Previous track error:", error);
-            setIsPlaying(false);
-          }
-        } else {
-          // No previous tracks, just restart current track
-          const clampedTime = Math.max(0, Math.min(0, audioRef.current.duration || 0));
-          audioRef.current.currentTime = clampedTime;
-          setProgress(clampedTime);
-
-          try {
-            if (duration > 0) {
-              navigator.mediaSession.setPositionState({
-                duration: duration,
-                playbackRate: 1,
-                position: 0,
-              });
-            }
-          } catch (_e) {
-            // Ignore position state errors
-          }
-        }
-      });
-
-      // Set position state if available
-      if (duration > 0) {
-        navigator.mediaSession.setPositionState({
-          duration: duration,
-          playbackRate: 1,
-          position: progress,
-        });
-      }
-    } catch (error) {
-      console.error("Media Session API error:", error);
-    }
-  }, [
-    currentMixtape,
-    isPlaying,
-    progress,
-    duration,
-    queue,
-    audioSrc,
-    previousTracks,
-    togglePlay,
-    seek,
-  ]);
-
-  // Set up audio event listeners
-  // biome-ignore lint/correctness/useExhaustiveDependencies: listeners are attached once per track; re-running on every state change would tear them down mid-playback
-  useEffect(() => {
-    if (!audioRef.current) return;
-
-    const audio = audioRef.current;
-
-    const handleTimeUpdate = () => {
-      setProgress(audio.currentTime);
-    };
-
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-      setIsLoading(false);
-
-      // Update Media Session metadata when audio loads
-      updateMediaSession();
-    };
-
-    const handleLoadStart = () => {
-      setIsLoading(true);
-      setDuration(0);
-      setProgress(0);
-    };
-
-    const handleEnded = async () => {
-      setIsPlaying(false);
-      setProgress(0);
-
-      // Play next track if available
-      if (isContinuousPlayback && queue.length > 0) {
-        const nextTrack = queue[0];
-        const remainingQueue = queue.slice(1);
-
-        try {
-          // Add current track to previous tracks history
-          if (currentMixtape && audioSrc) {
-            setPreviousTracks((prev) => [
-              ...prev,
-              {
-                audio_uri: audioSrc,
-                mixtapeInfo: currentMixtape,
-              },
-            ]);
-          }
-
-          audio.pause();
-          audio.src = nextTrack.audio_uri;
-          audio.load();
-          setAudioSrcState(nextTrack.audio_uri);
-          setCurrentMixtape(nextTrack.mixtapeInfo);
-          setQueue(remainingQueue);
-
-          await new Promise((resolve) => setTimeout(resolve, 100));
-          await audio.play();
-          setIsPlaying(true);
-        } catch (error) {
-          console.error("Auto-play next track error:", error);
-          setIsPlaying(false);
-        }
-      }
-    };
-
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-    audio.addEventListener("loadstart", handleLoadStart);
-    audio.addEventListener("ended", handleEnded);
-
-    return () => {
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      audio.removeEventListener("loadstart", handleLoadStart);
-      audio.removeEventListener("ended", handleEnded);
-    };
-  }, [queue, audioSrc, isContinuousPlayback, currentMixtape]);
-
-  // Update audio volume when volume state changes
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-      localStorage.setItem("audio-volume", volume.toString());
+  const toggleMute = useCallback(() => {
+    if (volume > 0) {
+      lastVolumeRef.current = volume;
+      setVolumeState(0);
+    } else {
+      setVolumeState(lastVolumeRef.current);
     }
   }, [volume]);
 
-  // Initialize audio element
   useEffect(() => {
-    audioRef.current = new Audio();
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.src = "";
+    const audio = new Audio();
+    audioRef.current = audio;
+
+    const savedVolume = Number(localStorage.getItem(VOLUME_KEY) ?? Number.NaN);
+    if (Number.isFinite(savedVolume)) setVolumeState(clamp(savedVolume, 0, 1));
+    const savedContinuousPlayback = localStorage.getItem(CONTINUOUS_PLAYBACK_KEY);
+    if (savedContinuousPlayback !== null) {
+      setContinuousPlayback(savedContinuousPlayback === "true");
+    }
+
+    const updatePositionState = () => {
+      if (!("mediaSession" in navigator) || !Number.isFinite(audio.duration)) return;
+      navigator.mediaSession.setPositionState({
+        duration: audio.duration,
+        playbackRate: audio.playbackRate,
+        position: audio.currentTime,
+      });
+    };
+
+    const listeners: Record<string, () => void> = {
+      play: () => {
+        setIsPlaying(true);
+        updatePositionState();
+      },
+      pause: () => {
+        setIsPlaying(false);
+        updatePositionState();
+      },
+      timeupdate: () => setProgress(audio.currentTime),
+      seeked: updatePositionState,
+      loadstart: () => {
+        setIsLoading(true);
+        setProgress(0);
+        setDuration(0);
+      },
+      loadedmetadata: () => {
+        setIsLoading(false);
+        setDuration(audio.duration);
+        updatePositionState();
+      },
+      error: () => setIsLoading(false),
+      ended: () => {
+        setProgress(0);
+        if (continuousPlaybackRef.current) next();
+      },
+    };
+
+    for (const [event, listener] of Object.entries(listeners)) {
+      audio.addEventListener(event, listener);
+    }
+
+    const actionHandlers: [MediaSessionAction, MediaSessionActionHandler][] = [
+      ["play", () => play(audio)],
+      ["pause", () => audio.pause()],
+      ["seekbackward", ({ seekOffset }) => seek(audio.currentTime - (seekOffset || SEEK_OFFSET_S))],
+      ["seekforward", ({ seekOffset }) => seek(audio.currentTime + (seekOffset || SEEK_OFFSET_S))],
+      ["seekto", ({ seekTime }) => seekTime != null && seek(seekTime)],
+      ["nexttrack", next],
+      ["previoustrack", previous],
+    ];
+
+    const setActionHandlers = (clear: boolean) => {
+      if (!("mediaSession" in navigator)) return;
+      for (const [action, handler] of actionHandlers) {
+        try {
+          navigator.mediaSession.setActionHandler(action, clear ? null : handler);
+        } catch {
+          // Browsers throw for actions they don't support.
+        }
       }
     };
-  }, []);
 
-  // Update Media Session when state changes
+    setActionHandlers(false);
+    setIsReady(true);
+
+    return () => {
+      setActionHandlers(true);
+      for (const [event, listener] of Object.entries(listeners)) {
+        audio.removeEventListener(event, listener);
+      }
+      audio.pause();
+      audio.src = "";
+    };
+  }, [next, previous, seek]);
+
   useEffect(() => {
-    updateMediaSession();
-  }, [updateMediaSession]);
-
-  const toggleMute = () => {
     if (!audioRef.current) return;
+    audioRef.current.volume = volume;
+    localStorage.setItem(VOLUME_KEY, String(volume));
+  }, [volume]);
 
-    if (!isMuted) {
-      // Saving current volume before muting
-      if (volume > 0) {
-        setLastVolume(volume);
-      }
-      setVolumeState(0);
-    } else {
-      // Restore to last volume, but ensure it's not 0
-      setVolumeState(lastVolume || 1);
-    }
+  useEffect(() => {
+    continuousPlaybackRef.current = isContinuousPlayback;
+    // Until then the default would overwrite the saved preference.
+    if (isReady) localStorage.setItem(CONTINUOUS_PLAYBACK_KEY, String(isContinuousPlayback));
+  }, [isContinuousPlayback, isReady]);
 
-    audioRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
+  useEffect(() => {
+    if (!currentTrack || !("mediaSession" in navigator)) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: currentTrack.title,
+      artist: "door.link",
+      album: `Mix ${currentTrack.number}`,
+      artwork: MEDIA_SESSION_ARTWORK,
+    });
+  }, [currentTrack]);
 
-  const setVolume = (newVolume: number) => {
-    if (!audioRef.current) return;
-    const clampedVolume = Math.max(0, Math.min(1, newVolume));
-    setVolumeState(clampedVolume);
-  };
+  useEffect(() => {
+    if (!("mediaSession" in navigator)) return;
+    navigator.mediaSession.playbackState = isPlaying ? "playing" : "paused";
+  }, [isPlaying]);
 
-  const setAudioSrc = async (
-    src: string,
-    mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string },
-    newQueue?: Array<{
-      audio_uri: string;
-      mixtapeInfo: { number: string; title: string; id: string; artwork_uri?: string };
-    }>,
-    autoPlay?: boolean,
-  ) => {
-    if (!audioRef.current) return;
+  const value = useMemo(
+    () => ({
+      isReady,
+      isPlaying,
+      isLoading,
+      isMuted: volume === 0,
+      volume,
+      currentTrack,
+      isContinuousPlayback,
+      setContinuousPlayback,
+      playTrack,
+      loadTrack,
+      togglePlay,
+      toggleMute,
+      setVolume,
+      seek,
+    }),
+    [
+      isReady,
+      isPlaying,
+      isLoading,
+      volume,
+      currentTrack,
+      isContinuousPlayback,
+      playTrack,
+      loadTrack,
+      togglePlay,
+      toggleMute,
+      setVolume,
+      seek,
+    ],
+  );
 
-    try {
-      setIsLoading(true);
-
-      // Add current track to previous tracks history if we're switching tracks
-      if (audioRef.current.src && currentMixtape && audioSrc && audioSrc !== src) {
-        setPreviousTracks((prev) => [
-          ...prev,
-          {
-            audio_uri: audioSrc,
-            mixtapeInfo: currentMixtape,
-          },
-        ]);
-      }
-
-      // Pause and reset any existing playback
-      if (audioRef.current.src) {
-        audioRef.current.pause();
-        setIsPlaying(false);
-      }
-
-      // Set up the new audio source
-      audioRef.current.src = src;
-      setAudioSrcState(src);
-      setCurrentMixtape(mixtapeInfo);
-
-      // Update queue if provided
-      if (newQueue) setQueue(newQueue);
-
-      // Load the audio and wait for metadata
-      audioRef.current.load();
-
-      // Wait for metadata to load
-      if (!audioRef.current.duration) {
-        await new Promise((resolve) => {
-          const handleMetadata = () => {
-            audioRef.current?.removeEventListener("loadedmetadata", handleMetadata);
-            resolve(true);
-          };
-          audioRef.current?.addEventListener("loadedmetadata", handleMetadata);
-        });
-      }
-
-      // Only auto-play if specified
-      if (autoPlay) {
-        const playPromise = audioRef.current.play();
-        await playPromise;
-        setIsPlaying(true);
-      }
-    } catch (error) {
-      console.error("Playback error:", error);
-      setIsPlaying(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const progressValue = useMemo(() => ({ progress, duration }), [progress, duration]);
 
   return (
-    <AudioContext.Provider
-      value={{
-        isReady: mounted,
-        isPlaying,
-        isMuted: isMuted || volume === 0,
-        volume,
-        progress,
-        duration,
-        currentMixtape,
-        audioSrc,
-        isLoading,
-        queue,
-        previousTracks,
-        isContinuousPlayback,
-        setContinuousPlayback: setIsContinuousPlayback,
-        togglePlay,
-        toggleMute,
-        setVolume,
-        seek,
-        setAudioSrc,
-      }}
-    >
-      {children}
+    <AudioContext.Provider value={value}>
+      <AudioProgressContext.Provider value={progressValue}>
+        {children}
+      </AudioProgressContext.Provider>
     </AudioContext.Provider>
   );
 }
 
 export function useAudio() {
   const context = useContext(AudioContext);
-  if (context === undefined) {
-    throw new Error("useAudio must be used within an AudioProvider");
-  }
+  if (!context) throw new Error("useAudio must be used within an AudioProvider");
   return context;
 }
+
+export const useAudioProgress = () => useContext(AudioProgressContext);
