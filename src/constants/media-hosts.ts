@@ -1,6 +1,5 @@
 // Hosts `/api/download` is allowed to proxy from.
 
-// Mixtapes predating the Supabase migration still live in the original S3 bucket.
 const LEGACY_MEDIA_HOSTS = ["radio-strapi-bucket.s3.sa-east-1.amazonaws.com"];
 
 const getSupabaseHost = () => {
@@ -40,10 +39,7 @@ export const isAllowedMediaUrl = (url: string) => {
   }
 };
 
-// Supabase Storage sets Content-Disposition from `?download`, so those files are
-// fetched straight from its CDN — no proxying ~100MB through a serverless
-// function. The legacy S3 bucket rejects the equivalent parameter on unsigned
-// requests, so those still go through /api/download.
+// Supabase files download straight from its CDN; legacy S3 files go through /api/download.
 export const getDownloadUrl = (audioUri: string, filename: string) => {
   if (isSupabaseStorageUrl(audioUri)) {
     const url = new URL(audioUri);

@@ -40,9 +40,6 @@ export function Player() {
   const handleDownload = () => {
     const filename = `${currentTrack.number}-${currentTrack.title}.mp3`;
 
-    // Let the browser own the transfer: it streams to disk, survives a tab
-    // change and can resume. Reading the response into a Blob first meant
-    // holding a ~100MB file in memory before anything was written.
     const link = document.createElement("a");
     link.href = getDownloadUrl(currentTrack.src, filename);
     link.download = filename;

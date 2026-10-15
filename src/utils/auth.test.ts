@@ -31,8 +31,6 @@ describe("isAdmin", () => {
     assert.equal(isAdmin(ADMIN), false);
   });
 
-  // Callers pass `user?.id ?? ""` for signed-out visitors. An empty or
-  // whitespace-only ADMIN_UUIDS must never let that empty id through.
   it("rejects the empty uuid used as a fallback for signed-out callers", () => {
     process.env.ADMIN_UUIDS = ADMIN;
     assert.equal(isAdmin(""), false);

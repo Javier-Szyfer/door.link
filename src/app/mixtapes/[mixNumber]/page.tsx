@@ -8,11 +8,8 @@ import { getMixtapeByMixNumber, getPublishedMixtapes } from "@/lib/mixtapes";
 
 type ParamsType = Promise<{ mixNumber: string }>;
 
-// Mixtapes change rarely; serve from cache and refresh in the background.
 export const revalidate = 300;
 
-// Prerender every published mixtape so the page is served from cache instead of
-// querying Supabase per visit.
 export const generateStaticParams = async () => {
   const { mixtapes } = await getPublishedMixtapes();
   return mixtapes?.map(({ number }) => ({ mixNumber: number })) ?? [];
@@ -37,8 +34,6 @@ export default async function MixPage(props: { params: ParamsType }) {
   const { mixNumber } = await props.params;
   const { mixtape, error } = await getMixtapeByMixNumber(mixNumber);
 
-  // Thrown rather than rendered so a failed revalidation keeps serving the
-  // cached page instead of caching the error.
   if (error) throw error;
   if (!mixtape) notFound();
 

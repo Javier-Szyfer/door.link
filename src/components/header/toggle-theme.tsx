@@ -5,7 +5,6 @@ import { useTheme } from "next-themes";
 export const ToggleThemeIcon = () => {
   const { resolvedTheme, setTheme } = useTheme();
 
-  // The logo is picked in CSS: the theme is unknown on the server.
   return (
     <button
       type="button"

@@ -25,7 +25,6 @@ export async function GET(request: Request) {
     return new NextResponse("URL is required", { status: 400 });
   }
 
-  // Without the allowlist this route is an open proxy.
   if (!isAllowedMediaUrl(url)) {
     return new NextResponse("Invalid or unsafe URL", { status: 400 });
   }
@@ -36,8 +35,6 @@ export async function GET(request: Request) {
 
   let response: Response;
   try {
-    // A redirect would leave the allowlisted host, so it is refused, not followed.
-    // Neither media host redirects for the files it actually serves.
     response = await fetch(url, {
       redirect: "error",
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
@@ -56,7 +53,6 @@ export async function GET(request: Request) {
     });
   }
 
-  // A missing content-type is rejected too, rather than passed through unknown.
   const contentType = response.headers.get("content-type");
   if (!contentType || !ALLOWED_CONTENT_TYPES.some((type) => contentType.includes(type))) {
     return new NextResponse("File type not allowed", { status: 415 });
@@ -72,6 +68,5 @@ export async function GET(request: Request) {
   const contentLength = response.headers.get("content-length");
   if (contentLength) headers.set("content-length", contentLength);
 
-  // Streamed, not buffered: these files are large enough to risk a timeout.
   return new NextResponse(response.body, { headers, status: 200 });
 }

@@ -19,7 +19,6 @@ type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
 export function MixtapeRow({ mixtape }: { mixtape: Mixtape }) {
   const { id, number, title, description, created_at, status, duration } = mixtape;
 
-  // The action revalidates, which refreshes this page's data on its own.
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this mixtape?")) return;
 

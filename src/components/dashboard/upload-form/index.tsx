@@ -39,8 +39,6 @@ export const UploadForm = ({ mixtape }: { mixtape?: Mixtape }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [isSavingMixtape, setIsSavingMixtape] = useState(false);
   const [artworkPreview, setArtworkPreview] = useState(mixtape?.artwork_uri ?? null);
-  // Synchronous guard against double-submits: state updates are async and can lag
-  // behind a rapid second click, so we also gate on a ref that flips immediately.
   const isSubmittingRef = useRef(false);
 
   const router = useRouter();
@@ -59,7 +57,6 @@ export const UploadForm = ({ mixtape }: { mixtape?: Mixtape }) => {
 
     setIsUploading(true);
     const folder = type === "audio" ? "audio" : "images";
-    // Prefixed so a file that shares a name with an existing one can't replace it.
     const filePath = `${folder}/${Date.now()}-${file.name}`;
     const toastId = toast.loading(`Uploading ${file.name}...`);
     const supabase = createClient();
@@ -100,7 +97,6 @@ export const UploadForm = ({ mixtape }: { mixtape?: Mixtape }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Bail out if a submit is already in flight (prevents duplicate writes).
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     setIsSavingMixtape(true);

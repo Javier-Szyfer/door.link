@@ -7,18 +7,15 @@ import { createClient } from "@/utils/supabase/server";
 
 export type MixtapeInput = Omit<Database["public"]["Tables"]["mixtapes"]["Insert"], "id">;
 
-// Returns null for anyone but an admin, so a missing check fails closed.
+// Returns a Supabase client if the caller is an admin, otherwise null.
 const getAdminClient = async () => {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
   return isAdmin(data.user?.id) ? supabase : null;
 };
 
-// The public pages are cached; publish changes without waiting for them to expire.
 const revalidatePublicPages = () => revalidatePath("/", "layout");
 
-// The input comes from the client, so an `id` in it is dropped rather than
-// trusted: the row to write is chosen by the `id` argument alone.
 const withoutId = ({ id: _id, ...fields }: MixtapeInput & { id?: unknown }) => fields;
 
 export const getAllMixtapes = async () => {
@@ -56,7 +53,6 @@ export const deleteMixtape = async (id: number) => {
     console.error("Error deleting mixtape:", error);
     return { error: "Failed to delete mixtape" };
   }
-  // RLS filters rows out silently, so a refused delete also matches zero rows.
   if (data.length === 0) return { error: "Mixtape not found or cannot be deleted" };
 
   revalidatePublicPages();
@@ -96,7 +92,6 @@ export const updateMixtape = async (id: number, input: MixtapeInput) => {
     console.error("Error updating mixtape:", error);
     return { error: "Failed to update mixtape" };
   }
-  // RLS filters rows out silently, so a refused update also matches zero rows.
   if (data.length === 0) {
     return {
       error: `No mixtape was updated (id ${id}). It may not exist or you may not have permission.`,
