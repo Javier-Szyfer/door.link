@@ -1,8 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
-// Refreshes the Supabase session cookie on every request. Route protection lives
-// in the (protected) layout and the server actions, not here.
+// Refreshes the Supabase session cookie on every request.
 export const updateSession = async (request: NextRequest) => {
   let response = NextResponse.next({ request });
 

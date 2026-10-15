@@ -26,8 +26,7 @@ export const toTrack = ({ id, number, title, audio_uri }: Mixtape): Track => ({
 });
 
 interface AudioContextType {
-  // The audio element exists. Child effects run before the provider's, so a
-  // child loading a track on mount must wait for this.
+  // True once the audio element exists.
   isReady: boolean;
   isPlaying: boolean;
   isLoading: boolean;
@@ -44,8 +43,6 @@ interface AudioContextType {
   seek: (time: number) => void;
 }
 
-// Kept apart so the many consumers that ignore playback position don't
-// re-render on every timeupdate.
 interface AudioProgressType {
   progress: number;
   duration: number;
@@ -73,14 +70,12 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 
 const play = (audio: HTMLAudioElement) =>
   audio.play().catch((error: unknown) => {
-    // Switching tracks aborts the pending play() of the previous one.
     if (error instanceof DOMException && error.name === "AbortError") return;
     console.error("Playback error:", error);
   });
 
 export function AudioProvider({ children }: { children: ReactNode }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  // Read from event and media session handlers, which outlive any one render.
   const currentTrackRef = useRef<Track | null>(null);
   const queueRef = useRef<Track[]>([]);
   const historyRef = useRef<Track[]>([]);
@@ -244,9 +239,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       for (const [action, handler] of actionHandlers) {
         try {
           navigator.mediaSession.setActionHandler(action, clear ? null : handler);
-        } catch {
-          // Browsers throw for actions they don't support.
-        }
+        } catch {}
       }
     };
 
@@ -271,7 +264,6 @@ export function AudioProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     continuousPlaybackRef.current = isContinuousPlayback;
-    // Until then the default would overwrite the saved preference.
     if (isReady) localStorage.setItem(CONTINUOUS_PLAYBACK_KEY, String(isContinuousPlayback));
   }, [isContinuousPlayback, isReady]);
 

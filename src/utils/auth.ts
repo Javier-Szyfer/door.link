@@ -1,5 +1,3 @@
-// An empty uuid — or an empty ADMIN_UUIDS, which would parse to `[""]` — must
-// never match.
 export const isAdmin = (uuid: string | undefined) => {
   if (!uuid) return false;
 

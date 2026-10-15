@@ -1,8 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-// Both logos are rendered and CSS picks one: the theme is unknown on the server,
-// so choosing in JS would hydrate with the wrong logo.
 const Keyhole = () => {
   return (
     <Link href="/">

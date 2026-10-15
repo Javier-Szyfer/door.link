@@ -15,8 +15,6 @@ export const signIn = async (formData: FormData) => {
   if (error) return encodedRedirect("error", "/admin", "Invalid email or password");
 
   if (!isAdmin(data.user?.id)) {
-    // signInWithPassword has already set the session cookie. Without this, a
-    // refused user stays signed in and can reach /admin by navigating to it.
     await supabase.auth.signOut();
     return encodedRedirect("error", "/admin", "You are not authorized to access this page");
   }

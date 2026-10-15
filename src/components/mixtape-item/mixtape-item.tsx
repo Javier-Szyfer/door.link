@@ -28,7 +28,6 @@ export const MixtapeItem = ({
   const handlePlayClick = () => {
     if (isCurrent) return togglePlay();
 
-    // Continuous playback carries on down the list from here.
     const index = allMixtapes.findIndex((m) => m.id === id);
     playTrack(toTrack(mixtape), allMixtapes.slice(index + 1).map(toTrack));
   };
