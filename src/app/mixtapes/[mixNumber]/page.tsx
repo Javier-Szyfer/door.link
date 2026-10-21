@@ -27,6 +27,7 @@ export const generateMetadata = async ({ params }: { params: ParamsType }) => {
       images: OG_IMAGE,
       url: `${SITE_URL}/mixtapes/${mixNumber}`,
     },
+    twitter: { card: "summary_large_image", images: OG_IMAGE },
   };
 };
 
