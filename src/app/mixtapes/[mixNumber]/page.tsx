@@ -2,7 +2,13 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import Keyhole from "@/components/keyhole";
 import { LoadMixtape } from "@/components/player/load-mixtape";
-import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
+import {
+  OG_IMAGE,
+  OG_VIDEO,
+  SITE_DESCRIPTION,
+  SITE_ICONS,
+  TWITTER_PLAYER,
+} from "@/constants/metadata";
 import { SITE_URL } from "@/constants/urls";
 import { getMixtapeByMixNumber, getPublishedMixtapes } from "@/lib/mixtapes";
 
@@ -25,8 +31,10 @@ export const generateMetadata = async ({ params }: { params: ParamsType }) => {
       title: `${mixNumber} | door.link`,
       description: SITE_DESCRIPTION,
       images: OG_IMAGE,
+      videos: OG_VIDEO,
       url: `${SITE_URL}/mixtapes/${mixNumber}`,
     },
+    twitter: TWITTER_PLAYER,
   };
 };
 

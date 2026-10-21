@@ -5,7 +5,14 @@ import { ThemeProvider } from "next-themes";
 import { BlueHeartIcon } from "@/components/blue-heart-icon";
 import { Player } from "@/components/player/player";
 import { Toaster } from "@/components/ui/sonner";
-import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS, SITE_NAME } from "@/constants/metadata";
+import {
+  OG_IMAGE,
+  OG_VIDEO,
+  SITE_DESCRIPTION,
+  SITE_ICONS,
+  SITE_NAME,
+  TWITTER_PLAYER,
+} from "@/constants/metadata";
 import { SITE_URL } from "@/constants/urls";
 import { AudioProvider } from "@/contexts/audio-context";
 
@@ -18,7 +25,9 @@ export const metadata = {
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
     images: OG_IMAGE,
+    videos: OG_VIDEO,
   },
+  twitter: TWITTER_PLAYER,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
