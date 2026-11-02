@@ -1,15 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
+import { endAdminSession } from "@/utils/session";
 
 export const signOut = async () => {
-  const supabase = await createClient();
-  await supabase.auth.signOut();
-
-  revalidatePath("/admin/dashboard");
-  revalidatePath("/admin/upload-mixtape");
-
+  await endAdminSession();
   redirect("/admin");
 };

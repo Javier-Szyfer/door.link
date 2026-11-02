@@ -4,7 +4,6 @@ import { DownloadIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { getDownloadUrl } from "@/constants/media-hosts";
 import { useAudio, useAudioProgress } from "@/contexts/audio-context";
 import { MuteIcon } from "./icons/mute-icon";
 import { PauseIcon } from "./icons/pause-icon";
@@ -40,12 +39,10 @@ export function Player() {
 
   if (!currentTrack) return null;
 
+  // Downloads the current track, which R2 names "number-title.ext".
   const handleDownload = () => {
-    const filename = `${currentTrack.number}-${currentTrack.title}.mp3`;
-
     const link = document.createElement("a");
-    link.href = getDownloadUrl(currentTrack.src, filename);
-    link.download = filename;
+    link.href = currentTrack.src;
     document.body.appendChild(link);
     link.click();
     link.remove();

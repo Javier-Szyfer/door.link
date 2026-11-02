@@ -1,8 +1,6 @@
 import { Feed } from "feed";
 import { SITE_URL } from "@/constants/urls";
-import type { Database } from "@/types/database.types";
-
-type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
+import type { Mixtape } from "@/types/mixtape";
 
 function getAudioMimeType(url: string): string {
   const extension = url.split(".").pop()?.toLowerCase();
