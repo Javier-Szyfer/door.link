@@ -1,4 +1,4 @@
-import { createHmac, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, scrypt, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 
 const scryptAsync = promisify(scrypt) as (
@@ -27,6 +27,15 @@ export const verifyPassword = async (password: string, stored: string | undefine
   const expected = Buffer.from(hashHex, "hex");
   const actual = await scryptAsync(password, Buffer.from(saltHex, "hex"), expected.length);
   return safeEqual(actual, expected);
+};
+
+// Key that signs session tokens; changing either input invalidates every existing token.
+export const getSessionSigningKey = (
+  sessionSecret: string | undefined,
+  passwordHash: string | undefined,
+) => {
+  if (!sessionSecret || !passwordHash) return undefined;
+  return createHash("sha256").update(sessionSecret).update("\0").update(passwordHash).digest("hex");
 };
 
 const sign = (payload: string, secret: string) =>

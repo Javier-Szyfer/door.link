@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { createSessionToken, hashPassword, verifyPassword, verifySessionToken } from "./auth.ts";
+import {
+  createSessionToken,
+  getSessionSigningKey,
+  hashPassword,
+  verifyPassword,
+  verifySessionToken,
+} from "./auth.ts";
 
 const SECRET = "test-secret";
 const NOW = 1_800_000_000_000;
@@ -57,5 +63,19 @@ describe("verifySessionToken", () => {
     assert.equal(verifySessionToken(token, "", NOW), false);
     assert.equal(verifySessionToken("garbage", SECRET, NOW), false);
     assert.equal(verifySessionToken(`${token}.extra`, SECRET, NOW), false);
+  });
+});
+
+describe("getSessionSigningKey", () => {
+  it("changes when the password hash or the secret changes", () => {
+    const key = getSessionSigningKey("secret", "salt:hash");
+    assert.equal(key, getSessionSigningKey("secret", "salt:hash"));
+    assert.notEqual(key, getSessionSigningKey("secret", "salt:other"));
+    assert.notEqual(key, getSessionSigningKey("other", "salt:hash"));
+  });
+
+  it("is undefined when either input is missing", () => {
+    assert.equal(getSessionSigningKey(undefined, "salt:hash"), undefined);
+    assert.equal(getSessionSigningKey("secret", ""), undefined);
   });
 });
