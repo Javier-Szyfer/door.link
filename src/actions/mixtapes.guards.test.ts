@@ -10,12 +10,12 @@ const actions = [...source.matchAll(/^export const (\w+) = async[\s\S]*?^};$/gm)
 describe("mixtape server actions", () => {
   it("is a file of server actions", () => {
     assert.match(source, /^"use server";/);
-    assert.ok(actions.length >= 5, `expected to find the actions, found ${actions.length}`);
+    assert.ok(actions.length >= 6, `expected to find the actions, found ${actions.length}`);
   });
 
   for (const [body, name] of actions) {
     it(`${name} authorizes the caller`, () => {
-      assert.ok(body.includes("await getAdminClient()"), `${name} does not call getAdminClient`);
+      assert.ok(body.includes("await isAdminSession()"), `${name} does not call isAdminSession`);
     });
   }
 });

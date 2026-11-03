@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { createMixtape, type MixtapeInput, updateMixtape } from "@/actions/mixtapes";
+import { createMixtape, getUploadUrl, updateMixtape } from "@/actions/mixtapes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,12 +15,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { Database } from "@/types/database.types";
-import { createClient } from "@/utils/supabase/client";
+import type { Mixtape, MixtapeInput } from "@/types/mixtape";
 import { ArtworkInput } from "./artwork-input";
 import { AudioInput } from "./audio-input";
-
-type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
 
 const toFormData = (mixtape?: Mixtape): MixtapeInput => ({
   number: mixtape?.number ?? "",
@@ -56,21 +53,26 @@ export const UploadForm = ({ mixtape }: { mixtape?: Mixtape }) => {
     if (type === "artwork") setArtworkPreview(URL.createObjectURL(file));
 
     setIsUploading(true);
-    const folder = type === "audio" ? "audio" : "images";
-    const filePath = `${folder}/${Date.now()}-${file.name}`;
     const toastId = toast.loading(`Uploading ${file.name}...`);
-    const supabase = createClient();
 
     try {
-      const { error: uploadError } = await supabase.storage
-        .from("media")
-        .upload(filePath, file, { cacheControl: "3600" });
+      const upload = await getUploadUrl({
+        kind: type,
+        fileName: file.name,
+        contentType: file.type,
+        number: formData.number,
+        title: formData.title,
+      });
+      if (upload.error !== undefined) throw new Error(upload.error);
 
-      if (uploadError) throw uploadError;
+      const response = await fetch(upload.url, {
+        method: "PUT",
+        body: file,
+        headers: upload.headers,
+      });
+      if (!response.ok) throw new Error(`Upload failed with status ${response.status}`);
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("media").getPublicUrl(filePath);
+      const { publicUrl } = upload;
 
       setFormData((prev) => ({
         ...prev,
@@ -201,6 +203,7 @@ export const UploadForm = ({ mixtape }: { mixtape?: Mixtape }) => {
           <AudioInput
             audioUri={formData.audio_uri}
             onFileSelect={(file) => handleFileUpload(file, "audio")}
+            disabled={!formData.number.trim() || !formData.title.trim()}
           />
 
           <ArtworkInput

@@ -4,9 +4,10 @@ import { Label } from "@/components/ui/label";
 interface AudioInputProps {
   audioUri: string;
   onFileSelect: (file: File) => void;
+  disabled?: boolean;
 }
 
-export const AudioInput = ({ audioUri, onFileSelect }: AudioInputProps) => {
+export const AudioInput = ({ audioUri, onFileSelect, disabled = false }: AudioInputProps) => {
   const handleClick = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -29,6 +30,7 @@ export const AudioInput = ({ audioUri, onFileSelect }: AudioInputProps) => {
             type="file"
             accept="audio/*"
             required={!audioUri}
+            disabled={disabled}
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) onFileSelect(file);
@@ -44,11 +46,17 @@ export const AudioInput = ({ audioUri, onFileSelect }: AudioInputProps) => {
             <button
               type="button"
               onClick={handleClick}
-              className="cursor-pointer text-left text-sm text-muted-foreground transition-colors hover:text-foreground"
+              disabled={disabled}
+              className="cursor-pointer text-left disabled:cursor-not-allowed disabled:opacity-50 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               Change audio
             </button>
           </div>
+        )}
+        {disabled && (
+          <p className="text-sm text-muted-foreground">
+            Fill in the number and title first: the download is named after them.
+          </p>
         )}
       </div>
     </div>

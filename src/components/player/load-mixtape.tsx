@@ -2,14 +2,10 @@
 
 import { useEffect } from "react";
 import { toTrack, useAudio } from "@/contexts/audio-context";
-import type { Database } from "@/types/database.types";
+import type { Mixtape } from "@/types/mixtape";
 
 // Queues the page's mixtape in the global player, which the root layout renders.
-export const LoadMixtape = ({
-  mixtape,
-}: {
-  mixtape: Database["public"]["Tables"]["mixtapes"]["Row"];
-}) => {
+export const LoadMixtape = ({ mixtape }: { mixtape: Mixtape }) => {
   const { isReady, currentTrack, loadTrack } = useAudio();
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: load once per page; re-running when playback moves to another track would yank it back to this one

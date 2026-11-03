@@ -1,23 +1,18 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { isAdmin } from "@/utils/auth";
+import { verifyPassword } from "@/utils/auth";
 import { encodedRedirect } from "@/utils/redirect";
-import { createClient } from "@/utils/supabase/server";
+import { startAdminSession } from "@/utils/session";
 
 export const signIn = async (formData: FormData) => {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-  const supabase = await createClient();
+  const password = formData.get("password");
+  const isValid =
+    typeof password === "string" &&
+    (await verifyPassword(password, process.env.ADMIN_PASSWORD_HASH));
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (!isValid) return encodedRedirect("error", "/admin", "Invalid password");
 
-  if (error) return encodedRedirect("error", "/admin", "Invalid email or password");
-
-  if (!isAdmin(data.user?.id)) {
-    await supabase.auth.signOut();
-    return encodedRedirect("error", "/admin", "You are not authorized to access this page");
-  }
-
+  await startAdminSession();
   redirect("/admin/dashboard");
 };

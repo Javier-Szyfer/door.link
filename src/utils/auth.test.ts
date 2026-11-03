@@ -1,46 +1,81 @@
 import assert from "node:assert/strict";
-import { afterEach, describe, it } from "node:test";
-import { isAdmin } from "./auth.ts";
+import { describe, it } from "node:test";
+import {
+  createSessionToken,
+  getSessionSigningKey,
+  hashPassword,
+  verifyPassword,
+  verifySessionToken,
+} from "./auth.ts";
 
-const ADMIN = "11111111-1111-1111-1111-111111111111";
-const OTHER = "22222222-2222-2222-2222-222222222222";
+const SECRET = "test-secret";
+const NOW = 1_800_000_000_000;
 
-describe("isAdmin", () => {
-  afterEach(() => {
-    delete process.env.ADMIN_UUIDS;
+describe("verifyPassword", () => {
+  it("accepts the password that was hashed", async () => {
+    const hash = await hashPassword("correct horse battery staple");
+    assert.equal(await verifyPassword("correct horse battery staple", hash), true);
   });
 
-  it("accepts a uuid present in ADMIN_UUIDS", () => {
-    process.env.ADMIN_UUIDS = ADMIN;
-    assert.equal(isAdmin(ADMIN), true);
+  it("rejects a different password", async () => {
+    const hash = await hashPassword("correct horse battery staple");
+    assert.equal(await verifyPassword("correct horse battery stapler", hash), false);
   });
 
-  it("accepts any uuid from a comma-separated list, ignoring surrounding spaces", () => {
-    process.env.ADMIN_UUIDS = `${OTHER}, ${ADMIN}`;
-    assert.equal(isAdmin(ADMIN), true);
-    assert.equal(isAdmin(OTHER), true);
+  it("salts each hash", async () => {
+    assert.notEqual(await hashPassword("same"), await hashPassword("same"));
   });
 
-  it("rejects a uuid that is not listed", () => {
-    process.env.ADMIN_UUIDS = ADMIN;
-    assert.equal(isAdmin(OTHER), false);
+  it("rejects everyone when no hash is configured or it is malformed", async () => {
+    assert.equal(await verifyPassword("anything", undefined), false);
+    assert.equal(await verifyPassword("anything", ""), false);
+    assert.equal(await verifyPassword("anything", "not-a-hash"), false);
   });
 
-  it("rejects everyone when ADMIN_UUIDS is unset", () => {
-    delete process.env.ADMIN_UUIDS;
-    assert.equal(isAdmin(ADMIN), false);
+  it("rejects an empty password", async () => {
+    assert.equal(await verifyPassword("", await hashPassword("")), false);
+  });
+});
+
+describe("verifySessionToken", () => {
+  it("accepts a fresh token signed with the same secret", () => {
+    assert.equal(verifySessionToken(createSessionToken(SECRET, NOW), SECRET, NOW + 1000), true);
   });
 
-  it("rejects the empty uuid used as a fallback for signed-out callers", () => {
-    process.env.ADMIN_UUIDS = ADMIN;
-    assert.equal(isAdmin(""), false);
+  it("rejects an expired token", () => {
+    const token = createSessionToken(SECRET, NOW, 60);
+    assert.equal(verifySessionToken(token, SECRET, NOW + 61_000), false);
   });
 
-  it("rejects the empty uuid when ADMIN_UUIDS is empty or whitespace", () => {
-    process.env.ADMIN_UUIDS = "";
-    assert.equal(isAdmin(""), false);
+  it("rejects a token signed with another secret", () => {
+    assert.equal(verifySessionToken(createSessionToken("other", NOW), SECRET, NOW), false);
+  });
 
-    process.env.ADMIN_UUIDS = " , ";
-    assert.equal(isAdmin(""), false);
+  it("rejects a token whose expiry was tampered with", () => {
+    const [, signature] = createSessionToken(SECRET, NOW, 60).split(".");
+    assert.equal(verifySessionToken(`${NOW + 10 ** 12}.${signature}`, SECRET, NOW), false);
+  });
+
+  it("rejects missing tokens, missing secrets and malformed tokens", () => {
+    const token = createSessionToken(SECRET, NOW);
+    assert.equal(verifySessionToken(undefined, SECRET, NOW), false);
+    assert.equal(verifySessionToken(token, undefined, NOW), false);
+    assert.equal(verifySessionToken(token, "", NOW), false);
+    assert.equal(verifySessionToken("garbage", SECRET, NOW), false);
+    assert.equal(verifySessionToken(`${token}.extra`, SECRET, NOW), false);
+  });
+});
+
+describe("getSessionSigningKey", () => {
+  it("changes when the password hash or the secret changes", () => {
+    const key = getSessionSigningKey("secret", "salt:hash");
+    assert.equal(key, getSessionSigningKey("secret", "salt:hash"));
+    assert.notEqual(key, getSessionSigningKey("secret", "salt:other"));
+    assert.notEqual(key, getSessionSigningKey("other", "salt:hash"));
+  });
+
+  it("is undefined when either input is missing", () => {
+    assert.equal(getSessionSigningKey(undefined, "salt:hash"), undefined);
+    assert.equal(getSessionSigningKey("secret", ""), undefined);
   });
 });

@@ -12,9 +12,7 @@ import {
   useRef,
   useState,
 } from "react";
-import type { Database } from "@/types/database.types";
-
-type Mixtape = Database["public"]["Tables"]["mixtapes"]["Row"];
+import type { Mixtape } from "@/types/mixtape";
 
 export type Track = Pick<Mixtape, "id" | "number" | "title"> & { src: string };
 

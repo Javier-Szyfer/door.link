@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { SITE_URL } from "@/constants/urls";
 import { toTrack, useAudio } from "@/contexts/audio-context";
-import type { Database } from "@/types/database.types";
+import type { Mixtape } from "@/types/mixtape";
 import { CopyLinkButton } from "./copy-link";
 import { ExpandedDialog } from "./expanded-dialog";
 
@@ -26,8 +26,8 @@ export const MixtapeItem = ({
   mixtape,
   allMixtapes,
 }: {
-  mixtape: Database["public"]["Tables"]["mixtapes"]["Row"];
-  allMixtapes: Database["public"]["Tables"]["mixtapes"]["Row"][];
+  mixtape: Mixtape;
+  allMixtapes: Mixtape[];
 }) => {
   const { id, number, title, duration, artwork_uri, description } = mixtape;
   const { isPlaying, currentTrack, togglePlay, playTrack } = useAudio();
