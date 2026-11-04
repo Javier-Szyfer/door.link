@@ -28,8 +28,10 @@ const objectUrl = (bucket: string, key: string) =>
   `https://${requireEnv("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com/${bucket}/${encodeKey(key)}`;
 
 // Sends a signed S3 request for one object.
-export const r2Fetch = (bucket: string, key: string, init?: RequestInit) =>
-  getClient().fetch(objectUrl(bucket, key), init);
+export const r2Fetch = async (bucket: string, key: string, init: RequestInit = {}) => {
+  const signed = await getClient().sign(objectUrl(bucket, key), init);
+  return fetch(signed.url, { method: signed.method, headers: signed.headers, body: init.body });
+};
 
 // Returns a URL that lets the holder PUT one object with exactly these headers.
 export const presignPut = async (
