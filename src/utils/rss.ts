@@ -1,6 +1,7 @@
 import { Feed } from "feed";
-import { SITE_URL } from "@/constants/urls";
-import type { Mixtape } from "@/types/mixtape";
+import { SITE_URL } from "../constants/urls.ts";
+import type { Mixtape } from "../types/mixtape.ts";
+import { parseDurationSeconds } from "./duration.ts";
 
 function getAudioMimeType(url: string): string {
   const extension = url.split(".").pop()?.toLowerCase();
@@ -34,6 +35,7 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
     copyright: `All rights reserved ${new Date().getFullYear()}`,
     updated: mixtapes.length > 0 ? new Date(mixtapes[0].created_at) : new Date(),
     generator: "Door RSS Feed",
+    podcast: true,
     feedLinks: {
       rss: `${SITE_URL}/rss.xml`,
     },
@@ -49,11 +51,15 @@ export function generateRssFeed(mixtapes: Mixtape[]) {
       link: `${SITE_URL}/mixtapes/${mixtape.number}`,
       description: mixtape.description,
       date: new Date(mixtape.created_at),
-      enclosure: {
+      audio: {
         url: mixtape.audio_uri,
         type: getAudioMimeType(mixtape.audio_uri),
         length: 0,
+        duration: parseDurationSeconds(mixtape.duration) ?? undefined,
       },
+      extensions: [
+        { name: "itunes:image", objects: { _attributes: { href: mixtape.artwork_uri } } },
+      ],
     });
   }
 
