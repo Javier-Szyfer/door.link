@@ -2,9 +2,10 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import Keyhole from "@/components/keyhole";
 import { LoadMixtape } from "@/components/player/load-mixtape";
-import { OG_IMAGE, SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
+import { SITE_DESCRIPTION, SITE_ICONS } from "@/constants/metadata";
 import { SITE_URL } from "@/constants/urls";
 import { getMixtapeByMixNumber, getPublishedMixtapes } from "@/lib/mixtapes";
+import { mixtapeOgImage } from "@/utils/mixtape-og-image";
 
 type ParamsType = Promise<{ mixNumber: string }>;
 
@@ -17,6 +18,8 @@ export const generateStaticParams = async () => {
 
 export const generateMetadata = async ({ params }: { params: ParamsType }) => {
   const { mixNumber } = await params;
+  const { mixtape } = await getMixtapeByMixNumber(mixNumber);
+  const image = mixtapeOgImage(mixtape?.artwork_uri);
   return {
     title: `${mixNumber} | door.link`,
     description: SITE_DESCRIPTION,
@@ -24,10 +27,10 @@ export const generateMetadata = async ({ params }: { params: ParamsType }) => {
     openGraph: {
       title: `${mixNumber} | door.link`,
       description: SITE_DESCRIPTION,
-      images: OG_IMAGE,
+      images: image,
       url: `${SITE_URL}/mixtapes/${mixNumber}`,
     },
-    twitter: { card: "summary_large_image", images: OG_IMAGE },
+    twitter: { card: "summary_large_image", images: image },
   };
 };
 
