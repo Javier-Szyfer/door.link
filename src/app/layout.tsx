@@ -11,7 +11,7 @@ import {
   SITE_DESCRIPTION,
   SITE_ICONS,
   SITE_NAME,
-  TWITTER_PLAYER,
+  TWITTER_CARD,
 } from "@/constants/metadata";
 import { SITE_URL } from "@/constants/urls";
 import { AudioProvider } from "@/contexts/audio-context";
@@ -27,7 +27,7 @@ export const metadata = {
     images: OG_IMAGE,
     videos: OG_VIDEO,
   },
-  twitter: TWITTER_PLAYER,
+  twitter: TWITTER_CARD,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

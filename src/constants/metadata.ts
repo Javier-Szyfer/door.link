@@ -18,15 +18,9 @@ export const OG_VIDEO = {
   width: 1200,
   height: 630,
 };
-export const TWITTER_PLAYER = {
-  card: "player" as const,
+export const TWITTER_CARD = {
+  card: "summary_large_image" as const,
   images: OG_IMAGE,
-  players: {
-    playerUrl: `${OG_BASE_URL}/og/player`,
-    streamUrl: OG_VIDEO.url,
-    width: OG_VIDEO.width,
-    height: OG_VIDEO.height,
-  },
 };
 export const SITE_ICONS = [
   {
