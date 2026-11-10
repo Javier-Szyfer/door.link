@@ -1,10 +1,9 @@
 import { parseFeed } from "@/lib/feed";
-
-const FEED_URL = "https://www.door.link/rss.xml";
+import { feedUrl } from "@/lib/feed-url";
 
 export async function GET() {
   try {
-    const response = await fetch(FEED_URL, { next: { revalidate: 300 } });
+    const response = await fetch(feedUrl(), { next: { revalidate: 300 } });
     if (!response.ok) throw new Error(`Feed responded ${response.status}`);
     const mixes = parseFeed(await response.text());
 
