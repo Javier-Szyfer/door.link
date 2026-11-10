@@ -20,15 +20,14 @@ R2 no acepta comodines de subdominio: cada origen (dominio propio, URL de produc
 
 ## Deploy
 
-- Repo privado en GitHub, importado en Vercel (framework Next.js, build `bun run build`). Es un monorepo: en el proyecto de la app, Root Directory `apps/app`.
-- Dominio de producción: `app.door.link` (ya está en `AllowedOrigins`).
+- La app vive en el monorepo de door.link (`apps/app`), importado en Vercel (framework Next.js, build `bun run build`). En el proyecto de la app, Root Directory `apps/app`.
+- Dominio de producción: `app.door.link`. Agregarlo en Vercel; `docs/r2-cors.json` ya incluye `https://app.door.link`, pero ese JSON hay que pegarlo en R2 (ver arriba) cuando el dominio salga a producción: todavía no está aplicado.
 - Deployment Protection activada mientras se itera: solo el dueño puede abrirla.
 - Para abrirla a oyentes: desactivar la protección (la app ya manda `noindex`).
-- Dominio propio: agregarlo en Vercel y en `AllowedOrigins`.
 
 ## Datos
 
-La lista sale de `FEED_URL`. Sin definir en producción usa `https://www.door.link/rss.xml`; en local usa `http://localhost:3001/rss.xml` (`apps/web` corriendo con `bun run dev`). Next puede prerenderizar `/api/mixes` durante el build, así que `FEED_URL` tiene que estar definida al hacer build y también al arrancar. Ver `.env.example`. La portada y la duración vienen de `itunes:image` e `itunes:duration`, que agrega door-new (branch `feat/rss-itunes-tags`). Hasta que eso esté en producción, los mixes aparecen sin portada ni duración.
+La lista sale de `FEED_URL`. Sin definir en producción usa `https://www.door.link/rss.xml`; en local usa `http://localhost:3001/rss.xml` (`apps/web` corriendo con `bun run dev`). Next puede prerenderizar `/api/mixes` durante el build, así que `FEED_URL` tiene que estar definida al hacer build y también al arrancar. Ver `.env.example`. La portada y la duración vienen de `itunes:image` e `itunes:duration`, que emite `apps/web/src/utils/rss.ts`.
 
 ## Pantalla de arranque
 

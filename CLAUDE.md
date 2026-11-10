@@ -14,6 +14,7 @@ Monorepo con bun workspaces.
 - `bun install` en la raíz.
 - `bun run dev` / `bun run build` / `bun run test` en la raíz corren en todas las apps.
 - Por app: `cd apps/<app>` y `bun run <script>`.
+- Biome/lint se corre dentro de cada app (`cd apps/web` / `cd apps/app`), nunca desde la raíz: cada una usa una versión distinta y la raíz resuelve la equivocada.
 
 ## Reglas
 
