@@ -1,6 +1,10 @@
 [
   {
-    "AllowedOrigins": ["http://localhost:3000", "https://door-app-lac.vercel.app"],
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "https://door-app-lac.vercel.app",
+      "https://app.door.link"
+    ],
     "AllowedMethods": ["GET", "HEAD"],
     "AllowedHeaders": ["Range"],
     "ExposeHeaders": ["Content-Length", "Content-Range", "Accept-Ranges", "Content-Type"],
