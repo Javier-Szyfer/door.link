@@ -2,10 +2,15 @@
 
 ## CORS del bucket de media
 
-Las descargas offline leen los MP3 con `fetch`, así que `door-media` tiene que permitir el origen de la app.
+La política de `door-media` tiene dos reglas, y `docs/r2-cors.json` es la política completa:
+
+- `PUT` desde door.link: las subidas del admin (`apps/web`). En local, door.link corre en `localhost:3001`.
+- `GET`/`HEAD` con `Range` desde la app: las descargas offline leen los MP3 con `fetch`.
+
+Para cambiarla:
 
 1. Cloudflare → R2 → `door-media` → Settings → CORS Policy → Edit.
-2. Pegar `docs/r2-cors.json`. Reemplazar `https://door-app-lac.vercel.app` por la URL de producción real si Vercel asigna otra.
+2. Pegar `docs/r2-cors.json` entero. Si se pega solo una regla, se pierde la otra.
 3. Verificar:
 
    ```sh
@@ -16,14 +21,14 @@ Las descargas offline leen los MP3 con `fetch`, así que `door-media` tiene que 
 
    Debe imprimir el origen.
 
-R2 no acepta comodines de subdominio: cada origen (dominio propio, URL de producción) se agrega exacto. Los previews por branch no pueden descargar.
+R2 no acepta comodines de subdominio: cada origen se agrega exacto. Un preview solo puede descargar desde la URL fija de su branch (`door-app-git-<branch>-javierszyfers-projects.vercel.app`), y solo si esa URL está en la regla.
 
 ## Deploy
 
 - La app vive en el monorepo de door.link (`apps/app`), importado en Vercel (framework Next.js, build `bun run build`). En el proyecto de la app, Root Directory `apps/app`.
-- Dominio de producción: `app.door.link`. Agregarlo en Vercel; `docs/r2-cors.json` ya incluye `https://app.door.link`, pero ese JSON hay que pegarlo en R2 (ver arriba) cuando el dominio salga a producción: todavía no está aplicado.
-- Deployment Protection activada mientras se itera: solo el dueño puede abrirla.
-- Para abrirla a oyentes: desactivar la protección (la app ya manda `noindex`).
+- Dos proyectos en Vercel apuntan a este repo: `door-link` (Root Directory `apps/web`) y `door-app` (Root Directory `apps/app`). En los dos están activados "Include files outside the root directory" y "Skip deployments when there are no changes".
+- Dominio de producción: `app.door.link`, con un CNAME en Namecheap (el DNS de door.link no está en Cloudflare). Ya está en la regla de CORS.
+- Deployment Protection está desactivada en `door-app`, porque la app instalada en iOS no comparte cookies con Safari. La app manda `noindex`.
 
 ## Datos
 
