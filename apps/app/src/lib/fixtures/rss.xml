@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+  <channel>
+    <title>door.link</title>
+    <item>
+      <title><![CDATA[212 - door 212 for Beams T]]></title>
+      <link>https://door.link/mixtapes/212</link>
+      <pubDate>Thu, 08 Oct 2026 00:00:00 GMT</pubDate>
+      <description><![CDATA[A mixtape for Beams T]]></description>
+      <enclosure length="0" type="audio/mpeg" url="https://media.keyholemedia.store/audio/door-212.mp3"/>
+    </item>
+    <item>
+      <title><![CDATA[214 - now more than ever... door...]]></title>
+      <link>https://door.link/mixtapes/214</link>
+      <pubDate>Wed, 04 Nov 2026 00:00:00 GMT</pubDate>
+      <description><![CDATA[In moments of sudden clarity]]></description>
+      <enclosure length="0" type="audio/mpeg" url="https://media.keyholemedia.store/audio/door-214.mp3"/>
+      <itunes:duration>2712</itunes:duration>
+      <itunes:image href="https://media.keyholemedia.store/images/door-214.jpeg"/>
+    </item>
+    <item>
+      <title><![CDATA[in door we trust]]></title>
+      <link>https://door.link/mixtapes/213</link>
+      <pubDate>Wed, 21 Oct 2026 00:00:00 GMT</pubDate>
+      <description><![CDATA[Featuring Harold Budd]]></description>
+      <enclosure length="0" type="audio/mpeg" url="https://media.keyholemedia.store/audio/Door%20213.mp3"/>
+      <itunes:duration>45:12</itunes:duration>
+      <itunes:image href="https://media.keyholemedia.store/images/door-213.jpeg"/>
+    </item>
+  </channel>
+</rss>
