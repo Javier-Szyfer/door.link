@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant desktop (@media (hover: hover) and (pointer: fine) and (min-width: 768px));
+
 :root {
   color-scheme: dark;
   --bg: #121212;
