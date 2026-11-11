@@ -6,11 +6,11 @@ and dancing.
 
 
 
-## Estructura
+## Structure
 
-Monorepo con bun workspaces.
+Monorepo with bun workspaces.
 
-- `apps/web`: door.link (puerto 3001).
-- `apps/app`: la PWA, app.door.link (puerto 3000).
+- `apps/web`: door.link (port 3001).
+- `apps/app`: the PWA, app.door.link (port 3000).
 
-`bun run dev` desde la raíz levanta las dos apps.
+`bun run dev` from the root starts both apps.

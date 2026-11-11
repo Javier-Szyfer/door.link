@@ -1,17 +1,17 @@
-# Operación
+# Operations
 
-## CORS del bucket de media
+## Media bucket CORS
 
-La política de `door-media` tiene dos reglas, y `docs/r2-cors.json` es la política completa:
+The `door-media` policy has two rules, and `docs/r2-cors.json` is the complete policy:
 
-- `PUT` desde door.link: las subidas del admin (`apps/web`). En local, door.link corre en `localhost:3001`.
-- `GET`/`HEAD` con `Range` desde la app: las descargas offline leen los MP3 con `fetch`.
+- `PUT` from door.link: admin uploads (`apps/web`). Locally, door.link runs on `localhost:3001`.
+- `GET`/`HEAD` with `Range` from the app: offline downloads read the MP3s with `fetch`.
 
-Para cambiarla:
+To change it:
 
 1. Cloudflare → R2 → `door-media` → Settings → CORS Policy → Edit.
-2. Pegar `docs/r2-cors.json` entero. Si se pega solo una regla, se pierde la otra.
-3. Verificar:
+2. Paste the whole `docs/r2-cors.json`. If you paste just one rule, the other is lost.
+3. Verify:
 
    ```sh
    curl -sI -H "Origin: http://localhost:3000" \
@@ -19,25 +19,25 @@ Para cambiarla:
      | grep -i access-control-allow-origin
    ```
 
-   Debe imprimir el origen.
+   It must print the origin.
 
-R2 no acepta comodines de subdominio: cada origen se agrega exacto. Un preview solo puede descargar desde la URL fija de su branch (`door-app-git-<branch>-javierszyfers-projects.vercel.app`), y solo si esa URL está en la regla.
+R2 doesn't accept subdomain wildcards: each origin is added exactly. A preview can only download from its branch's fixed URL (`door-app-git-<branch>-javierszyfers-projects.vercel.app`), and only if that URL is in the rule.
 
 ## Deploy
 
-- La app vive en el monorepo de door.link (`apps/app`), importado en Vercel (framework Next.js, build `bun run build`). En el proyecto de la app, Root Directory `apps/app`.
-- Dos proyectos en Vercel apuntan a este repo: `door-link` (Root Directory `apps/web`) y `door-app` (Root Directory `apps/app`). En los dos están activados "Include files outside the root directory" y "Skip deployments when there are no changes".
-- Dominio de producción: `app.door.link`, con un CNAME en Namecheap (el DNS de door.link no está en Cloudflare). Ya está en la regla de CORS.
-- Deployment Protection está desactivada en `door-app`, porque la app instalada en iOS no comparte cookies con Safari. La app manda `noindex`.
+- The app lives in the door.link monorepo (`apps/app`), imported into Vercel (Next.js framework, build `bun run build`). In the app's project, Root Directory is `apps/app`.
+- Two Vercel projects point at this repo: `door-link` (Root Directory `apps/web`) and `door-app` (Root Directory `apps/app`). Both have "Include files outside the root directory" and "Skip deployments when there are no changes" enabled.
+- Production domain: `app.door.link`, with a CNAME in Namecheap (door.link's DNS is not on Cloudflare). It is already in the CORS rule.
+- Deployment Protection is disabled on `door-app`, because the app installed on iOS doesn't share cookies with Safari. The app sends `noindex`.
 
-## Datos
+## Data
 
-La lista sale de `FEED_URL`. Sin definir en producción usa `https://www.door.link/rss.xml`; en local usa `http://localhost:3001/rss.xml` (`apps/web` corriendo con `bun run dev`). Next puede prerenderizar `/api/mixes` durante el build, así que `FEED_URL` tiene que estar definida al hacer build y también al arrancar. Ver `.env.example`. La portada y la duración vienen de `itunes:image` e `itunes:duration`, que emite `apps/web/src/utils/rss.ts`.
+The list comes from `FEED_URL`. If unset in production it uses `https://www.door.link/rss.xml`; locally it uses `http://localhost:3001/rss.xml` (`apps/web` running with `bun run dev`). Next may prerender `/api/mixes` during the build, so `FEED_URL` must be set both at build time and at startup. See `.env.example`. The cover and duration come from `itunes:image` and `itunes:duration`, which `apps/web/src/utils/rss.ts` emits.
 
-## Pantalla de arranque
+## Launch screen
 
-Las imágenes de `public/splash` son lisas, del color `THEME_BG` de `src/lib/theme.ts`. Después de ellas la app muestra un skeleton de Home: probamos una cerradura como splash, pero en la app instalada iOS no empalma su imagen de arranque con la página y el corte se notaba. Si cambia el fondo, actualizar `THEME_BG` y `--bg` y correr `bun run splash`; los tests avisan si no coinciden. iOS las lee al instalar la app, así que para ver un cambio hay que borrarla y volver a agregarla a la pantalla de inicio.
+The images in `public/splash` are plain, in the `THEME_BG` color from `src/lib/theme.ts`. After them the app shows a Home skeleton: we tried a lock as the splash, but in the installed iOS app the launch image doesn't blend with the page and the cut was noticeable. If the background changes, update `THEME_BG` and `--bg` and run `bun run splash`; the tests warn if they don't match. iOS reads them when the app is installed, so to see a change you have to delete it and add it to the home screen again.
 
-## Probar en el iPhone
+## Testing on the iPhone
 
-`bun dev --hostname 0.0.0.0` y abrir `http://<ip-de-la-mac>:3000` en Safari sirve para la UI, pero el service worker y las descargas necesitan HTTPS: probar eso en el deploy de Vercel, instalada con "Agregar a pantalla de inicio".
+`bun dev --hostname 0.0.0.0` and opening `http://<mac-ip>:3000` in Safari works for the UI, but the service worker and downloads need HTTPS: test those on the Vercel deploy, installed with "Add to Home Screen".

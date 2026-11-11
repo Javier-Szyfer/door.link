@@ -1,22 +1,23 @@
 # door
 
-Monorepo con bun workspaces.
+Monorepo with bun workspaces.
 
-## Estructura
+## Structure
 
-- `apps/web`: door.link (workspace `web`, puerto 3001, Tailwind 3).
-- `apps/app`: la PWA en app.door.link (workspace `app`, puerto 3000, Tailwind 4).
-- Un solo `bun.lock` en la raíz; `overrides` y `trustedDependencies` viven en el `package.json` raíz.
-- Cada app tiene su propio `AGENTS.md`/`CLAUDE.md`.
+- `apps/web`: door.link (workspace `web`, port 3001, Tailwind 3).
+- `apps/app`: the PWA at app.door.link (workspace `app`, port 3000, Tailwind 4).
+- A single `bun.lock` at the root; `overrides` and `trustedDependencies` live in the root `package.json`.
+- Each app has its own `AGENTS.md`/`CLAUDE.md`.
 
-## Comandos
+## Commands
 
-- `bun install` en la raíz.
-- `bun run dev` / `bun run build` / `bun run test` en la raíz corren en todas las apps.
-- Por app: `cd apps/<app>` y `bun run <script>`.
-- Biome/lint se corre dentro de cada app (`cd apps/web` / `cd apps/app`), nunca desde la raíz: cada una usa una versión distinta y la raíz resuelve la equivocada.
+- `bun install` at the root.
+- `bun run dev` / `bun run build` / `bun run test` at the root run across all apps.
+- Per app: `cd apps/<app>` and `bun run <script>`.
+- Run Biome/lint inside each app (`cd apps/web` / `cd apps/app`), never from the root: each uses a different version and the root resolves the wrong one.
 
-## Reglas
+## Rules
 
-- No compartir UI ni CSS entre apps; door.link no cambia de estilos.
-- No pushear hasta probar en local.
+- Do not share UI or CSS between apps; door.link's styles do not change.
+- Do not push until tested locally.
+- Everything written in the repo is in English: docs, code comments, commit messages, PR titles and descriptions.
