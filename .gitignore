@@ -2,3 +2,6 @@
 .DS_Store
 .vercel
 .env*.local
+
+# Local planning docs (plans, specs, references): never published
+**/docs/superpowers/
