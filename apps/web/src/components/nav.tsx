@@ -1,4 +1,8 @@
+import { APP_URL, qrSvg } from "@/lib/qr";
+import { AppDialog } from "./app-dialog";
 import { PlaybackModeToggle } from "./playback-toggle";
+
+const APP_QR = qrSvg(APP_URL);
 
 export const Nav = () => {
   return (
@@ -10,6 +14,7 @@ export const Nav = () => {
         <a href="https://shop.door.link" target="_blank" rel="noopener noreferrer">
           Shop
         </a>
+        <AppDialog qr={APP_QR} />
         <a href="mailto:contact@door.link">Contact</a>
       </div>
       <PlaybackModeToggle />
