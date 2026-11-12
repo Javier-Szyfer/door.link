@@ -1,6 +1,5 @@
 "use client";
 
-import { Star } from "lucide-react";
 import { MixActions } from "@/components/mix/mix-actions";
 import { MixRow } from "@/components/mix/mix-row";
 import { SortMenu } from "@/components/mix/sort-menu";
@@ -26,11 +25,7 @@ export function SavedScreen() {
       actions={list.length > 1 && <SortMenu order={order} onChoose={setOrder} />}
     >
       {list.length === 0 ? (
-        <EmptyState
-          icon={Star}
-          title="No saved mixes"
-          hint="Tap the star on a mix to keep it here."
-        />
+        <EmptyState title="No saved mixes" hint="Tap the star on a mix to keep it here." />
       ) : (
         list.map((mix, index) => (
           <MixRow

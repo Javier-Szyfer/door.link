@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, Ellipsis, Play, Share, Square, Star, Trash2 } from "lucide-react";
+import { ArrowDown, Ellipsis, Pause, Play, Share, Square, Star, Trash2 } from "lucide-react";
 import { type ReactNode, useRef, useState } from "react";
 import { usePlayer } from "@/components/player/audio-engine";
 import { PopoverMenu } from "@/components/shell/popover-menu";
@@ -12,9 +12,9 @@ import { useNotice } from "@/lib/use-notice";
 
 type Item = { label: string; icon: ReactNode; onSelect: () => void; destructive?: boolean };
 
-// A "…" button that opens play, favorite, download and share actions for a mix.
+// A "…" button that opens play/pause, favorite, download and share actions for a mix.
 export function MixMenu({ mix }: { mix: Mix }) {
-  const { play } = usePlayer();
+  const { current, isPlaying, play, toggle: playPause } = usePlayer();
   const { saved, toggleSaved, downloads } = useLibrary();
   const { active, start, cancel, remove } = useDownloads();
   const { notify } = useNotice();
@@ -25,6 +25,10 @@ export function MixMenu({ mix }: { mix: Mix }) {
   const isSaved = saved.has(mix.number);
   const downloading = active[mix.number] !== undefined;
   const downloaded = Boolean(downloads[mix.number]);
+  // This mix is the one loaded in the player: the item pauses or resumes it
+  // instead of starting it over.
+  const loaded = current?.number === mix.number;
+  const playing = loaded && isPlaying;
 
   const download = () => {
     notify(`Downloading ${mix.title}`);
@@ -38,7 +42,13 @@ export function MixMenu({ mix }: { mix: Mix }) {
   };
 
   const items: Item[] = [
-    { label: "Play", icon: <Play size={20} />, onSelect: () => play(mix) },
+    playing
+      ? { label: "Pause", icon: <Pause size={20} />, onSelect: playPause }
+      : {
+          label: "Play",
+          icon: <Play size={20} />,
+          onSelect: () => (loaded ? playPause() : play(mix)),
+        },
     {
       label: isSaved ? "Remove Favorite" : "Favorite",
       icon: <Star size={20} fill={isSaved ? "currentColor" : "none"} />,

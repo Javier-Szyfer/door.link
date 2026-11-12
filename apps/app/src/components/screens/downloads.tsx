@@ -1,6 +1,5 @@
 "use client";
 
-import { CircleArrowDown } from "lucide-react";
 import { DownloadButton } from "@/components/mix/download-button";
 import { MixActions } from "@/components/mix/mix-actions";
 import { MixRow } from "@/components/mix/mix-row";
@@ -32,11 +31,7 @@ export function DownloadsScreen() {
       actions={stored.length > 1 && <SortMenu order={order} onChoose={setOrder} />}
     >
       {inProgress.length === 0 && stored.length === 0 ? (
-        <EmptyState
-          icon={CircleArrowDown}
-          title="No downloads"
-          hint="Download mixes to listen without a connection."
-        />
+        <EmptyState title="No downloads" hint="Download mixes to listen without a connection." />
       ) : (
         <>
           {inProgress.map((mix) => (
