@@ -11,6 +11,13 @@ permissions:
 jobs:
   check:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [web, app]
+    defaults:
+      run:
+        working-directory: apps/${{ matrix.app }}
     steps:
       - uses: actions/checkout@v4
 
@@ -23,7 +30,9 @@ jobs:
         with:
           node-version: 24
 
-      - run: bun install --frozen-lockfile
+      - name: Install
+        run: bun install --frozen-lockfile
+        working-directory: .
 
       - name: Lint and format
         run: bunx biome check .
