@@ -3,8 +3,8 @@ import { THEME_BG } from "../lib/theme.ts";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "door",
-    short_name: "door",
+    name: "door.link",
+    short_name: "door.link",
     description: "door.link mixtapes, online and offline",
     start_url: "/",
     scope: "/",

@@ -6,6 +6,10 @@ import manifest from "./manifest.ts";
 
 describe("manifest", () => {
   const m = manifest();
+  it("is named door.link", () => {
+    assert.equal(m.name, "door.link");
+    assert.equal(m.short_name, "door.link");
+  });
   it("opens standalone", () => assert.equal(m.display, "standalone"));
   it("starts at the root", () => assert.equal(m.start_url, "/"));
   it("has a 192px icon", () => assert.ok(m.icons?.some((icon) => icon.sizes === "192x192")));

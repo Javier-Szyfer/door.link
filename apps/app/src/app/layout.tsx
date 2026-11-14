@@ -13,13 +13,13 @@ const monoFont = Anonymous_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "door",
+  title: "door.link",
   description: "door.link mixtapes, online and offline",
   robots: { index: false, follow: false },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "door",
+    title: "door.link",
     startupImage: splashImages(),
   },
   other: { "apple-mobile-web-app-capable": "yes" },
