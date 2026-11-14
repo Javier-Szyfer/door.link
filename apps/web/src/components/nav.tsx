@@ -11,10 +11,10 @@ export const Nav = () => {
         <a target="_blank" rel="noopener noreferrer" href="/rss.xml">
           RSS
         </a>
+        <AppDialog qr={APP_QR} />
         <a href="https://shop.door.link" target="_blank" rel="noopener noreferrer">
           Shop
         </a>
-        <AppDialog qr={APP_QR} />
         <a href="mailto:contact@door.link">Contact</a>
       </div>
       <PlaybackModeToggle />
