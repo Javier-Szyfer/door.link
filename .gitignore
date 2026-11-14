@@ -3,5 +3,7 @@
 .vercel
 .env*.local
 
-# Local planning docs (plans, specs, references): never published
-**/docs/superpowers/
+# Agent instructions and internal docs: local only, never in the repo
+CLAUDE.md
+AGENTS.md
+docs/
