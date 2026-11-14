@@ -23,7 +23,7 @@ const subscribe = (onChange: () => void) => {
 const isDesktop = () => window.matchMedia(DESKTOP).matches;
 const isDesktopOnServer = () => false;
 
-// The "App" link in the nav and the panel it opens, with a QR that opens the
+// The "PWA" link in the nav and the panel it opens, with a QR that opens the
 // app on a phone. On phones the panel is a centered modal and the QR itself is
 // the link. On desktop it floats bottom-right and isn't modal: a modal locks the
 // page scroll, and hiding the scrollbar would shift the whole site sideways.
@@ -32,7 +32,7 @@ export const AppDialog = ({ qr }: { qr: string }) => {
 
   return (
     <Dialog modal={!desktop}>
-      <DialogTrigger className="cursor-pointer">App</DialogTrigger>
+      <DialogTrigger className="cursor-pointer">PWA</DialogTrigger>
       <DialogPortal>
         <DialogOverlay />
         {/* Centered with inset + auto margins, not translate: the fade animation sets
