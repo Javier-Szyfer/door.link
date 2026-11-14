@@ -29,7 +29,7 @@ export function HomeSkeleton() {
       <section className="skeleton-resume pb-5">
         <SectionTitle>Continue listening</SectionTitle>
         <div className="px-4">
-          <div className={`h-14 w-[48vw] max-w-[240px] rounded-xl ${block}`} />
+          <div className={`h-14 w-[48vw] max-w-[240px] ${block}`} />
         </div>
       </section>
       <div className="skeleton-grid grid grid-cols-2 gap-x-4 gap-y-5 px-4">

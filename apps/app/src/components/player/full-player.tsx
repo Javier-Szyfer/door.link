@@ -40,7 +40,7 @@ function MixInfo({ mix }: { mix: Mix }) {
           <p className="pt-5 pb-2 text-[13px] font-semibold text-muted">Featuring</p>
           <div className="flex flex-wrap gap-2">
             {artists.map((artist) => (
-              <span key={artist} className="rounded-full bg-white/15 px-3 py-1.5 text-[13px]">
+              <span key={artist} className="bg-white/15 px-3 py-1.5 text-[13px]">
                 {artist}
               </span>
             ))}

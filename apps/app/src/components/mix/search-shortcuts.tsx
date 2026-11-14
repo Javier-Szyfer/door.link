@@ -51,7 +51,7 @@ export function SearchShortcuts({
                 key={key}
                 type="button"
                 onClick={() => onSelect({ kind: "artist", key, name })}
-                className="rounded-full bg-fill px-3 py-1.5 text-[13px] transition-transform duration-150 active:scale-95"
+                className="bg-fill px-3 py-1.5 text-[13px] transition-transform duration-150 active:scale-95"
               >
                 {name}
               </button>

@@ -66,7 +66,7 @@ export function SearchScreen() {
             type="button"
             aria-label={`Remove filter ${filter.kind === "year" ? filter.year : filter.name}`}
             onClick={() => setFilter(null)}
-            className="flex min-w-0 items-center gap-1.5 rounded-full bg-fill py-1.5 pr-2 pl-3 text-[13px] active:scale-95"
+            className="flex min-w-0 items-center gap-1.5 bg-fill py-1.5 pr-2 pl-3 text-[13px] active:scale-95"
           >
             <span className="truncate">{filter.kind === "year" ? filter.year : filter.name}</span>
             <X size={14} className="shrink-0 text-muted" />

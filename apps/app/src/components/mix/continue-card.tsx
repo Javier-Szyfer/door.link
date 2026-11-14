@@ -18,7 +18,7 @@ export function ContinueCard({ mix, progress }: { mix: Mix; progress: Progress }
       type="button"
       onClick={() => play(mix)}
       disabled={!playable}
-      className="flex w-[48vw] max-w-[240px] shrink-0 snap-start snap-always items-center gap-2.5 rounded-xl bg-fill/70 p-1.5 text-left active:scale-[0.98] disabled:opacity-40"
+      className="flex w-[48vw] max-w-[240px] shrink-0 snap-start snap-always items-center gap-2.5 bg-fill/70 p-1.5 text-left active:scale-[0.98] disabled:opacity-40"
     >
       <Artwork mix={mix} className="size-11 shrink-0 text-xs" />
       <span className="flex h-11 min-w-0 flex-1 flex-col justify-between py-0.5">
