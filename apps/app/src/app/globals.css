@@ -107,7 +107,7 @@ button {
 
 /* The loading screen takes the shape this device will end up showing. */
 .skeleton-resume,
-.skeleton-list {
+.skeleton-grid {
   display: none;
 }
 
@@ -115,11 +115,11 @@ html[data-resume] .skeleton-resume {
   display: block;
 }
 
-html[data-view="list"] .skeleton-list {
-  display: block;
+html[data-view="grid"] .skeleton-grid {
+  display: grid;
 }
 
-html[data-view="list"] .skeleton-grid {
+html[data-view="grid"] .skeleton-list {
   display: none;
 }
 

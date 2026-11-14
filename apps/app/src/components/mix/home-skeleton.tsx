@@ -32,14 +32,10 @@ export function HomeSkeleton() {
           <div className={`h-14 w-[48vw] max-w-[240px] rounded-xl ${block}`} />
         </div>
       </section>
-      <div className="px-4 pb-6">
-        <div className={`aspect-square rounded-xl ${block}`} />
-        <CardText title="w-2/3 text-[18px] leading-snug" />
-      </div>
       <div className="skeleton-grid grid grid-cols-2 gap-x-4 gap-y-5 px-4">
         {["a", "b", "c", "d"].map((key) => (
           <div key={key}>
-            <div className={`aspect-square rounded-lg ${block}`} />
+            <div className={`aspect-square ${block}`} />
             <CardText title="w-3/4 text-[13px]" />
           </div>
         ))}
@@ -47,7 +43,7 @@ export function HomeSkeleton() {
       <div className="skeleton-list">
         {["a", "b", "c", "d", "e"].map((key) => (
           <div key={key} className="flex items-center gap-3 pl-4">
-            <div className={`size-12 shrink-0 rounded-lg ${block}`} />
+            <div className={`size-12 shrink-0 ${block}`} />
             <div className="min-h-11 min-w-0 flex-1 border-b border-separator py-2.5 pr-2 box-content">
               <TextLine className="w-2/3 text-[15px]" />
               <TextLine className="w-1/4 text-[13px]" />

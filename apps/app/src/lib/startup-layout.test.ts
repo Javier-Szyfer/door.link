@@ -20,8 +20,8 @@ const run = (stored: Record<string, string>, storage = true) => {
 };
 
 describe("startupLayoutScript", () => {
-  it("marks a stored list view", () => assert.equal(run({ "door:view": "list" }).view, "list"));
-  it("leaves the grid unmarked", () => assert.equal(run({}).view, undefined));
+  it("marks a stored grid view", () => assert.equal(run({ "door:view": "grid" }).view, "grid"));
+  it("leaves the list unmarked", () => assert.equal(run({}).view, undefined));
   it("marks a pending continue listening row", () =>
     assert.equal(run({ [HAS_RESUME_KEY]: "1" }).resume, "1"));
   it("leaves no row unmarked", () => assert.equal(run({}).resume, undefined));

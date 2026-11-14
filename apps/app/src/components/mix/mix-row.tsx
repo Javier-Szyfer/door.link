@@ -26,7 +26,7 @@ export function MixRow({ mix, trailing, divider = false, showDownload = true }: 
         aria-label={`Play ${mix.title}`}
         className="shrink-0 active:opacity-60"
       >
-        <Artwork mix={mix} className="size-12 rounded-lg text-xs" />
+        <Artwork mix={mix} className="size-12 text-xs" />
       </button>
       <div
         className={`flex min-w-0 flex-1 items-center gap-1 py-2.5 pr-2 ${

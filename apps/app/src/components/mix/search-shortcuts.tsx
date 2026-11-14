@@ -29,7 +29,7 @@ export function SearchShortcuts({
                 type="button"
                 aria-label={`${year}, ${count} ${count === 1 ? "mix" : "mixes"}`}
                 onClick={() => onSelect({ kind: "year", year })}
-                className="relative size-[108px] shrink-0 snap-start overflow-hidden rounded-xl text-left text-white transition-transform duration-150 active:scale-[0.97]"
+                className="relative size-[108px] shrink-0 snap-start overflow-hidden text-left text-white transition-transform duration-150 active:scale-[0.97]"
               >
                 <Artwork mix={cover} className="absolute inset-0 size-full text-[0px]" />
                 <span className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />

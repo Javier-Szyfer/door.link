@@ -40,7 +40,7 @@ export function MiniPlayer({
         className="flex min-w-0 flex-1 items-center gap-3 text-left"
         aria-label={`Open player for ${current.title}`}
       >
-        <Artwork mix={current} className="size-8 shrink-0 rounded-lg text-[8px]" />
+        <Artwork mix={current} className="size-8 shrink-0 text-[8px]" />
         <Marquee text={line} className="text-[15px] font-medium" />
       </button>
       <button

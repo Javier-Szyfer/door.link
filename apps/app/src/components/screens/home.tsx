@@ -28,7 +28,7 @@ const VIEW_OPTIONS: { view: HomeView; label: string; icon: typeof List }[] = [
   { view: "list", label: "List", icon: List },
 ];
 
-// Home: continue listening, the newest mix large, then the catalog as a grid or a list.
+// Home: continue listening, then the catalog as a grid or a list.
 export function HomeScreen() {
   const { mixes, progress, downloads, loading, libraryLoaded, stale, refresh } = useLibrary();
   const { play } = usePlayer();
@@ -42,7 +42,6 @@ export function HomeScreen() {
   };
 
   const sorted = sortMixes(mixes, order, progress);
-  const [featured, ...rest] = sorted;
   const resume = continueListening(mixes, progress);
   const ready = homeReady({ libraryLoaded, loading, mixCount: mixes.length });
   const hasResume = resume.length > 0;
@@ -108,21 +107,16 @@ export function HomeScreen() {
         </section>
       )}
 
-      {ready && featured && (
-        <div className="px-4 pb-6">
-          <MixCard mix={featured} large />
-        </div>
-      )}
       {ready &&
         (view === "list" ? (
           <div>
-            {rest.map((mix) => (
+            {sorted.map((mix) => (
               <MixRow key={mix.number} mix={mix} divider trailing={<MixActions mix={mix} />} />
             ))}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-x-4 gap-y-5 px-4">
-            {rest.map((mix) => (
+            {sorted.map((mix) => (
               <MixCard key={mix.number} mix={mix} />
             ))}
           </div>

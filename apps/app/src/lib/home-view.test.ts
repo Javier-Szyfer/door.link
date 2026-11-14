@@ -3,10 +3,10 @@ import { describe, it } from "node:test";
 import { homeReady, parseHomeView } from "./home-view.ts";
 
 describe("parseHomeView", () => {
-  it("reads a stored list view", () => assert.equal(parseHomeView("list"), "list"));
-  it("falls back to the grid", () => {
-    assert.equal(parseHomeView(null), "grid");
-    assert.equal(parseHomeView("tiles"), "grid");
+  it("reads a stored grid view", () => assert.equal(parseHomeView("grid"), "grid"));
+  it("falls back to the list", () => {
+    assert.equal(parseHomeView(null), "list");
+    assert.equal(parseHomeView("tiles"), "list");
   });
 });
 

@@ -97,7 +97,7 @@ export function FullPlayer() {
             >
               <Artwork
                 mix={current}
-                className={`aspect-square w-full rounded-xl text-5xl shadow-artwork transition-transform duration-500 ${
+                className={`aspect-square w-full text-5xl shadow-artwork transition-transform duration-500 ${
                   isPlaying ? "scale-100" : "scale-[0.86]"
                 }`}
               />
