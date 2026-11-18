@@ -42,7 +42,7 @@ const panelStyle =
   "fixed z-50 flex w-[280px] flex-col gap-3 border border-stone-300 bg-white p-6 text-[#414141] duration-150 focus:outline-none data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 dark:bg-[#121212] dark:text-[#f1f1f1]";
 
 // The "Download" link in the nav. On desktop it opens a non-modal bottom-right
-// panel with the PWA's QR and the iOS app; on iPhone a modal with the iOS app
+// panel with the iOS app and the PWA's QR; on iPhone a modal with the iOS app
 // and the PWA; on other phones it goes straight to the PWA's install guide.
 export const AppDialog = ({ qr }: { qr: string }) => {
   const device = useSyncExternalStore(subscribe, getDevice, getServerDevice);
@@ -54,11 +54,7 @@ export const AppDialog = ({ qr }: { qr: string }) => {
       href={IOS_APP_URL}
       target="_blank"
       rel="noopener noreferrer"
-      className={
-        device === "iphone"
-          ? "flex items-center justify-center gap-1 border border-stone-300 py-3 font-medium dark:border-[#333]"
-          : "flex items-center gap-1 font-medium"
-      }
+      className="flex items-center justify-center gap-1 border border-stone-300 py-3 font-medium dark:border-[#333]"
     >
       iOS app
       <ArrowUpRight size={14} />
@@ -94,16 +90,17 @@ export const AppDialog = ({ qr }: { qr: string }) => {
         ) : (
           <DialogPrimitive.Content className={`${panelStyle} right-4 bottom-4`}>
             <DialogTitle className="font-medium">Get the app</DialogTitle>
-            <DialogDescription className="text-sm text-[#414141] dark:text-[#84858C]">
+            {iosApp}
+            <Or />
+            <p className="font-medium">PWA</p>
+            <DialogDescription className="-mt-2 text-sm text-[#414141] dark:text-[#84858C]">
               Scan with your phone's camera, then add door.link to your home screen.
             </DialogDescription>
             <div
-              className="mt-2 aspect-square w-full bg-white dark:bg-[#f1f1f1] [&>svg]:size-full"
+              className="mt-1 aspect-square w-full bg-white dark:bg-[#f1f1f1] [&>svg]:size-full"
               // biome-ignore lint/security/noDangerouslySetInnerHtml: an SVG generated at build time from a fixed URL
               dangerouslySetInnerHTML={{ __html: qr }}
             />
-            <Or />
-            {iosApp}
           </DialogPrimitive.Content>
         )}
       </DialogPortal>
