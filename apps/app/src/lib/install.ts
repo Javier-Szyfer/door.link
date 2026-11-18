@@ -1,3 +1,5 @@
+export const IOS_APP_URL = "https://apps.apple.com/us/app/door-link/id6818614516";
+
 export type InstallGuide =
   | { kind: "android" }
   | { kind: "ios-safari"; modern: boolean }
