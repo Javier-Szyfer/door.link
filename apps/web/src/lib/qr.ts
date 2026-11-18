@@ -6,6 +6,9 @@ export const APP_URL = "https://app.door.link";
 // Opens the app with its install guide showing.
 export const APP_INSTALL_URL = `${APP_URL}/?install`;
 
+// The native app on the App Store.
+export const IOS_APP_URL = "https://apps.apple.com/us/app/door-link/id6818614516";
+
 // The QR code for `text` as an SVG string: dark modules on a transparent
 // background, so whatever sits behind it is the light part. The SVG includes
 // the 4-module quiet zone the QR spec asks for, so scanners can find the edges.

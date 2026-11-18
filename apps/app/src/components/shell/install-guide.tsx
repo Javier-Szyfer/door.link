@@ -1,10 +1,10 @@
 "use client";
 
-import { Ellipsis, EllipsisVertical, Share, SquarePlus } from "lucide-react";
+import { ArrowUpRight, EllipsisVertical, Share, SquarePlus, TextAlignStart } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { type ReactNode, useEffect, useState, useSyncExternalStore } from "react";
 import { Keyhole } from "@/components/icons/keyhole";
-import { chromeIntent, type InstallGuide as Guide, installGuide } from "@/lib/install";
+import { chromeIntent, type InstallGuide as Guide, IOS_APP_URL, installGuide } from "@/lib/install";
 
 const DISMISSED_KEY = "door:install-dismissed";
 
@@ -56,7 +56,7 @@ function Steps({ guide }: { guide: Guide }) {
   const steps: [string, ReactNode?][] =
     guide.kind === "ios-safari" && guide.modern
       ? [
-          ["Tap ··· next to the address bar", <Ellipsis key="i" {...ICON} />],
+          ["Tap ≡ in the address bar", <TextAlignStart key="i" {...ICON} />],
           ["Tap Share", <Share key="i" {...ICON} />],
           ["Tap Add to Home Screen", <SquarePlus key="i" {...ICON} />],
           ["Tap Add"],
@@ -87,6 +87,28 @@ function Steps({ guide }: { guide: Guide }) {
         </Step>
       ))}
     </ol>
+  );
+}
+
+// The App Store link under the steps on iPhone, split from them by "or".
+function IosApp() {
+  return (
+    <div className="flex w-full max-w-xs flex-col items-center gap-4 text-[13px]">
+      <div className="flex w-full items-center gap-3">
+        <span className="h-px flex-1 bg-separator" />
+        or
+        <span className="h-px flex-1 bg-separator" />
+      </div>
+      <a
+        href={IOS_APP_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-1 font-semibold text-fg"
+      >
+        iOS app
+        <ArrowUpRight size={14} strokeWidth={2} />
+      </a>
+    </div>
   );
 }
 
@@ -177,6 +199,8 @@ export function InstallGuide() {
           ) : (
             <Steps guide={guide} />
           )}
+
+          {(guide.kind === "in-app" ? guide.os === "ios" : guide.kind !== "android") && <IosApp />}
 
           <button
             type="button"
