@@ -56,7 +56,7 @@ export const AppDialog = ({ qr }: { qr: string }) => {
       rel="noopener noreferrer"
       className="flex items-center justify-center gap-1 border border-stone-300 py-3 font-medium dark:border-[#333]"
     >
-      iOS app
+      iOS
       <ArrowUpRight size={14} />
     </a>
   );
