@@ -1,8 +1,8 @@
-import { APP_URL, qrSvg } from "@/lib/qr";
+import { APP_INSTALL_URL, qrSvg } from "@/lib/qr";
 import { AppDialog } from "./app-dialog";
 import { PlaybackModeToggle } from "./playback-toggle";
 
-const APP_QR = qrSvg(APP_URL);
+const APP_QR = qrSvg(APP_INSTALL_URL);
 
 export const Nav = () => {
   return (
