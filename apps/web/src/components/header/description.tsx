@@ -11,15 +11,18 @@ export const Description = () => {
       {!fullDescription ? (
         <div className="mt-7 flex lg:mt-12">
           <p>
-            A handpicked music selection, grown over time, algorithm-free, made for listening and
-            dancing.
-            <button
-              type="button"
-              onClick={handleInfo}
-              className="ml-2 cursor-pointer whitespace-nowrap text-[#1500FF] dark:text-[#84858C]"
-            >
-              [ more ]
-            </button>
+            A handpicked music selection, grown over time, algorithm-free, made for listening and{" "}
+            {/* Keeps "[ more ]" on the same line as the last word, so it never wraps alone. */}
+            <span className="whitespace-nowrap">
+              dancing.
+              <button
+                type="button"
+                onClick={handleInfo}
+                className="ml-2 cursor-pointer text-[#1500FF] dark:text-[#84858C]"
+              >
+                [ more ]
+              </button>
+            </span>
           </p>
         </div>
       ) : (
@@ -42,14 +45,17 @@ export const Description = () => {
                 Romina Malta
               </span>
             </a>{" "}
-            on Mixcloud in 2014, Door became independent in 2020 and took on a new name: door.link.
-            <button
-              type="button"
-              onClick={handleInfo}
-              className="ml-2 cursor-pointer whitespace-nowrap text-[#1500FF] dark:text-[#84858C]"
-            >
-              [ less ]
-            </button>
+            on Mixcloud in 2014, Door became independent in 2020 and took on a new name:{" "}
+            <span className="whitespace-nowrap">
+              door.link.
+              <button
+                type="button"
+                onClick={handleInfo}
+                className="ml-2 cursor-pointer text-[#1500FF] dark:text-[#84858C]"
+              >
+                [ less ]
+              </button>
+            </span>
           </p>
         </div>
       )}

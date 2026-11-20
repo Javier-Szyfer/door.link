@@ -13,8 +13,10 @@ import {
 } from "@/components/ui/dialog";
 import { APP_INSTALL_URL, IOS_APP_URL } from "@/lib/qr";
 
-// Tailwind's `lg`, where the Download link opens a QR panel instead of the app.
-const DESKTOP = "(min-width: 1024px)";
+// A computer is told apart by its mouse/trackpad, not by the window's width: a
+// narrowed desktop window must still get the QR panel, not leave the page (and
+// stop the mix that's playing).
+const DESKTOP = "(hover: hover) and (pointer: fine)";
 
 type Device = "desktop" | "iphone" | "other";
 
@@ -47,7 +49,13 @@ const panelStyle =
 export const AppDialog = ({ qr }: { qr: string }) => {
   const device = useSyncExternalStore(subscribe, getDevice, getServerDevice);
 
-  if (device === "other") return <a href={APP_INSTALL_URL}>Download</a>;
+  // New tab, so a mix playing here keeps playing.
+  if (device === "other")
+    return (
+      <a href={APP_INSTALL_URL} target="_blank" rel="noopener noreferrer">
+        Download
+      </a>
+    );
 
   const iosApp = (
     <a
